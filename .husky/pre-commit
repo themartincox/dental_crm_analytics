@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for code quality checks
+npx lint-staged
+
+# Run security audit
+npm audit --audit-level high
+
+# Check for potential security issues in code
+npx eslint src --ext .js,.jsx --format json | jq '.[] | select(.messages[].ruleId | test("security")) | .filePath' | wc -l | xargs -I {} echo "Security issues found: {}"

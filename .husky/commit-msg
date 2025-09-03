@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate commit message format for compliance tracking
+commit_regex='^(feat|fix|docs|style|refactor|test|chore|security)(\(.+\))?: .{1,72}'
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "Invalid commit message format. Use: type(scope): description"
+    echo "Types: feat, fix, docs, style, refactor, test, chore, security"
+    echo "Example: feat(auth): add audit logging for user sessions"
+    exit 1
+fi
+
+# Check for security-related commits
+if grep -qE "^security" "$1"; then
+    echo "Security-related commit detected. Ensure proper testing and review."
+fi
