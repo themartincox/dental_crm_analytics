@@ -13,10 +13,25 @@ const Checkbox = React.forwardRef(({
     description,
     error,
     size = "default",
+    onCheckedChange,
+    onChange,
     ...props
 }, ref) => {
     // Generate unique ID if not provided
     const checkboxId = id || `checkbox-${Math.random()?.toString(36)?.substr(2, 9)}`;
+
+    // Handle checkbox change
+    const handleChange = (e) => {
+        const isChecked = e?.target?.checked;
+        
+        // Call both handlers if provided
+        if (onChange) {
+            onChange(e);
+        }
+        if (onCheckedChange) {
+            onCheckedChange(isChecked);
+        }
+    };
 
     // Size variants
     const sizeClasses = {
@@ -35,6 +50,7 @@ const Checkbox = React.forwardRef(({
                     checked={checked}
                     disabled={disabled}
                     required={required}
+                    onChange={handleChange}
                     className="sr-only"
                     {...props}
                 />
@@ -42,19 +58,20 @@ const Checkbox = React.forwardRef(({
                 <label
                     htmlFor={checkboxId}
                     className={cn(
-                        "peer shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground cursor-pointer transition-colors",
+                        "peer shrink-0 rounded-sm border-2 border-gray-300 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer transition-all duration-200 flex items-center justify-center",
                         sizeClasses?.[size],
-                        checked && "bg-primary text-primary-foreground border-primary",
-                        indeterminate && "bg-primary text-primary-foreground border-primary",
-                        error && "border-destructive",
-                        disabled && "cursor-not-allowed opacity-50"
+                        checked && "bg-blue-600 text-white border-blue-600",
+                        indeterminate && "bg-blue-600 text-white border-blue-600",
+                        error && "border-red-500",
+                        disabled && "cursor-not-allowed opacity-50 bg-gray-100",
+                        !checked && !indeterminate && "hover:border-blue-400"
                     )}
                 >
                     {checked && !indeterminate && (
-                        <Check className="h-3 w-3 text-current flex items-center justify-center" />
+                        <Check className="h-3 w-3 text-current" />
                     )}
                     {indeterminate && (
-                        <Minus className="h-3 w-3 text-current flex items-center justify-center" />
+                        <Minus className="h-3 w-3 text-current" />
                     )}
                 </label>
             </div>
@@ -65,22 +82,22 @@ const Checkbox = React.forwardRef(({
                             htmlFor={checkboxId}
                             className={cn(
                                 "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer",
-                                error ? "text-destructive" : "text-foreground"
+                                error ? "text-red-600" : "text-gray-900"
                             )}
                         >
                             {label}
-                            {required && <span className="text-destructive ml-1">*</span>}
+                            {required && <span className="text-red-500 ml-1">*</span>}
                         </label>
                     )}
 
                     {description && !error && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                             {description}
                         </p>
                     )}
 
                     {error && (
-                        <p className="text-sm text-destructive">
+                        <p className="text-sm text-red-600">
                             {error}
                         </p>
                     )}

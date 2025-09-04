@@ -84,7 +84,7 @@ const WidgetConfigurationDashboard = () => {
   };
 
   const createNewWidget = () => {
-    setSelectedWidget({
+    const newWidget = {
       id: `widget-${Date.now()}`,
       name: 'New Widget',
       practiceId: 'practice-1',
@@ -104,7 +104,9 @@ const WidgetConfigurationDashboard = () => {
         showHeader: true,
         enableAnalytics: true,
         showGDCInfo: false,
-        allowedOrigins: ['*']
+        allowedOrigins: ['*'],
+        language: 'en',
+        customCSS: ''
       },
       analytics: {
         views: 0,
@@ -112,7 +114,9 @@ const WidgetConfigurationDashboard = () => {
         conversionRate: 0,
         avgSessionTime: '0:00'
       }
-    });
+    };
+    
+    setSelectedWidget(newWidget);
     setIsCreating(true);
     setActiveTab('builder');
   };
@@ -345,7 +349,11 @@ const WidgetConfigurationDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setSelectedWidget(widget)}
+                        onClick={() => {
+                          setSelectedWidget(widget);
+                          setIsCreating(false);
+                          setActiveTab('builder');
+                        }}
                         className="text-blue-600 hover:text-blue-800"
                         title="Edit"
                       >
@@ -385,6 +393,7 @@ const WidgetConfigurationDashboard = () => {
         <div className="col-span-8">
           {activeTab === 'builder' && (
             <WidgetBuilder
+              key={selectedWidget?.id} // Force re-render when widget changes
               widget={selectedWidget}
               onSave={saveWidget}
               onCancel={() => {

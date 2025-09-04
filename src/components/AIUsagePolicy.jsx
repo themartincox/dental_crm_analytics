@@ -25,6 +25,18 @@ const AIUsagePolicy = () => {
     checkAuthStatus();
   }, []);
 
+  // Log policy view event when component mounts and user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      logAIUsageEvent('ai_policy_viewed', {
+        action: 'policy_document_accessed',
+        userRole: userRole,
+        containsHealthData: false,
+        policySection: 'full_document'
+      });
+    }
+  }, [isLoggedIn, userRole]);
+
   const logAIUsageEvent = async (eventType, details) => {
     if (!isLoggedIn) return;
 
@@ -330,16 +342,6 @@ const AIUsagePolicy = () => {
             </a>
           </p>
         </div>
-      </div>
-
-      {/* Log Policy View Event */}
-      <div className="hidden">
-        {isLoggedIn && logAIUsageEvent('ai_policy_viewed', {
-          action: 'policy_document_accessed',
-          userRole: userRole,
-          containsHealthData: false,
-          policySection: 'full_document'
-        })}
       </div>
     </div>
   );

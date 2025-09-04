@@ -9,6 +9,27 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
   const [formData, setFormData] = useState(widget);
   const [availableServices, setAvailableServices] = useState([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Ensure formData is properly initialized
+    if (widget) {
+      setFormData({
+        ...widget,
+        settings: {
+          allowedServices: [],
+          autoResize: true,
+          showHeader: true,
+          enableAnalytics: true,
+          showGDCInfo: false,
+          allowedOrigins: ['*'],
+          language: 'en',
+          customCSS: '',
+          ...widget?.settings
+        }
+      });
+    }
+  }, [widget]);
 
   useEffect(() => {
     // Load available services from practice data
@@ -41,11 +62,11 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     }));
   };
 
-  const handleServiceToggle = (serviceId) => {
+  const handleServiceToggle = (serviceId, checked) => {
     const currentServices = formData?.settings?.allowedServices || [];
-    const updatedServices = currentServices?.includes(serviceId)
-      ? currentServices?.filter(id => id !== serviceId)
-      : [...currentServices, serviceId];
+    const updatedServices = checked
+      ? [...currentServices, serviceId]
+      : currentServices?.filter(id => id !== serviceId);
     
     handleSettingsChange('allowedServices', updatedServices);
   };
@@ -160,21 +181,33 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
           </p>
           
           <div className="grid grid-cols-2 gap-3">
-            {availableServices?.map((service) => (
-              <div key={service?.id} className="flex items-center">
-                <Checkbox
-                  id={`service-${service?.id}`}
-                  checked={formData?.settings?.allowedServices?.includes(service?.id) || false}
-                  onCheckedChange={() => handleServiceToggle(service?.id)}
-                />
-                <label 
-                  htmlFor={`service-${service?.id}`}
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  {service?.name}
-                </label>
-              </div>
-            ))}
+            {availableServices?.map((service) => {
+              const isChecked = formData?.settings?.allowedServices?.includes(service?.id) || false;
+              
+              return (
+                <div key={service?.id} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`service-${service?.id}`}
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handleServiceToggle(service?.id, checked)}
+                  />
+                  <label 
+                    htmlFor={`service-${service?.id}`}
+                    className="text-sm text-gray-700 cursor-pointer select-none"
+                  >
+                    {service?.name}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Service selection feedback */}
+          <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+            {formData?.settings?.allowedServices?.length > 0 
+              ? `${formData?.settings?.allowedServices?.length} service(s) selected`
+              : 'All services will be available when no specific services are selected'
+            }
           </div>
         </div>
 
@@ -182,54 +215,71 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
         <div className="space-y-4">
           <h4 className="text-md font-medium text-gray-900">Display Settings</h4>
           
-          <div className="space-y-3">
-            <div className="flex items-center">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
               <Checkbox
                 id="auto-resize"
                 checked={formData?.settings?.autoResize !== false}
                 onCheckedChange={(checked) => handleSettingsChange('autoResize', checked)}
               />
-              <label htmlFor="auto-resize" className="ml-2 text-sm text-gray-700">
-                Auto-resize widget height based on content
-              </label>
+              <div className="flex-1">
+                <label htmlFor="auto-resize" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Auto-resize widget height based on content
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  Dynamically adjusts widget height to fit content
+                </p>
+              </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-start space-x-3">
               <Checkbox
                 id="show-header"
                 checked={formData?.settings?.showHeader !== false}
                 onCheckedChange={(checked) => handleSettingsChange('showHeader', checked)}
               />
-              <label htmlFor="show-header" className="ml-2 text-sm text-gray-700">
-                Show widget header with progress indicators
-              </label>
+              <div className="flex-1">
+                <label htmlFor="show-header" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Show widget header with progress indicators
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  Display step-by-step progress indicators at the top
+                </p>
+              </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-start space-x-3">
               <Checkbox
                 id="enable-analytics"
                 checked={formData?.settings?.enableAnalytics !== false}
                 onCheckedChange={(checked) => handleSettingsChange('enableAnalytics', checked)}
               />
-              <label htmlFor="enable-analytics" className="ml-2 text-sm text-gray-700">
-                Enable analytics tracking
-              </label>
+              <div className="flex-1">
+                <label htmlFor="enable-analytics" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Enable analytics tracking
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  Track user interactions and conversion metrics
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-start space-x-3">
               <Checkbox
                 id="show-gdc-info"
                 checked={formData?.settings?.showGDCInfo === true}
                 onCheckedChange={(checked) => handleSettingsChange('showGDCInfo', checked)}
               />
-              <label htmlFor="show-gdc-info" className="ml-2 text-sm text-gray-700">
-                Show GDC compliance information
-              </label>
+              <div className="flex-1">
+                <label htmlFor="show-gdc-info" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Show GDC compliance information
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  Display General Dental Council information and regulatory details.
+                  Typically disabled when embedding on practice websites that already contain this information.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Display General Dental Council information and regulatory details. 
-              Typically disabled when embedding on practice websites that already contain this information.
-            </p>
           </div>
         </div>
 
