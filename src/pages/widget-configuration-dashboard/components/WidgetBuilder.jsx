@@ -215,6 +215,21 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                 Enable analytics tracking
               </label>
             </div>
+
+            <div className="flex items-center">
+              <Checkbox
+                id="show-gdc-info"
+                checked={formData?.settings?.showGDCInfo === true}
+                onCheckedChange={(checked) => handleSettingsChange('showGDCInfo', checked)}
+              />
+              <label htmlFor="show-gdc-info" className="ml-2 text-sm text-gray-700">
+                Show GDC compliance information
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 mt-1 ml-6">
+              Display General Dental Council information and regulatory details. 
+              Typically disabled when embedding on practice websites that already contain this information.
+            </p>
           </div>
         </div>
 

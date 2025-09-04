@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Check, Calendar, Shield, X, Minimize2, Maximize2 } from 'lucide-react';
 
 import ServiceSelection from '../public-booking-interface/components/ServiceSelection';
-
 import TimeSlotSelection from '../public-booking-interface/components/TimeSlotSelection';
 import PatientInformation from '../public-booking-interface/components/PatientInformation';
 import PaymentForm from '../public-booking-interface/components/PaymentForm';
 import BookingConfirmation from '../public-booking-interface/components/BookingConfirmation';
+import GDCFooter from '../../components/GDCFooter';
 
 const EmbeddableBookingWidget = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -86,6 +86,7 @@ const EmbeddableBookingWidget = () => {
       language,
       autoResize: urlParams?.get('autoResize') !== 'false',
       showHeader: urlParams?.get('showHeader') !== 'false',
+      showGDCInfo: urlParams?.get('showGDCInfo') === 'true',
       enableAnalytics: urlParams?.get('analytics') !== 'false'
     };
 
@@ -586,6 +587,13 @@ const EmbeddableBookingWidget = () => {
           <div className="flex items-center justify-center text-sm text-gray-400">
             <span>Powered by DentalCRM</span>
           </div>
+        </div>
+      )}
+      
+      {/* Conditionally render GDC Footer for widget */}
+      {widgetConfig?.showGDCInfo && !isMinimized && (
+        <div className="border-t border-gray-200">
+          <GDCFooter />
         </div>
       )}
     </div>

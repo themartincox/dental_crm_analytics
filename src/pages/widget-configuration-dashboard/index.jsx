@@ -103,6 +103,7 @@ const WidgetConfigurationDashboard = () => {
         autoResize: true,
         showHeader: true,
         enableAnalytics: true,
+        showGDCInfo: false,
         allowedOrigins: ['*']
       },
       analytics: {
@@ -159,6 +160,7 @@ const WidgetConfigurationDashboard = () => {
       services: widget?.settings?.allowedServices?.join(','),
       autoResize: widget?.settings?.autoResize,
       showHeader: widget?.settings?.showHeader,
+      showGDCInfo: widget?.settings?.showGDCInfo,
       analytics: widget?.settings?.enableAnalytics
     };
 

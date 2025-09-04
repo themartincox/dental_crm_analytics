@@ -5,6 +5,7 @@ import { Check, Calendar, Clock, CreditCard, Shield, Star, MapPin, Phone, Mail }
 
 import Select from '../../components/ui/Select';
 import Icon from '../../components/AppIcon';
+import GDCFooter from '../../components/GDCFooter';
 import ServiceSelection from './components/ServiceSelection';
 import DentistSelection from './components/DentistSelection';
 import TimeSlotSelection from './components/TimeSlotSelection';
@@ -12,7 +13,7 @@ import PatientInformation from './components/PatientInformation';
 import PaymentForm from './components/PaymentForm';
 import BookingConfirmation from './components/BookingConfirmation';
 
-const PublicBookingInterface = () => {
+const PublicBookingInterface = ({ showGDCInfo = false }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState({
     service: null,
@@ -427,6 +428,9 @@ const PublicBookingInterface = () => {
           </div>
         )}
       </div>
+      
+      {/* Conditionally render GDC Footer */}
+      {showGDCInfo && <GDCFooter />}
     </div>
   );
 };
