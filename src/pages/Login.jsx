@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2, Chrome } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import SEOHead from '../components/SEOHead';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   
-  const { signIn, signUp, loading, isAuthenticated, error: authError } = useAuth();
+  const { signIn, signInWithGoogle, signUp, loading, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -48,6 +49,29 @@ const Login = () => {
     
     setErrors(newErrors);
     return Object.keys(newErrors)?.length === 0;
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('');
+      setSubmitError('');
+      setIsLoading(true);
+      
+      const result = await signInWithGoogle();
+      
+      if (result?.error) {
+        console.error('Google OAuth Error:', result?.error);
+        setError(result?.error?.message || 'Failed to authenticate with Google');
+        return;
+      }
+      
+      // OAuth redirect will handle the rest
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setError('An unexpected error occurred during Google authentication.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -130,206 +154,264 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Mail className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            {isSignUp ? 'Create your account' : 'Sign in to your account'}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {isSignUp ? 'Join your dental practice team' : 'Access your dental CRM dashboard'}
-          </p>
-        </div>
-
-        {/* Form */}
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-xl shadow-lg" onSubmit={handleSubmit}>
-          {/* Global Error */}
-          {(submitError || error || authError?.message || message) && (
-            <div className={`border rounded-lg p-4 flex items-start gap-3 ${
-              message ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-            }`}>
-              <AlertCircle className={`h-5 w-5 flex-shrink-0 mt-0.5 ${
-                message ? 'text-green-500' : 'text-red-500'
-              }`} />
-              <div className={`text-sm ${message ? 'text-green-700' : 'text-red-700'}`}>
-                {message || submitError || error || authError?.message}
-              </div>
+    <>
+      <SEOHead 
+        title={`${isSignUp ? 'Create Account' : 'Sign In'} | Dental CRM`}
+        description="Secure OAuth authentication to access your dental practice management system"
+      />
+      
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          {/* Header */}
+          <div className="text-center">
+            <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Mail className="h-6 w-6 text-white" />
             </div>
-          )}
-
-          <div className="space-y-5">
-            {/* Full Name for Sign Up */}
-            {isSignUp && (
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  autoComplete="name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e?.target?.value)}
-                  placeholder="Enter your full name"
-                />
-              </div>
-            )}
-
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <div className="relative">
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e?.target?.value)}
-                  className={errors?.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
-                  placeholder="Enter your email"
-                />
-                <Mail className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
-              </div>
-              {errors?.email && (
-                <p className="mt-1 text-sm text-red-600">{errors?.email}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e?.target?.value)}
-                  className={errors?.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {errors?.password && (
-                <p className="mt-1 text-sm text-red-600">{errors?.password}</p>
-              )}
-            </div>
-
-            {/* Role for Sign Up */}
-            {isSignUp && (
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  value={role}
-                  onChange={(e) => setRole(e?.target?.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="receptionist">Receptionist</option>
-                  <option value="dentist">Dentist</option>
-                  <option value="hygienist">Hygienist</option>
-                  <option value="manager">Manager</option>
-                </select>
-              </div>
-            )}
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              {isSignUp ? 'Create your account' : 'Sign in to your account'}
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              {isSignUp ? 'Join your dental practice team' : 'Access your dental CRM dashboard'}
+            </p>
           </div>
 
-          {/* Remember Me */}
-          {!isSignUp && (
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e?.target?.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div>
-            <Button
-              type="submit"
-              disabled={loading || isLoading}
-              className="w-full flex justify-center py-3 px-4 text-sm font-medium"
-            >
-              {loading || isLoading ? (
-                <>
-                  <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                  {isSignUp ? 'Creating Account...' : 'Signing In...'}
-                </>
-              ) : (
-                <>
-                  <Lock className="-ml-1 mr-2 h-4 w-4" />
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Demo Login Button */}
-          {!isSignUp && (
-            <div>
+          {/* OAuth Section */}
+          <div className="bg-white p-8 rounded-xl shadow-lg">
+            {/* Google OAuth Button */}
+            <div className="space-y-4">
               <Button
                 type="button"
-                variant="outline"
-                onClick={handleDemoLogin}
+                onClick={handleGoogleSignIn}
                 disabled={loading || isLoading}
-                className="w-full flex justify-center py-3 px-4 text-sm font-medium"
+                variant="outline"
+                className="w-full flex justify-center items-center py-3 px-4 text-sm font-medium border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                Try Demo Account
+                {loading || isLoading ? (
+                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                ) : (
+                  <Chrome className="h-5 w-5 mr-2" />
+                )}
+                {loading || isLoading ? 'Authenticating...' : `${isSignUp ? 'Sign up' : 'Sign in'} with Google`}
               </Button>
-            </div>
-          )}
 
-          {/* Toggle Form */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setErrors({});
-                setSubmitError('');
-                setError('');
-                setMessage('');
-              }}
-              className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-            >
-              {isSignUp
-                ? 'Already have an account? Sign in' :'Need an account? Sign up'
-              }
-            </button>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+              {/* Global Error */}
+              {(submitError || error || authError?.message || message) && (
+                <div className={`border rounded-lg p-4 flex items-start gap-3 ${
+                  message ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                }`}>
+                  <AlertCircle className={`h-5 w-5 flex-shrink-0 mt-0.5 ${
+                    message ? 'text-green-500' : 'text-red-500'
+                  }`} />
+                  <div className={`text-sm ${message ? 'text-green-700' : 'text-red-700'}`}>
+                    {message || submitError || error || authError?.message}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-5">
+                {/* Full Name for Sign Up */}
+                {isSignUp && (
+                  <div>
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <Input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      autoComplete="name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e?.target?.value)}
+                      placeholder="Enter your full name"
+                      disabled={loading || isLoading}
+                    />
+                  </div>
+                )}
+
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e?.target?.value)}
+                      className={errors?.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
+                      placeholder="Enter your email"
+                      disabled={loading || isLoading}
+                    />
+                    <Mail className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+                  </div>
+                  {errors?.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors?.email}</p>
+                  )}
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e?.target?.value)}
+                      className={errors?.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
+                      placeholder="Enter your password"
+                      disabled={loading || isLoading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={loading || isLoading}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {errors?.password && (
+                    <p className="mt-1 text-sm text-red-600">{errors?.password}</p>
+                  )}
+                </div>
+
+                {/* Role for Sign Up */}
+                {isSignUp && (
+                  <div>
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                      Role
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={role}
+                      onChange={(e) => setRole(e?.target?.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      disabled={loading || isLoading}
+                    >
+                      <option value="receptionist">Receptionist</option>
+                      <option value="dentist">Dentist</option>
+                      <option value="hygienist">Hygienist</option>
+                      <option value="manager">Manager</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Remember Me */}
+              {!isSignUp && (
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e?.target?.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    disabled={loading || isLoading}
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                    Remember me
+                  </label>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div>
+                <Button
+                  type="submit"
+                  disabled={loading || isLoading}
+                  className="w-full flex justify-center py-3 px-4 text-sm font-medium"
+                >
+                  {loading || isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                      {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="-ml-1 mr-2 h-4 w-4" />
+                      {isSignUp ? 'Create Account' : 'Sign In'}
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Demo Login Button */}
+              {!isSignUp && (
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDemoLogin}
+                    disabled={loading || isLoading}
+                    className="w-full flex justify-center py-3 px-4 text-sm font-medium"
+                  >
+                    Try Demo Account
+                  </Button>
+                </div>
+              )}
+
+              {/* Toggle Form */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(!isSignUp);
+                    setErrors({});
+                    setSubmitError('');
+                    setError('');
+                    setMessage('');
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+                  disabled={loading || isLoading}
+                >
+                  {isSignUp
+                    ? 'Already have an account? Sign in' :'Need an account? Sign up'
+                  }
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+          
+          {/* Terms and Conditions */}
+          <div className="text-center">
+            <p className="text-xs text-gray-500">
+              By continuing, you agree to our{' '}
+              <a href="/privacy-policy" className="text-blue-600 hover:text-blue-500">
+                Privacy Policy
+              </a>{' '}
+              and{' '}
+              <a href="/gdc-standards" className="text-blue-600 hover:text-blue-500">
+                Terms of Service
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

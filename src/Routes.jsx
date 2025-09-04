@@ -9,6 +9,7 @@ import Login from "pages/Login";
 import CookieConsent from "components/CookieConsent";
 import GDCFooter from "components/GDCFooter";
 import AIUsagePolicyPage from './pages/AIUsagePolicy';
+import ServerValidatedProtectedRoute from './components/ServerValidatedProtectedRoute';
 
 // Lazy load dashboard components for better performance
 const LeadGenerationConversionAnalyticsDashboard = lazy(() => import('./pages/lead-generation-conversion-analytics-dashboard'));
@@ -56,82 +57,54 @@ const Routes = () => {
                   <Route path="/privacy-policy" element={<div className="p-8"><h1>Privacy Policy</h1><p>Privacy policy content...</p></div>} />
                   <Route path="/gdc-standards" element={<div className="p-8"><h1>GDC Standards</h1><p>GDC standards content...</p></div>} />
                   
-                  {/* Protected Routes - Admin/Manager Only */}
-                  <Route 
-                    path="/" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <PracticePerformanceOverviewDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/compliance-operations-monitoring-dashboard" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <ComplianceOperationsMonitoringDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/widget-configuration-dashboard" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <WidgetConfigurationDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/cross-site-analytics-dashboard" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <CrossSiteAnalyticsDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Protected Routes - Staff Access */}
+                  {/* F3 - Protected routes with server-side validation */}
                   <Route 
                     path="/patient-management-dashboard" 
                     element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'dentist', 'hygienist', 'receptionist', 'manager']}>
+                      <ServerValidatedProtectedRoute requireClinicalAccess={true}>
                         <PatientManagementDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/appointment-scheduler" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'dentist', 'receptionist', 'manager']}>
-                        <AppointmentScheduler />
-                      </ProtectedRoute>
+                      </ServerValidatedProtectedRoute>
                     } 
                   />
                   
                   <Route 
-                    path="/lead-generation-conversion-analytics-dashboard" 
+                    path="/appointment-scheduler" 
                     element={
-                      <ProtectedRoute>
-                        <LeadGenerationConversionAnalyticsDashboard />
-                      </ProtectedRoute>
+                      <ServerValidatedProtectedRoute requiredRoles={['dentist', 'hygienist', 'receptionist']}>
+                        <AppointmentScheduler />
+                      </ServerValidatedProtectedRoute>
                     } 
                   />
+                  
+                  {/* F3 - Admin routes with strict server validation */}
                   <Route 
-                    path="/patient-journey-revenue-optimization-dashboard" 
+                    path="/compliance-operations-monitoring-dashboard" 
                     element={
-                      <ProtectedRoute>
-                        <PatientJourneyRevenueDashboard />
-                      </ProtectedRoute>
+                      <ServerValidatedProtectedRoute requireAdminAccess={true}>
+                        <ComplianceOperationsMonitoringDashboard />
+                      </ServerValidatedProtectedRoute>
                     } 
                   />
+                  
+                  <Route 
+                    path="/practice-performance-overview-dashboard" 
+                    element={
+                      <ServerValidatedProtectedRoute requireAdminAccess={true}>
+                        <PracticePerformanceOverviewDashboard />
+                      </ServerValidatedProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* F3 - Marketing routes with specific access control */}
                   <Route 
                     path="/lead-management-screen" 
                     element={
-                      <ProtectedRoute>
+                      <ServerValidatedProtectedRoute requireMarketingAccess={true}>
                         <LeadManagementScreen />
-                      </ProtectedRoute>
+                      </ServerValidatedProtectedRoute>
                     } 
                   />
+                  
                   <Route 
                     path="/booking-confirmation-payment-processing" 
                     element={
@@ -145,6 +118,23 @@ const Routes = () => {
                     element={
                       <ProtectedRoute>
                         <ServiceProviderMatchingEngine />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  <Route 
+                    path="/widget-configuration-dashboard" 
+                    element={
+                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
+                        <WidgetConfigurationDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/cross-site-analytics-dashboard" 
+                    element={
+                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
+                        <CrossSiteAnalyticsDashboard />
                       </ProtectedRoute>
                     } 
                   />

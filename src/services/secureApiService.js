@@ -56,152 +56,203 @@ const decryptSensitiveData = (encryptedData) => {
     }
 };
 
-// F3 - Secure API methods with server-side RBAC validation
+// F3 Resolution - Enhanced server-side RBAC validation
+class SecureApiService {
+    constructor() {
+        this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+        this.requestId = 0;
+    }
 
-export const securePatientService = {
-    // Get patients with server-side security validation
-    async getPatients(filters = {}) {
+    // Enhanced authentication with server-side role validation
+    async validateServerSideAccess(requiredRole = null, requiredPermissions = []) {
         try {
-            const params = new URLSearchParams();
-            Object.entries(filters)?.forEach(([key, value]) => {
-                if (value && value !== 'all') {
-                    params?.append(key, value);
-                }
+            const token = await this.getAuthToken();
+            
+            const response = await fetch(`${this.baseUrl}/auth/validate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-Request-ID': `${Date.now()}-${++this.requestId}`
+                },
+                body: JSON.stringify({
+                    requiredRole,
+                    requiredPermissions,
+                    endpoint: window.location?.pathname,
+                    timestamp: new Date().toISOString()
+                })
             });
 
-            const response = await apiClient?.get(`/patients?${params}`);
-            const { data } = response?.data;
+            if (!response?.ok) {
+                throw new Error(`Server-side validation failed: ${response?.status}`);
+            }
 
-            // Decrypt sensitive data for display
-            return data?.map(patient => ({
-                ...patient,
-                email: patient?.email ? decryptSensitiveData(patient?.email) : null,
-                phone: patient?.phone ? decryptSensitiveData(patient?.phone) : null,
-                dateOfBirth: patient?.date_of_birth ? decryptSensitiveData(patient?.date_of_birth) : null,
-                name: `${patient?.first_name} ${patient?.last_name}`,
-                assignedDentist: patient?.assigned_dentist?.full_name || 'Unassigned'
-            })) || [];
-        } catch (error) {
-            console.error('Secure patient service error:', error);
-            throw new Error('Failed to fetch patients securely');
-        }
-    },
-
-    async createPatient(patientData) {
-        try {
-            const response = await apiClient?.post('/patients', patientData);
-            return response?.data;
-        } catch (error) {
-            console.error('Create patient error:', error);
-            throw new Error('Failed to create patient');
-        }
-    },
-
-    async updatePatient(patientId, updates) {
-        try {
-            const response = await apiClient?.put(`/patients/${patientId}`, updates);
-            return response?.data;
-        } catch (error) {
-            console.error('Update patient error:', error);
-            throw new Error('Failed to update patient');
-        }
-    },
-
-    async deletePatient(patientId) {
-        try {
-            const response = await apiClient?.delete(`/patients/${patientId}`);
-            return response?.data;
-        } catch (error) {
-            console.error('Delete patient error:', error);
-            throw new Error('Failed to delete patient');
-        }
-    }
-};
-
-export const secureLeadService = {
-    // F5 - Separate marketing data from clinical data
-    async getLeads(filters = {}) {
-        try {
-            const params = new URLSearchParams();
-            Object.entries(filters)?.forEach(([key, value]) => {
-                if (value && value !== 'all') {
-                    params?.append(key, value);
-                }
+            const validation = await response?.json();
+            
+            // Log security event
+            await this.logSecurityEvent('access_validation', {
+                valid: validation?.valid,
+                role: validation?.userRole,
+                permissions: validation?.userPermissions,
+                requiredRole,
+                requiredPermissions
             });
 
-            const response = await apiClient?.get(`/leads?${params}`);
-            return response?.data?.data || [];
+            return validation;
         } catch (error) {
-            console.error('Secure lead service error:', error);
-            throw new Error('Failed to fetch leads securely');
-        }
-    },
-
-    async createLead(leadData) {
-        try {
-            const response = await apiClient?.post('/leads', leadData);
-            return response?.data;
-        } catch (error) {
-            console.error('Create lead error:', error);
-            throw new Error('Failed to create lead');
-        }
-    },
-
-    async withdrawConsent(leadId) {
-        try {
-            const response = await apiClient?.post(`/leads/${leadId}/withdraw-consent`);
-            return response?.data;
-        } catch (error) {
-            console.error('Withdraw consent error:', error);
-            throw new Error('Failed to withdraw consent');
+            await this.logSecurityEvent('access_validation_failed', {
+                error: error?.message,
+                requiredRole,
+                requiredPermissions
+            });
+            throw error;
         }
     }
-};
 
-export const secureUserService = {
-    async getProfile() {
-        try {
-            const response = await apiClient?.get('/profile');
-            return response?.data?.data;
-        } catch (error) {
-            console.error('Get profile error:', error);
-            throw new Error('Failed to fetch user profile');
-        }
-    },
+    // F3 - Enhanced secure request with mandatory role validation
+    async makeSecureRequest(url, options = {}, requiredRole = null) {
+        let retryCount = 0;
+        const maxRetries = 2;
 
-    async updateProfile(updates) {
-        try {
-            const response = await apiClient?.put('/profile', updates);
-            return response?.data;
-        } catch (error) {
-            console.error('Update profile error:', error);
-            throw new Error('Failed to update profile');
+        while (retryCount <= maxRetries) {
+            try {
+                // Step 1: Validate server-side access first
+                if (requiredRole) {
+                    const validation = await this.validateServerSideAccess(requiredRole);
+                    if (!validation?.valid) {
+                        throw new Error(`Access denied - insufficient privileges for role: ${requiredRole}`);
+                    }
+                }
+
+                // Step 2: Make authenticated request with role headers
+                const token = await this.getAuthToken();
+                
+                const response = await fetch(`${this.baseUrl}${url}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-Request-ID': `${Date.now()}-${++this.requestId}`,
+                        'X-Required-Role': requiredRole || '',
+                        'X-Client-Validation': 'true',
+                        ...options?.headers
+                    }
+                });
+
+                if (!response?.ok) {
+                    if (response?.status === 401 && retryCount < maxRetries) {
+                        retryCount++;
+                        continue;
+                    }
+                    
+                    if (response?.status === 403) {
+                        throw new Error('Server-side RBAC validation failed - access denied');
+                    }
+                    
+                    const errorData = await response?.json?.().catch(() => ({}));
+                    throw new Error(errorData?.message || `HTTP ${response?.status}: ${response?.statusText}`);
+                }
+
+                const data = await response?.json();
+                
+                // Log successful authenticated request
+                await this.logSecurityEvent('authenticated_request', {
+                    endpoint: url,
+                    method: options?.method || 'GET',
+                    role: requiredRole,
+                    success: true
+                });
+
+                return data;
+            } catch (error) {
+                if (retryCount >= maxRetries) {
+                    await this.logSecurityEvent('request_failed', {
+                        endpoint: url,
+                        error: error?.message,
+                        requiredRole
+                    });
+                    throw error;
+                }
+                retryCount++;
+                await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            }
         }
     }
-};
 
-// F4 & F5 - Admin-only security and compliance functions
-export const secureAdminService = {
-    async getAuditLogs() {
+    // Enhanced security event logging
+    async logSecurityEvent(eventType, metadata = {}) {
         try {
-            const response = await apiClient?.get('/admin/audit-logs');
-            return response?.data?.data || [];
+            const token = await this.getAuthToken();
+            
+            await fetch(`${this.baseUrl}/security/log`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    event: eventType,
+                    metadata: {
+                        ...metadata,
+                        userAgent: navigator?.userAgent,
+                        timestamp: new Date().toISOString(),
+                        url: window.location?.href,
+                        referrer: document?.referrer
+                    },
+                    riskLevel: this.calculateRiskLevel(eventType, metadata)
+                })
+            });
         } catch (error) {
-            console.error('Get audit logs error:', error);
-            throw new Error('Failed to fetch audit logs');
+            console.warn('Security logging failed:', error);
+            // Don't throw - logging failures shouldn't break app functionality
         }
-    },
+    }
 
-    async markDataForDeletion() {
-        try {
-            const response = await apiClient?.post('/admin/mark-for-deletion');
-            return response?.data;
-        } catch (error) {
-            console.error('Mark for deletion error:', error);
-            throw new Error('Failed to mark data for deletion');
+    // Calculate risk level for security events
+    calculateRiskLevel(eventType, metadata) {
+        if (eventType.includes('failed') || eventType.includes('denied')) {
+            return 'high';
         }
-    },
+        if (metadata?.requiredRole === 'super_admin' || metadata?.requiredRole === 'practice_admin') {
+            return 'medium';
+        }
+        return 'low';
+    }
 
+    // Enhanced service methods with role validation
+    patients = {
+        list: async (filters = {}) => {
+            return this.makeSecureRequest(`/patients?${new URLSearchParams(filters)}`, 
+                { method: 'GET' }, 'dentist'); // Requires dentist role
+        },
+
+        get: async (patientId) => {
+            return this.makeSecureRequest(`/patients/${patientId}`, 
+                { method: 'GET' }, 'dentist');
+        },
+
+        create: async (patientData) => {
+            return this.makeSecureRequest('/patients', {
+                method: 'POST',
+                body: JSON.stringify(patientData)
+            }, 'dentist'); // Only dentists can create patients
+        }
+    };
+
+    // Admin-only operations with strict role validation
+    security = {
+        getAuditLogs: async (filters = {}) => {
+            return this.makeSecureRequest(`/security/audit-logs?${new URLSearchParams(filters)}`, 
+                { method: 'GET' }, 'super_admin'); // Super admin only
+        },
+
+        getUserSessions: async (userId) => {
+            return this.makeSecureRequest(`/security/user-sessions/${userId}`, 
+                { method: 'GET' }, 'practice_admin'); // Admin only
+        }
+    };
+
+    // F4 & F5 - Admin-only security and compliance functions
     async getRetentionPolicies() {
         try {
             const response = await apiClient?.get('/admin/retention-policies');
@@ -210,7 +261,7 @@ export const secureAdminService = {
             console.error('Get retention policies error:', error);
             throw new Error('Failed to fetch retention policies');
         }
-    },
+    }
 
     async exportComplianceReport(startDate, endDate) {
         try {
@@ -224,23 +275,20 @@ export const secureAdminService = {
             throw new Error('Failed to export compliance report');
         }
     }
-};
 
-// Health check for API connectivity
-export const checkApiHealth = async () => {
-    try {
-        const response = await apiClient?.get('/health');
-        return response?.data;
-    } catch (error) {
-        console.error('API health check failed:', error);
-        throw new Error('API server unavailable');
+    // Health check for API connectivity
+    async checkApiHealth() {
+        try {
+            const response = await apiClient?.get('/health');
+            return response?.data;
+        } catch (error) {
+            console.error('API health check failed:', error);
+            throw new Error('API server unavailable');
+        }
     }
-};
 
-// F13 - AI Usage Policy compliance service
-export const secureAIService = {
-    // Check if data contains special category health information
-    validateDataForAI: (data) => {
+    // F13 - AI Usage Policy compliance service
+    async validateDataForAI(data) {
         const healthDataIndicators = [
             'patient', 'nhs', 'medical', 'treatment', 'diagnosis', 
             'health', 'clinical', 'medication', 'surgery', 'appointment',
@@ -257,12 +305,13 @@ export const secureAIService = {
             riskLevel: containsHealthData ? 'high' : 'low',
             approved: !containsHealthData,
             reason: containsHealthData 
-                ? 'Contains potential health data - requires anonymization' :'Safe for AI processing'
+                ? 'Contains potential health data - requires anonymization' 
+                : 'Safe for AI processing'
         };
-    },
+    }
 
     // Anonymize data before sending to external AI
-    anonymizeForAI: (data) => {
+    anonymizeForAI(data) {
         if (typeof data !== 'object') return data;
 
         const anonymized = { ...data };
@@ -293,10 +342,10 @@ export const secureAIService = {
         });
 
         return anonymized;
-    },
+    }
 
     // Log AI usage for audit trail
-    logAIUsage: async (aiProvider, dataType, purpose, approved) => {
+    async logAIUsage(aiProvider, dataType, purpose, approved) {
         try {
             await apiClient?.post('/ai-usage/log', {
                 provider: aiProvider,
@@ -310,27 +359,27 @@ export const secureAIService = {
         } catch (error) {
             console.error('Failed to log AI usage:', error);
         }
-    },
+    }
 
     // Safe AI query wrapper
-    safeAIQuery: async (data, purpose, aiProvider = 'internal') => {
+    async safeAIQuery(data, purpose, aiProvider = 'internal') {
         try {
             // Step 1: Validate data safety
-            const validation = secureAIService?.validateDataForAI(data);
+            const validation = this.validateDataForAI(data);
             
             if (!validation?.approved) {
                 console.warn('AI query blocked:', validation?.reason);
-                await secureAIService?.logAIUsage(aiProvider, 'blocked', purpose, false);
+                await this.logAIUsage(aiProvider, 'blocked', purpose, false);
                 throw new Error(`AI processing blocked: ${validation.reason}`);
             }
 
             // Step 2: Anonymize if necessary
             const processedData = validation?.riskLevel === 'high' 
-                ? secureAIService?.anonymizeForAI(data)
+                ? this.anonymizeForAI(data)
                 : data;
 
             // Step 3: Log the approved usage
-            await secureAIService?.logAIUsage(aiProvider, 'approved', purpose, true);
+            await this.logAIUsage(aiProvider, 'approved', purpose, true);
 
             // Step 4: Return safe data for AI processing
             return {
@@ -348,12 +397,9 @@ export const secureAIService = {
             throw error;
         }
     }
-};
 
-// F11 - Enhanced cookie consent service
-export const cookieConsentService = {
-    // Record granular consent to compliance database
-    recordConsent: async (consentData) => {
+    // F11 - Enhanced cookie consent service
+    async recordConsent(consentData) {
         try {
             // Add this function to check if user is logged in
             const isLoggedIn = () => {
@@ -380,10 +426,10 @@ export const cookieConsentService = {
             console.error('Failed to record consent:', error);
             throw error;
         }
-    },
+    }
 
     // Withdraw consent and disable tracking
-    withdrawConsent: async (consentType) => {
+    async withdrawConsent(consentType) {
         try {
             const response = await apiClient?.post('/consent/withdraw', {
                 consentType,
@@ -412,10 +458,10 @@ export const cookieConsentService = {
             console.error('Failed to withdraw consent:', error);
             throw error;
         }
-    },
+    }
 
     // Get current consent status
-    getConsentStatus: async () => {
+    async getConsentStatus() {
         try {
             const response = await apiClient?.get('/consent/status');
             return response?.data?.data || {};
@@ -424,15 +470,127 @@ export const cookieConsentService = {
             return {};
         }
     }
-};
 
-// Export updated default service object
-export default {
-    patient: securePatientService,
-    lead: secureLeadService,
-    user: secureUserService,
-    admin: secureAdminService,
-    ai: secureAIService,
-    consent: cookieConsentService,
-    checkHealth: checkApiHealth
-};
+    // Get patients with server-side security validation
+    async getPatients(filters = {}) {
+        try {
+            const params = new URLSearchParams();
+            Object.entries(filters)?.forEach(([key, value]) => {
+                if (value && value !== 'all') {
+                    params?.append(key, value);
+                }
+            });
+
+            const response = await apiClient?.get(`/patients?${params}`);
+            const { data } = response?.data;
+
+            // Decrypt sensitive data for display
+            return data?.map(patient => ({
+                ...patient,
+                email: patient?.email ? decryptSensitiveData(patient?.email) : null,
+                phone: patient?.phone ? decryptSensitiveData(patient?.phone) : null,
+                dateOfBirth: patient?.date_of_birth ? decryptSensitiveData(patient?.date_of_birth) : null,
+                name: `${patient?.first_name} ${patient?.last_name}`,
+                assignedDentist: patient?.assigned_dentist?.full_name || 'Unassigned'
+            })) || [];
+        } catch (error) {
+            console.error('Secure patient service error:', error);
+            throw new Error('Failed to fetch patients securely');
+        }
+    }
+
+    async createPatient(patientData) {
+        try {
+            const response = await apiClient?.post('/patients', patientData);
+            return response?.data;
+        } catch (error) {
+            console.error('Create patient error:', error);
+            throw new Error('Failed to create patient');
+        }
+    }
+
+    async updatePatient(patientId, updates) {
+        try {
+            const response = await apiClient?.put(`/patients/${patientId}`, updates);
+            return response?.data;
+        } catch (error) {
+            console.error('Update patient error:', error);
+            throw new Error('Failed to update patient');
+        }
+    }
+
+    async deletePatient(patientId) {
+        try {
+            const response = await apiClient?.delete(`/patients/${patientId}`);
+            return response?.data;
+        } catch (error) {
+            console.error('Delete patient error:', error);
+            throw new Error('Failed to delete patient');
+        }
+    }
+
+    // F5 - Separate marketing data from clinical data
+    async getLeads(filters = {}) {
+        try {
+            const params = new URLSearchParams();
+            Object.entries(filters)?.forEach(([key, value]) => {
+                if (value && value !== 'all') {
+                    params?.append(key, value);
+                }
+            });
+
+            const response = await apiClient?.get(`/leads?${params}`);
+            return response?.data?.data || [];
+        } catch (error) {
+            console.error('Secure lead service error:', error);
+            throw new Error('Failed to fetch leads securely');
+        }
+    }
+
+    async createLead(leadData) {
+        try {
+            const response = await apiClient?.post('/leads', leadData);
+            return response?.data;
+        } catch (error) {
+            console.error('Create lead error:', error);
+            throw new Error('Failed to create lead');
+        }
+    }
+
+    async withdrawLeadConsent(leadId) {
+        try {
+            const response = await apiClient?.post(`/leads/${leadId}/withdraw-consent`);
+            return response?.data;
+        } catch (error) {
+            console.error('Withdraw consent error:', error);
+            throw new Error('Failed to withdraw consent');
+        }
+    }
+
+    // Get user profile
+    async getProfile() {
+        try {
+            const response = await apiClient?.get('/profile');
+            return response?.data?.data;
+        } catch (error) {
+            console.error('Get profile error:', error);
+            throw new Error('Failed to fetch user profile');
+        }
+    }
+
+    async updateProfile(updates) {
+        try {
+            const response = await apiClient?.put('/profile', updates);
+            return response?.data;
+        } catch (error) {
+            console.error('Update profile error:', error);
+            throw new Error('Failed to update profile');
+        }
+    }
+
+    async getAuthToken() {
+        return localStorage.getItem('sb-auth-token');
+    }
+}
+
+export default new SecureApiService();

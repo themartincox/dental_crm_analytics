@@ -35,69 +35,80 @@ export const AuthProvider = ({ children }) => {
   // Separate async function for fetching user profile
   const fetchUserProfile = async (userId) => {
     try {
-      // Use maybeSingle() instead of single() to handle cases where no profile exists
-      const { data, error } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.maybeSingle()
+      // CHANGED: Use the ensure_user_profile function directly first to avoid RLS issues
+      // This function bypasses RLS with SECURITY DEFINER
+      const { data: userData } = await supabase?.auth?.getUser()
+      
+      if (userData?.user) {
+        const { data: profileData, error: profileError } = await supabase?.rpc('ensure_user_profile', {
+          user_id: userId,
+          user_email: userData?.user?.email,
+          user_full_name: userData?.user?.user_metadata?.full_name || 
+                          userData?.user?.user_metadata?.fullName || 
+                          userData?.user?.user_metadata?.name || 
+                          userData?.user?.email?.split('@')?.[0] || 
+                          'Unknown User',
+          user_role: userData?.user?.user_metadata?.role || 'receptionist'
+        })
 
-      if (error) {
-        console.error('Error fetching user profile:', error)
-        setError(error)
-        return
-      }
-
-      // If no profile exists, try to create one using the new helper function
-      if (!data) {
-        console.warn('No user profile found for user ID:', userId)
-        
-        // Get the current user's auth data
-        const { data: { user } } = await supabase?.auth?.getUser()
-        
-        if (user) {
-          // Use the new helper function to safely create/retrieve profile
-          const { data: profileData, error: profileError } = await supabase?.rpc('ensure_user_profile', {
-            user_id: userId,
-            user_email: user?.email,
-            user_full_name: user?.user_metadata?.full_name || user?.user_metadata?.fullName || user?.email?.split('@')?.[0] || 'Unknown User',
-            user_role: user?.user_metadata?.role || 'receptionist'
-          })
-
-          if (profileError) {
-            console.error('Error creating/retrieving user profile:', profileError)
-            
-            // Fallback: try direct insert with ON CONFLICT handling
-            const { data: fallbackProfile, error: fallbackError } = await supabase?.from('user_profiles')?.upsert({
-              id: userId,
-              email: user?.email,
-              full_name: user?.user_metadata?.full_name || user?.user_metadata?.fullName || user?.email?.split('@')?.[0] || 'Unknown User',
-              role: user?.user_metadata?.role || 'receptionist',
-              is_active: true
-            }, {
-              onConflict: 'email',
-              ignoreDuplicates: false
-            })?.select()?.single()
-
-            if (fallbackError) {
-              console.error('Fallback profile creation also failed:', fallbackError)
-              setError(fallbackError)
-              return
-            }
-
-            setUserProfile(fallbackProfile)
+        if (profileError) {
+          console.error('Error with ensure_user_profile function:', profileError)
+          
+          // FALLBACK: Try direct query as last resort
+          const { data: directData, error: directError } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.maybeSingle()
+          
+          if (directError) {
+            console.error('Direct profile fetch also failed:', directError)
+            setError(directError)
             return
           }
-
-          setUserProfile(profileData)
+          
+          if (directData) {
+            setUserProfile(directData)
+            return
+          }
+          
+          // If all methods fail, set a meaningful error
+          const finalError = new Error('Unable to fetch or create user profile')
+          setError(finalError)
           return
         }
-        
-        // If we can't create a profile, set error state
-        const profileError = new Error('User profile not found and could not be created')
-        setError(profileError)
+
+        setUserProfile(profileData)
         return
       }
-
-      setUserProfile(data)
+      
+      // If no user data available, set error
+      const noUserError = new Error('No authenticated user found')
+      setError(noUserError)
+      
     } catch (err) {
       console.error('Error in fetchUserProfile:', err)
+      
+      // Check if this is the specific infinite recursion error
+      if (err?.code === '42P17' || err?.message?.includes('infinite recursion')) {
+        console.warn('Infinite recursion detected - using fallback approach')
+        
+        // Try to get minimal user data without triggering RLS
+        try {
+          const { data: { user } } = await supabase?.auth?.getUser()
+          if (user) {
+            // Create minimal profile object from auth user data
+            const minimalProfile = {
+              id: user?.id,
+              email: user?.email,
+              full_name: user?.user_metadata?.full_name || user?.email?.split('@')?.[0] || 'Unknown User',
+              role: user?.user_metadata?.role || 'receptionist',
+              is_active: true
+            }
+            setUserProfile(minimalProfile)
+            return
+          }
+        } catch (fallbackErr) {
+          console.error('Fallback approach also failed:', fallbackErr)
+        }
+      }
+      
       setError(err)
     }
   }
@@ -137,6 +148,34 @@ export const AuthProvider = ({ children }) => {
       return { data, error: null }
     } catch (error) {
       console.error('Sign in error:', error)
+      setError(error)
+      return { data: null, error }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const { data, error } = await supabase?.auth?.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window?.location?.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      })
+
+      if (error) throw error
+
+      return { data, error: null }
+    } catch (error) {
+      console.error('Google sign in error:', error)
       setError(error)
       return { data: null, error }
     } finally {
@@ -249,6 +288,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     resetPassword,

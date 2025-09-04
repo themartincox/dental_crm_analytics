@@ -8,39 +8,66 @@ const handleError = (error, operation) => {
 
 // Helper function to check if user is authenticated
 const checkAuth = () => {
-  const user = supabase?.auth?.user;
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-  return user;
+  // CHANGED: Use getUser() instead of deprecated auth.user
+  return supabase?.auth?.getUser()?.then(({ data: { user } }) => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    return user;
+  });
 };
 
 // ==================== USER PROFILE SERVICE ====================
 
 export const userProfileService = {
-  // Safely create or retrieve user profile
+  // Safely create or retrieve user profile with improved error handling
   async ensureUserProfile(userId, userData = {}) {
     try {
-      const { data, error } = await supabase?.rpc('ensure_user_profile', {
-        user_id: userId,
-        user_email: userData?.email,
-        user_full_name: userData?.fullName || userData?.full_name,
-        user_role: userData?.role || 'receptionist'
-      });
-
-      if (error) throw error;
+      // CHANGED: Add retry logic for infinite recursion issues
+      let retryCount = 0;
+      const maxRetries = 3;
       
-      return data;
+      while (retryCount < maxRetries) {
+        try {
+          const { data, error } = await supabase?.rpc('ensure_user_profile', {
+            user_id: userId,
+            user_email: userData?.email,
+            user_full_name: userData?.fullName || userData?.full_name,
+            user_role: userData?.role || 'receptionist'
+          });
+
+          if (error) {
+            // Check for infinite recursion error
+            if (error?.code === '42P17' || error?.message?.includes('infinite recursion')) {
+              console.warn(`Infinite recursion detected, retry ${retryCount + 1}/${maxRetries}`);
+              retryCount++;
+              
+              // Wait a bit before retrying
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+              continue;
+            }
+            throw error;
+          }
+          
+          return data;
+        } catch (retryError) {
+          if (retryCount === maxRetries - 1) {
+            throw retryError;
+          }
+          retryCount++;
+        }
+      }
     } catch (error) {
       handleError(error, 'ensureUserProfile');
     }
   },
 
-  // Update user profile with conflict resolution
+  // Update user profile with conflict resolution and improved error handling
   async updateUserProfile(userId, updates) {
     try {
-      checkAuth();
+      const user = await checkAuth();
       
+      // CHANGED: Use upsert with better conflict handling
       const { data, error } = await supabase?.from('user_profiles')?.upsert({
           id: userId,
           ...updates,
@@ -48,13 +75,44 @@ export const userProfileService = {
         }, {
           onConflict: 'id',
           ignoreDuplicates: false
-        })?.select()?.single();
+        })?.select()?.maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // Special handling for RLS errors
+        if (error?.code === '42P17') {
+          throw new Error('Profile update blocked by security policy. Please try again.');
+        }
+        throw error;
+      }
       
       return data;
     } catch (error) {
       handleError(error, 'updateUserProfile');
+    }
+  },
+
+  // ADDED: Get user profile with safe fallbacks
+  async getUserProfile(userId) {
+    try {
+      // Try the ensure function first (bypasses RLS)
+      const profile = await this.ensureUserProfile(userId);
+      
+      if (profile) {
+        return profile;
+      }
+      
+      // Fallback to direct query
+      const { data, error } = await supabase?.from('user_profiles')?.select('*')?.eq('id', userId)?.maybeSingle();
+      
+      if (error && error?.code === '42P17') {
+        throw new Error('Unable to fetch profile due to security policy recursion');
+      }
+      
+      if (error) throw error;
+      
+      return data;
+    } catch (error) {
+      handleError(error, 'getUserProfile');
     }
   },
 
