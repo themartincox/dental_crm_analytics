@@ -10,6 +10,8 @@ import CookieConsent from "components/CookieConsent";
 import GDCFooter from "components/GDCFooter";
 import AIUsagePolicyPage from './pages/AIUsagePolicy';
 import ServerValidatedProtectedRoute from './components/ServerValidatedProtectedRoute';
+import SystemOwnerAdminDashboard from './pages/system-owner-admin-dashboard/index';
+
 
 // Lazy load dashboard components for better performance
 const LeadGenerationConversionAnalyticsDashboard = lazy(() => import('./pages/lead-generation-conversion-analytics-dashboard'));
@@ -62,6 +64,16 @@ const Routes = () => {
                   <Route path="/complaints-procedure" element={<div className="p-8"><h1>Complaints Procedure</h1><p>Detailed complaints procedure content...</p></div>} />
                   <Route path="/privacy-policy" element={<div className="p-8"><h1>Privacy Policy</h1><p>Privacy policy content...</p></div>} />
                   <Route path="/gdc-standards" element={<div className="p-8"><h1>GDC Standards</h1><p>GDC standards content...</p></div>} />
+                  
+                  {/* System Owner Super Admin Route */}
+                  <Route 
+                    path="/system-owner-admin-dashboard" 
+                    element={
+                      <ServerValidatedProtectedRoute requiredRoles={['super_admin']}>
+                        <SystemOwnerAdminDashboard />
+                      </ServerValidatedProtectedRoute>
+                    } 
+                  />
                   
                   {/* F3 - Protected routes with server-side validation */}
                   <Route 
