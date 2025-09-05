@@ -49,6 +49,9 @@ const Routes = () => {
             <div className="flex-1">
               <Suspense fallback={<PageLoader />}>
                 <RouterRoutes>
+                  {/* Root Route - Redirect to login */}
+                  <Route path="/" element={<Login />} />
+                  
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/public-booking-interface" element={<PublicBookingInterface />} />
