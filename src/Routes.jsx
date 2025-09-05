@@ -26,6 +26,9 @@ const EmbeddableBookingWidget = lazy(() => import('./pages/embeddable-booking-wi
 const WidgetConfigurationDashboard = lazy(() => import('./pages/widget-configuration-dashboard'));
 const CrossSiteAnalyticsDashboard = lazy(() => import('./pages/cross-site-analytics-dashboard'));
 
+// Add new membership management import
+const MembershipProgramManagement = lazy(() => import('./pages/membership-program-management'));
+
 // Loading component for Suspense fallback
 const PageLoader = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -136,6 +139,16 @@ const Routes = () => {
                       <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
                         <CrossSiteAnalyticsDashboard />
                       </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Add new membership management route */}
+                  <Route 
+                    path="/membership-program-management" 
+                    element={
+                      <ServerValidatedProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager', 'receptionist']}>
+                        <MembershipProgramManagement />
+                      </ServerValidatedProtectedRoute>
                     } 
                   />
                   
