@@ -24,7 +24,7 @@
       "build",
       "serve"
     ],
-    "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for app functionality"
+    "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY DEPENDENCIES - Required for app functionality"
   },
   "dependencies": {
     "@dhiwise/component-tagger": "^1.0.10",
@@ -73,8 +73,8 @@
     "serve": "vite preview",
     "test": "vitest",
     "lint": "eslint src --ext .js,.jsx --fix",
-    "ci": "npm run lint && npm run build",
-    "test:coverage": "vitest run --coverage",
+    "ci": "npm ci && npm run lint && npm run build",
+    "test:coverage": "vitest run --coverage --reporter=verbose",
     "test:a11y": "vitest run --reporter=verbose tests/a11y"
   },
   "eslintConfig": {
@@ -102,6 +102,7 @@
     "@tailwindcss/line-clamp": "^0.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@vitejs/plugin-react": "4.3.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "autoprefixer": "10.4.2",
     "eslint": "^9.34.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
