@@ -1,7 +1,8 @@
 {
-  "name": "postinos-yolo-crm",
+  "name": "aes-crm",
   "version": "0.1.0",
   "private": true,
+  "description": "AES CRM — The Aesthetic CRM platform",
   "rocketCritical": {
     "dependencies": [
       "@dhiwise/component-tagger",

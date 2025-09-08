@@ -79,13 +79,16 @@ const Login = () => {
     setError('');
     
     try {
-      const { error } = await signInWithOAuth('google');
+      const { error } = await signInWithOAuth('google', {
+        redirectTo: 'https://crm-by-postino-6eko889.public.builtwithrocket.new/auth/callback'
+        // For local dev you can switch this to: http://localhost:3000/auth/callback
+      });
       
       if (error) {
         setError(`OAuth sign-in failed: ${error?.message}`);
         setIsLoading(false);
       }
-      // Don't set loading to false here - let the redirect happen
+      // Let the redirect happen
     } catch (err) {
       setError('Network error during OAuth sign-in');
       setIsLoading(false);
@@ -101,18 +104,33 @@ const Login = () => {
   return (
     <>
       <SEOHead 
-        title={`${isSignUp ? 'Sign Up' : 'Login'} - Dental CRM`}
-        description={`${isSignUp ? 'Create your account for' : 'Access'} the comprehensive dental practice management system`}
+        title={`${isSignUp ? 'Sign Up' : 'Login'} - AES CRM`}
+        description={`${isSignUp ? 'Create your account for' : 'Access'} the comprehensive aesthetic practice management system`}
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="text-center">
+              <div className="mb-4">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  AES CRM — The Aesthetic CRM
+                </h1>
+                <p className="text-sm text-gray-500">
+                  <a 
+                    href="https://postino.cc" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    Delivered by Postino
+                  </a>
+                </p>
+              </div>
               <h2 className="text-3xl font-extrabold text-gray-900">
                 {isSignUp ? 'Create Account' : 'Sign in to your account'}
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                {isSignUp ? 'Join our dental CRM platform' : 'Access your dental practice dashboard'}
+                {isSignUp ? 'Join our aesthetic practice platform' : 'Access your aesthetic practice dashboard'}
               </p>
             </div>
 

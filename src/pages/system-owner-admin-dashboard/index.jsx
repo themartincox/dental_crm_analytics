@@ -111,7 +111,8 @@ const SystemOwnerAdminDashboard = () => {
     try {
       const { data, error } = await supabase?.from('system_owner_audit_log')?.select(`
           *,
-          performed_by:user_profiles(full_name, email),
+          performed_by:user_profiles!system_owner_audit_log_performed_by_fkey(full_name, email),
+          target_user:user_profiles!system_owner_audit_log_target_user_id_fkey(full_name, email),
           target_client:client_organizations(organization_name)
         `)?.order('created_at', { ascending: false })?.limit(20);
 
@@ -176,11 +177,9 @@ const SystemOwnerAdminDashboard = () => {
   const handleBulkAction = async (action, clientIds) => {
     try {
       switch (action) {
-        case 'activate':
-          await supabase?.from('client_organizations')?.update({ status: 'active' })?.in('id', clientIds);
+        case 'activate': await supabase?.from('client_organizations')?.update({ status: 'active' })?.in('id', clientIds);
           break;
-        case 'suspend':
-          await supabase?.from('client_organizations')?.update({ status: 'suspended' })?.in('id', clientIds);
+        case 'suspend': await supabase?.from('client_organizations')?.update({ status: 'suspended' })?.in('id', clientIds);
           break;
         case 'delete':
           await supabase?.from('client_organizations')?.delete()?.in('id', clientIds);

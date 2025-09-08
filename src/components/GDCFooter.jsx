@@ -281,7 +281,19 @@ const GDCFooter = () => {
         <div className="border-t border-gray-200 pt-6">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div className="text-sm text-gray-600">
-              <div>© {currentYear} Postinos Dental Practice. All rights reserved.</div>
+              <div className="mb-2">
+                <span className="font-semibold">AES CRM — The Aesthetic CRM</span>
+                <span className="mx-2">|</span>
+                <a 
+                  href="https://postino.cc" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Delivered by Postino
+                </a>
+              </div>
+              <div>© {currentYear} AES Aesthetic Practice Management. All rights reserved.</div>
               <div className="mt-1">
                 <span className="font-medium">Principal:</span> Dr. Sarah Johnson BDS MFDS RCS(Ed) | 
                 <span className="font-medium"> GDC Registration:</span> 123456 | 

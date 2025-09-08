@@ -100,12 +100,13 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const signInWithOAuth = async (provider) => {
+  const signInWithOAuth = async (provider, options = {}) => {
     try {
       const { data, error } = await supabase?.auth?.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location?.origin}/o-auth-authentication-callback-handler`
+          redirectTo: `${window.location?.origin}/auth/callback`,
+          ...options
         }
       });
       return { data, error };

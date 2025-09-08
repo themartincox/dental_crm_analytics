@@ -57,10 +57,17 @@ const Header = () => {
           </div>
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold text-foreground leading-tight">
-              Postino's Yolo CRM
+              AES CRM — The Aesthetic CRM
             </h1>
             <span className="text-xs text-muted-foreground font-medium">
-              Healthcare Intelligence Platform
+              <a 
+                href="https://postino.cc" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-primary transition-colors"
+              >
+                Delivered by Postino
+              </a>
             </span>
           </div>
         </div>

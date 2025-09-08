@@ -21,6 +21,7 @@ const ActivityFeed = ({ activities }) => {
 
   const formatActionMessage = (activity) => {
     const performerName = activity?.performed_by?.full_name || activity?.performed_by?.email || 'System';
+    const targetUserName = activity?.target_user?.full_name || activity?.target_user?.email;
     const clientName = activity?.target_client?.organization_name || 'Unknown Client';
     const actionDetails = activity?.action_details || {};
 
@@ -54,11 +55,23 @@ const ActivityFeed = ({ activities }) => {
           message: `${performerName} performed bulk ${actionDetails?.action}`,
           details: `Applied to ${actionDetails?.client_count || 0} clients`
         };
+
+      case 'user_permissions_updated':
+        return {
+          message: `${performerName} updated permissions for ${targetUserName || 'user'}`,
+          details: `Client: ${clientName}`
+        };
+
+      case 'user_role_changed':
+        return {
+          message: `${performerName} changed role for ${targetUserName || 'user'}`,
+          details: `${actionDetails?.old_role} → ${actionDetails?.new_role} in ${clientName}`
+        };
         
       default:
         return {
           message: `${performerName} performed ${activity?.action_type?.replace('_', ' ')}`,
-          details: clientName
+          details: targetUserName ? `Target: ${targetUserName}` : clientName
         };
     }
   };

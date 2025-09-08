@@ -56,6 +56,7 @@ const Routes = () => {
                 <RouterRoutes>
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
+                  <Route path="/auth/callback" element={<OAuthAuthenticationCallbackHandler />} />
                   <Route path="/o-auth-authentication-callback-handler" element={<OAuthAuthenticationCallbackHandler />} />
                   <Route path="/public-booking" element={<PublicBookingInterface />} />
                   <Route path="/booking-widget" element={<EmbeddableBookingWidget />} />

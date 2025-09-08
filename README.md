@@ -1,6 +1,6 @@
-# React
+# AES CRM — The Aesthetic CRM
 
-A modern React-based project utilizing the latest frontend technologies and tools for building responsive web applications.
+A modern React-based aesthetic practice management platform utilizing the latest frontend technologies and tools for comprehensive aesthetic clinic operations.
 
 ## 🚀 Features
 
@@ -38,7 +38,7 @@ A modern React-based project utilizing the latest frontend technologies and tool
 ## 📁 Project Structure
 
 ```
-react_app/
+aes_crm/
 ├── public/             # Static assets
 ├── src/
 │   ├── components/     # Reusable UI components
@@ -89,7 +89,6 @@ This project uses Tailwind CSS for styling. The configuration includes:
 
 The app is built with responsive design using Tailwind CSS breakpoints.
 
-
 ## 📦 Deployment
 
 Build the application for production:
@@ -98,10 +97,17 @@ Build the application for production:
 npm run build
 ```
 
+## 🏥 About AES CRM
+
+AES CRM — The Aesthetic CRM is a comprehensive practice management platform designed specifically for aesthetic clinics and practices. It provides tools for patient management, appointment scheduling, treatment tracking, and business analytics.
+
+**Delivered by Postino** - Visit [postino.cc](https://postino.cc) for more information.
+
 ## 🙏 Acknowledgments
 
 - Built with [Rocket.new](https://rocket.new)
 - Powered by React and Vite
 - Styled with Tailwind CSS
+- Delivered by [Postino](https://postino.cc)
 
 Built with ❤️ on Rocket.new
