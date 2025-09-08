@@ -28,6 +28,9 @@ const EmbeddableBookingWidget = lazy(() => import('./pages/embeddable-booking-wi
 const WidgetConfigurationDashboard = lazy(() => import('./pages/widget-configuration-dashboard'));
 const CrossSiteAnalyticsDashboard = lazy(() => import('./pages/cross-site-analytics-dashboard'));
 
+// Add new OAuth callback import
+const OAuthAuthenticationCallbackHandler = lazy(() => import('./pages/o-auth-authentication-callback-handler'));
+
 // Add new membership management import
 const MembershipProgramManagement = lazy(() => import('./pages/membership-program-management'));
 
@@ -53,6 +56,7 @@ const Routes = () => {
                 <RouterRoutes>
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
+                  <Route path="/o-auth-authentication-callback-handler" element={<OAuthAuthenticationCallbackHandler />} />
                   <Route path="/public-booking" element={<PublicBookingInterface />} />
                   <Route path="/booking-widget" element={<EmbeddableBookingWidget />} />
                   <Route path="/booking-confirmation" element={<BookingConfirmationPaymentProcessing />} />

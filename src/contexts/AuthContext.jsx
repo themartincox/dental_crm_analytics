@@ -100,6 +100,20 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const signInWithOAuth = async (provider) => {
+    try {
+      const { data, error } = await supabase?.auth?.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location?.origin}/o-auth-authentication-callback-handler`
+        }
+      });
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase?.auth?.signOut()
@@ -132,6 +146,7 @@ export const AuthProvider = ({ children }) => {
     profileLoading,
     signUp,
     signIn,
+    signInWithOAuth,
     signOut,
     updateProfile
   }
