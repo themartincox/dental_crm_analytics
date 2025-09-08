@@ -2,21 +2,21 @@ import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
-import NotFound from "pages/NotFound";
-import ProtectedRoute from "components/ProtectedRoute";
+
 import { AuthProvider } from "contexts/AuthContext";
 import Login from "pages/Login";
 import CookieConsent from "components/CookieConsent";
 import GDCFooter from "components/GDCFooter";
 import AIUsagePolicyPage from './pages/AIUsagePolicy';
-import ServerValidatedProtectedRoute from './components/ServerValidatedProtectedRoute';
-import SystemOwnerAdminDashboard from './pages/system-owner-admin-dashboard/index';
 
+import SystemOwnerAdminDashboard from './pages/system-owner-admin-dashboard/index';
+import DentalCrmDashboard from './pages/dental-crm-dashboard/index';
+import NotFound from './pages/NotFound';
 
 // Lazy load dashboard components for better performance
 const LeadGenerationConversionAnalyticsDashboard = lazy(() => import('./pages/lead-generation-conversion-analytics-dashboard'));
 const ComplianceOperationsMonitoringDashboard = lazy(() => import('./pages/compliance-operations-monitoring-dashboard'));
-const PatientJourneyRevenueDashboard = lazy(() => import('./pages/patient-journey-revenue-optimization-dashboard'));
+const PatientJourneyRevenueOptimizationDashboard = lazy(() => import('./pages/patient-journey-revenue-optimization-dashboard'));
 const PracticePerformanceOverviewDashboard = lazy(() => import('./pages/practice-performance-overview-dashboard'));
 const PatientManagementDashboard = lazy(() => import('./pages/patient-management-dashboard'));
 const LeadManagementScreen = lazy(() => import('./pages/lead-management-screen'));
@@ -51,122 +51,30 @@ const Routes = () => {
             <div className="flex-1">
               <Suspense fallback={<PageLoader />}>
                 <RouterRoutes>
-                  {/* Root Route - Redirect to login */}
-                  <Route path="/" element={<Login />} />
-                  
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
-                  <Route path="/public-booking-interface" element={<PublicBookingInterface />} />
-                  <Route path="/embeddable-booking-widget" element={<EmbeddableBookingWidget />} />
-                  
-                  {/* GDC Compliance Routes */}
-                  <Route path="/ai-policy" element={<AIUsagePolicyPage />} />
-                  <Route path="/complaints-procedure" element={<div className="p-8"><h1>Complaints Procedure</h1><p>Detailed complaints procedure content...</p></div>} />
-                  <Route path="/privacy-policy" element={<div className="p-8"><h1>Privacy Policy</h1><p>Privacy policy content...</p></div>} />
-                  <Route path="/gdc-standards" element={<div className="p-8"><h1>GDC Standards</h1><p>GDC standards content...</p></div>} />
-                  
-                  {/* System Owner Super Admin Route */}
-                  <Route 
-                    path="/system-owner-admin-dashboard" 
-                    element={
-                      <ServerValidatedProtectedRoute requiredRoles={['super_admin']}>
-                        <SystemOwnerAdminDashboard />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* F3 - Protected routes with server-side validation */}
-                  <Route 
-                    path="/patient-management-dashboard" 
-                    element={
-                      <ServerValidatedProtectedRoute requireClinicalAccess={true}>
-                        <PatientManagementDashboard />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/appointment-scheduler" 
-                    element={
-                      <ServerValidatedProtectedRoute requiredRoles={['dentist', 'hygienist', 'receptionist']}>
-                        <AppointmentScheduler />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* F3 - Admin routes with strict server validation */}
-                  <Route 
-                    path="/compliance-operations-monitoring-dashboard" 
-                    element={
-                      <ServerValidatedProtectedRoute requireAdminAccess={true}>
-                        <ComplianceOperationsMonitoringDashboard />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/practice-performance-overview-dashboard" 
-                    element={
-                      <ServerValidatedProtectedRoute requireAdminAccess={true}>
-                        <PracticePerformanceOverviewDashboard />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* F3 - Marketing routes with specific access control */}
-                  <Route 
-                    path="/lead-management-screen" 
-                    element={
-                      <ServerValidatedProtectedRoute requireMarketingAccess={true}>
-                        <LeadManagementScreen />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/booking-confirmation-payment-processing" 
-                    element={
-                      <ProtectedRoute>
-                        <BookingConfirmationPaymentProcessing />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/service-provider-matching-engine" 
-                    element={
-                      <ProtectedRoute>
-                        <ServiceProviderMatchingEngine />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/widget-configuration-dashboard" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <WidgetConfigurationDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/cross-site-analytics-dashboard" 
-                    element={
-                      <ProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager']}>
-                        <CrossSiteAnalyticsDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Add new membership management route */}
-                  <Route 
-                    path="/membership-program-management" 
-                    element={
-                      <ServerValidatedProtectedRoute requiredRoles={['super_admin', 'practice_admin', 'manager', 'receptionist']}>
-                        <MembershipProgramManagement />
-                      </ServerValidatedProtectedRoute>
-                    } 
-                  />
-                  
+                  <Route path="/public-booking" element={<PublicBookingInterface />} />
+                  <Route path="/booking-widget" element={<EmbeddableBookingWidget />} />
+                  <Route path="/booking-confirmation" element={<BookingConfirmationPaymentProcessing />} />
+                  <Route path="/ai-usage-policy" element={<AIUsagePolicyPage />} />
+
+                  {/* Protected Routes - Available in Preview Mode */}
+                  <Route path="/" element={<DentalCrmDashboard />} />
+                  <Route path="/dashboard" element={<DentalCrmDashboard />} />
+                  <Route path="/appointments" element={<AppointmentScheduler />} />
+                  <Route path="/patients" element={<PatientManagementDashboard />} />
+                  <Route path="/leads" element={<LeadManagementScreen />} />
+                  <Route path="/memberships" element={<MembershipProgramManagement />} />
+                  <Route path="/analytics/leads" element={<LeadGenerationConversionAnalyticsDashboard />} />
+                  <Route path="/analytics/patient-journey" element={<PatientJourneyRevenueOptimizationDashboard />} />
+                  <Route path="/analytics/cross-site" element={<CrossSiteAnalyticsDashboard />} />
+                  <Route path="/analytics/practice-overview" element={<PracticePerformanceOverviewDashboard />} />
+                  <Route path="/compliance" element={<ComplianceOperationsMonitoringDashboard />} />
+                  <Route path="/widgets" element={<WidgetConfigurationDashboard />} />
+                  <Route path="/admin" element={<SystemOwnerAdminDashboard />} />
+                  <Route path="/matching-engine" element={<ServiceProviderMatchingEngine />} />
+
+                  {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
                 </RouterRoutes>
               </Suspense>

@@ -144,7 +144,7 @@ export const patientService = {
 
       // Apply filters
       if (filters?.status && filters?.status !== 'all') {
-        query = query?.eq('status', filters?.status);
+        query = query?.eq('patient_status', filters?.status);
       }
       if (filters?.treatmentType && filters?.treatmentType !== 'all') {
         query = query?.eq('treatment_type', filters?.treatmentType);
@@ -177,7 +177,7 @@ export const patientService = {
         dateOfBirth: patient?.date_of_birth,
         lastVisit: patient?.updated_at?.split('T')?.[0],
         nextAppointment: null, // Will be populated by appointment service
-        status: patient?.status,
+        status: patient?.patient_status,
         treatmentType: patient?.treatment_type,
         insuranceProvider: patient?.insurance_provider,
         outstandingBalance: 0, // Will be calculated from payments
@@ -226,7 +226,7 @@ export const patientService = {
           date_of_birth: patientData?.dateOfBirth,
           address: patientData?.address,
           postcode: patientData?.postcode,
-          status: patientData?.status || 'prospective',
+          patient_status: patientData?.status || 'prospective',
           treatment_type: patientData?.treatmentType || 'general',
           insurance_provider: patientData?.insuranceProvider || 'NHS',
           communication_preference: patientData?.communicationPreference || 'email',
@@ -263,7 +263,7 @@ export const patientService = {
           date_of_birth: patientData?.dateOfBirth,
           address: patientData?.address,
           postcode: patientData?.postcode,
-          status: patientData?.status,
+          patient_status: patientData?.status,
           treatment_type: patientData?.treatmentType,
           insurance_provider: patientData?.insuranceProvider,
           communication_preference: patientData?.communicationPreference,
@@ -419,10 +419,10 @@ export const leadService = {
 
       // Apply filters
       if (filters?.status && filters?.status !== 'all') {
-        query = query?.eq('status', filters?.status);
+        query = query?.eq('lead_status', filters?.status);
       }
       if (filters?.source && filters?.source !== 'all') {
-        query = query?.eq('source', filters?.source);
+        query = query?.eq('lead_source', filters?.source);
       }
       if (filters?.assignedTo) {
         query = query?.eq('assigned_to_id', filters?.assignedTo);
@@ -450,8 +450,8 @@ export const leadService = {
           email: leadData?.email,
           phone: leadData?.phone,
           postcode: leadData?.postcode,
-          source: leadData?.source,
-          status: 'new',
+          lead_source: leadData?.source,
+          lead_status: 'new',
           treatment_interest: leadData?.treatmentInterest,
           estimated_value: leadData?.estimatedValue,
           notes: leadData?.notes,
@@ -477,7 +477,7 @@ export const leadService = {
       
       // Update lead as converted
       const { error } = await supabase?.from('leads')?.update({
-          status: 'converted',
+          lead_status: 'converted',
           conversion_date: new Date()?.toISOString(),
           converted_patient_id: patient?.id
         })?.eq('id', leadId);
@@ -547,21 +547,21 @@ export const analyticsService = {
   // Get lead pipeline data
   async getLeadPipelineData() {
     try {
-      const { data, error } = await supabase?.from('leads')?.select('status, estimated_value');
+      const { data, error } = await supabase?.from('leads')?.select('lead_status, estimated_value');
 
       if (error) throw error;
       
       // Group by status and calculate totals
       const pipeline = {};
       data?.forEach(lead => {
-        if (!pipeline?.[lead?.status]) {
-          pipeline[lead?.status] = {
+        if (!pipeline?.[lead?.lead_status]) {
+          pipeline[lead?.lead_status] = {
             count: 0,
             value: 0
           };
         }
-        pipeline[lead?.status].count++;
-        pipeline[lead?.status].value += parseFloat(lead?.estimated_value || 0);
+        pipeline[lead?.lead_status].count++;
+        pipeline[lead?.lead_status].value += parseFloat(lead?.estimated_value || 0);
       });
 
       // Transform to expected format
