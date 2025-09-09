@@ -1,34 +1,81 @@
-# https://www.robotstxt.org/robotstxt.html
+# AES CRM - Robots.txt Configuration
+# https://aescrm.com
+
 User-agent: *
 
-# Allow public pages
+# Allow marketing pages
 Allow: /
-Allow: /public-booking-interface
-Allow: /login
+Allow: /aes-crm-marketing-landing-page
 
-# Disallow private dashboard and sensitive areas
-Disallow: /practice-performance-overview-dashboard
-Disallow: /patient-management-dashboard
-Disallow: /appointment-scheduler
-Disallow: /lead-management-screen
-Disallow: /patient-journey-revenue-optimization-dashboard
-Disallow: /lead-generation-conversion-analytics-dashboard
-Disallow: /compliance-operations-monitoring-dashboard
-Disallow: /widget-configuration-dashboard
-Disallow: /cross-site-analytics-dashboard
-Disallow: /service-provider-matching-engine
-Disallow: /booking-confirmation-payment-processing
+# Allow public booking interfaces
+Allow: /public-booking
+Allow: /booking-widget
+Allow: /booking-confirmation
 
-# Disallow common sensitive directories
-Disallow: /admin
-Disallow: /api
+# Allow policy pages
+Allow: /privacy
+Allow: /terms
+Allow: /ai-usage-policy
+
+# Block CRM application pages (require authentication)
+Disallow: /get-started
 Disallow: /dashboard
-Disallow: /private
-Disallow: /.env
-Disallow: /config
+Disallow: /appointments
+Disallow: /patients
+Disallow: /leads
+Disallow: /memberships
+Disallow: /analytics/
+Disallow: /compliance
+Disallow: /widgets
+Disallow: /admin
+Disallow: /matching-engine
+Disallow: /login
+
+# Block callback and internal pages
+Disallow: /auth/
+Disallow: /o-auth-authentication-callback-handler
+
+# Block assets and technical files
+Disallow: /assets/
+Disallow: /static/
+Disallow: /_next/
+Disallow: /api/
+
+# Crawl delay
+Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://dentalcrm.com/sitemap.xml
+Sitemap: https://aescrm.com/sitemap.xml
 
-# Crawl delay for respectful crawling
+# Search engine specific rules
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot  
+Allow: /
 Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Block common crawlers we don't want
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Social media crawlers (allow for proper card generation)
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

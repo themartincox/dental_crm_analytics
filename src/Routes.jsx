@@ -13,6 +13,12 @@ import SystemOwnerAdminDashboard from './pages/system-owner-admin-dashboard/inde
 import DentalCrmDashboard from './pages/dental-crm-dashboard/index';
 import NotFound from './pages/NotFound';
 
+// Import new marketing landing page
+import AESCRMMarketingLandingPage from './pages/aes-crm-marketing-landing-page/index';
+
+// Import new Get Started Gateway Page
+import GetStartedGatewayPage from './pages/get-started-gateway-page/index';
+
 // Lazy load dashboard components for better performance
 const LeadGenerationConversionAnalyticsDashboard = lazy(() => import('./pages/lead-generation-conversion-analytics-dashboard'));
 const ComplianceOperationsMonitoringDashboard = lazy(() => import('./pages/compliance-operations-monitoring-dashboard'));
@@ -54,6 +60,13 @@ const Routes = () => {
             <div className="flex-1">
               <Suspense fallback={<PageLoader />}>
                 <RouterRoutes>
+                  {/* Public Marketing Homepage */}
+                  <Route path="/" element={<AESCRMMarketingLandingPage />} />
+                  <Route path="/aes-crm-marketing-landing-page" element={<AESCRMMarketingLandingPage />} />
+
+                  {/* Get Started Gateway Page */}
+                  <Route path="/get-started-gateway-page" element={<GetStartedGatewayPage />} />
+
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/auth/callback" element={<OAuthAuthenticationCallbackHandler />} />
@@ -63,8 +76,8 @@ const Routes = () => {
                   <Route path="/booking-confirmation" element={<BookingConfirmationPaymentProcessing />} />
                   <Route path="/ai-usage-policy" element={<AIUsagePolicyPage />} />
 
-                  {/* Protected Routes - Available in Preview Mode */}
-                  <Route path="/" element={<DentalCrmDashboard />} />
+                  {/* CRM Application Routes */}
+                  <Route path="/get-started" element={<GetStartedGatewayPage />} />
                   <Route path="/dashboard" element={<DentalCrmDashboard />} />
                   <Route path="/appointments" element={<AppointmentScheduler />} />
                   <Route path="/patients" element={<PatientManagementDashboard />} />
@@ -84,8 +97,24 @@ const Routes = () => {
                 </RouterRoutes>
               </Suspense>
             </div>
-            <GDCFooter />
-            <CookieConsent />
+            
+            {/* Only show footer on non-marketing pages */}
+            <RouterRoutes>
+              <Route path="/" element={null} />
+              <Route path="/aes-crm-marketing-landing-page" element={null} />
+              <Route path="/get-started" element={null} />
+              <Route path="/get-started-gateway-page" element={null} />
+              <Route path="*" element={<GDCFooter />} />
+            </RouterRoutes>
+            
+            {/* Only show cookie consent on non-marketing pages */}
+            <RouterRoutes>
+              <Route path="/" element={null} />
+              <Route path="/aes-crm-marketing-landing-page" element={null} />
+              <Route path="/get-started" element={null} />
+              <Route path="/get-started-gateway-page" element={null} />
+              <Route path="*" element={<CookieConsent />} />
+            </RouterRoutes>
           </div>
         </ErrorBoundary>
       </AuthProvider>
