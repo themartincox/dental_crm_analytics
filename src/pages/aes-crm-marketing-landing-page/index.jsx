@@ -46,23 +46,23 @@ const AESCRMMarketingLandingPage = () => {
 
   const testimonials = [
     {
-      name: "Dr. Sarah Mitchell",
+      name: "Dr. Javaad Mirza",
       practice: "Pear Tree Dental",
-      location: "London",
+      location: "Nottingham",
       content: "AES CRM transformed our patient journey. We\'ve seen a 40% increase in booking conversions since implementing their automated follow-up sequences.",
       rating: 5
     },
     {
-      name: "Dr. James Thompson",
-      practice: "Elite Dental Clinic",
-      location: "Manchester",
+      name: "Dr. Imrana Ishaque",
+      practice: "Pear Tree Dental",
+      location: "Nottingham",
       content: "The aesthetic design impressed our patients immediately. Finally, a CRM that matches our practice's premium brand.",
       rating: 5
     },
     {
-      name: "Dr. Emma Richardson",
+      name: "Jake - Practice Manager",
       practice: "Smile Studio",
-      location: "Edinburgh", 
+      location: "London", 
       content: "ROI tracking is incredible. We can see exactly which marketing channels bring the highest-value patients.",
       rating: 5
     }
@@ -80,7 +80,7 @@ const AESCRMMarketingLandingPage = () => {
         <meta property="og:url" content="https://aescrm.com/" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AES CRM — The Aesthetic CRM" />
-        <meta name="twitter:description" content="Ace your patient journey with AES CRM — built for dental and cosmetic practices." />
+        <meta name="twitter:description" content="AES your patient journey with AES CRM — built for dental and cosmetic practices." />
         
         {/* JSON-LD Schema */}
         <script type="application/ld+json">
@@ -109,7 +109,7 @@ const AESCRMMarketingLandingPage = () => {
           "contactPoint": [{
             "@type": "ContactPoint",
             "contactType": "sales",
-            "email": "hello@aescrm.com",
+            "email": "martin@postino.cc",
             "availableLanguage": ["en-GB","en-US"]
           }]
         })}
