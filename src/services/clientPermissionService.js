@@ -59,6 +59,16 @@ class ClientPermissionService {
 
   async createClient(clientData) {
     try {
+      // Calculate pricing based on user count
+      const userCount = clientData?.total_users || 2;
+      const pricing = {
+        installation_fee: 1000, // £1,000
+        included_seats: 2,
+        additional_seats: Math.max(0, userCount - 2),
+        monthly_cost: Math.max(0, userCount - 2) * 50, // £50 per additional seat
+        free_trial_months: 12
+      };
+
       const { data, error } = await supabase?.from('client_organizations')?.insert([{
           organization_name: clientData?.organization_name,
           organization_type: clientData?.organization_type || 'dental_practice',
@@ -67,15 +77,23 @@ class ClientPermissionService {
           contact_email: clientData?.contact_email,
           contact_phone: clientData?.contact_phone,
           billing_address: clientData?.billing_address,
-          max_users: clientData?.max_users || 10
+          max_users: clientData?.max_users || 10,
+          total_users: userCount,
+          pricing_info: pricing,
+          installation_fee: pricing.installation_fee,
+          monthly_cost: pricing.monthly_cost,
+          free_trial_ends_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() // 12 months from now
         }])?.select()?.single();
 
       if (error) throw error;
 
-      // Log the action
+      // Log the action with pricing details
       await this.logSystemAction('client_organization_created', data?.id, {
         organization_name: data?.organization_name,
-        tier: data?.subscription_tier
+        user_count: userCount,
+        installation_fee: pricing.installation_fee,
+        monthly_cost: pricing.monthly_cost,
+        additional_seats: pricing.additional_seats
       });
 
       return { data, error: null };
@@ -267,10 +285,16 @@ class ClientPermissionService {
       const activeClients = clients?.filter(c => c?.status === 'active')?.length || 0;
       const totalUsers = clients?.reduce((sum, client) => sum + (client?.total_users || 0), 0) || 0;
 
-      // Calculate revenue (mock pricing)
-      const tierPricing = { basic: 99, professional: 299, enterprise: 599 };
+      // Calculate revenue based on actual pricing model
       const totalRevenue = clients?.reduce((sum, client) => {
-        return sum + (tierPricing?.[client?.subscription_tier] || 0);
+        const installFee = 1000; // £1,000 installation fee
+        const includedSeats = 2; // 2 seats included for 12 months
+        const additionalSeatPrice = 50; // £50 per month per additional seat
+        const currentUsers = client?.total_users || 0;
+        const additionalSeats = Math.max(0, currentUsers - includedSeats);
+        const monthlyRevenue = additionalSeats * additionalSeatPrice;
+        
+        return sum + installFee + monthlyRevenue;
       }, 0) || 0;
 
       return {

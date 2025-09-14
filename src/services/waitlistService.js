@@ -1,10 +1,11 @@
 import { leadsService } from './dentalCrmService';
+import { emailService } from './emailService';
 
 // Waitlist Service - Extends leads service for marketing page functionality
 export const waitlistService = {
   
   /**
-   * Add a new waitlist signup to the leads table
+   * Add a new waitlist signup to the leads table and send notifications
    * @param {Object} waitlistData - Waitlist form data
    * @returns {Promise<{data, error}>}
    */
@@ -25,25 +26,53 @@ export const waitlistService = {
         treatment_interest: waitlistData?.interest === 'cosmetic' ? 'cosmetic' : 
                            waitlistData?.interest === 'general' ? 'general' : 
                            waitlistData?.interest === 'orthodontics' ? 'orthodontics' : null,
-        utm_source: 'aescrm_landing',
-        utm_medium: 'waitlist_form',
-        utm_campaign: 'pre_launch_waitlist'
+        utm_source: waitlistData?.utm_source || 'aescrm_landing',
+        utm_medium: waitlistData?.utm_medium || 'waitlist_form',
+        utm_campaign: waitlistData?.utm_campaign || 'pre_launch_waitlist'
       };
 
+      // Store lead in database
       const result = await leadsService?.create(leadData);
       
+      if (result?.error) {
+        throw new Error(result.error.message || 'Failed to create lead record');
+      }
+
+      // Send notification email to admin (martin@postino.cc)
+      const notificationResult = await emailService.sendWaitlistNotification(waitlistData, leadNumber);
+      if (!notificationResult.success) {
+        console.error('Failed to send notification email:', notificationResult.error);
+        // Don't fail the entire process if email fails
+      }
+
+      // Send welcome email to the signup
+      const welcomeResult = await emailService.sendWelcomeEmail(waitlistData, leadNumber);
+      if (!welcomeResult.success) {
+        console.error('Failed to send welcome email:', welcomeResult.error);
+        // Don't fail the entire process if email fails
+      }
+      
       return {
-        success: !result?.error,
+        success: true,
         data: result?.data,
-        error: result?.error,
-        leadNumber
+        error: null,
+        leadNumber,
+        emailsSent: {
+          notification: notificationResult.success,
+          welcome: welcomeResult.success
+        }
       };
     } catch (error) {
+      console.error('Waitlist signup error:', error);
       return {
         success: false,
         data: null,
         error: error?.message || 'Failed to add to waitlist',
-        leadNumber: null
+        leadNumber: null,
+        emailsSent: {
+          notification: false,
+          welcome: false
+        }
       };
     }
   },

@@ -9,15 +9,18 @@ import CookieConsent from "components/CookieConsent";
 import GDCFooter from "components/GDCFooter";
 import AIUsagePolicyPage from './pages/AIUsagePolicy';
 
-import SystemOwnerAdminDashboard from './pages/system-owner-admin-dashboard/index';
-import DentalCrmDashboard from './pages/dental-crm-dashboard/index';
-import NotFound from './pages/NotFound';
+// Lazy load all non-critical pages for better performance
+const SystemOwnerAdminDashboard = lazy(() => import('./pages/system-owner-admin-dashboard/index'));
+const DentalCrmDashboard = lazy(() => import('./pages/dental-crm-dashboard/index'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
-// Import new marketing landing page
+// Marketing landing page - critical for LCP, keep as regular import
 import AESCRMMarketingLandingPage from './pages/aes-crm-marketing-landing-page/index';
 
-// Import new Get Started Gateway Page
-import GetStartedGatewayPage from './pages/get-started-gateway-page/index';
+// Lazy load other pages
+const GetStartedGatewayPage = lazy(() => import('./pages/get-started-gateway-page/index'));
+const PricingPage = lazy(() => import('./pages/pricing-page/index'));
+const ContactPage = lazy(() => import('./pages/contact-page/index'));
 
 // Lazy load dashboard components for better performance
 const LeadGenerationConversionAnalyticsDashboard = lazy(() => import('./pages/lead-generation-conversion-analytics-dashboard'));
@@ -69,6 +72,8 @@ const Routes = () => {
 
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
+                  <Route path="/pricing" element={<PricingPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
                   <Route path="/auth/callback" element={<OAuthAuthenticationCallbackHandler />} />
                   <Route path="/o-auth-authentication-callback-handler" element={<OAuthAuthenticationCallbackHandler />} />
                   <Route path="/public-booking" element={<PublicBookingInterface />} />
