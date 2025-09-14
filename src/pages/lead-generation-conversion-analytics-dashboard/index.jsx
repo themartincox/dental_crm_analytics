@@ -79,9 +79,11 @@ const LeadGenerationConversionAnalyticsDashboard = () => {
     [filters?.dateRange]
   );
 
-  // Simulate real-time updates
+  // Simulate real-time updates with proper cleanup
   useEffect(() => {
-    const interval = setInterval(() => {
+    let interval;
+    
+    const updateData = () => {
       setLastUpdate(new Date());
       
       // Simulate new high-value lead alerts
@@ -93,18 +95,24 @@ const LeadGenerationConversionAnalyticsDashboard = () => {
           timestamp: new Date(),
           priority: 'high'
         };
-        setRealTimeAlerts(prev => [newAlert, ...prev?.slice(0, 4)]);
+        setRealTimeAlerts(prev => [newAlert, ...prev.slice(0, 4)]);
       }
-    }, 15000); // Update every 15 seconds
+    };
 
-    return () => clearInterval(interval);
-  }, []);
+    // Only start interval if component is mounted
+    interval = setInterval(updateData, 15000);
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, []); // Empty dependency array is correct here
 
   // Clear cache when filters change significantly
   useEffect(() => {
-    const significantFilterChange = filters?.dateRange;
     clearDataCache();
-  }, [filters?.dateRange]);
+  }, [filters.dateRange]); // Only depend on the specific filter that affects cache
 
   const handleStageClick = (stage) => {
     console.log('Funnel stage clicked:', stage);

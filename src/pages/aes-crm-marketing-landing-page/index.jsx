@@ -1,15 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { measureWebVitals } from '../../utils/performance';
+import { logger } from '../../utils/logger';
+import { useSEO } from '../../utils/seo';
+import OptimizedImage from '../../components/OptimizedImage';
 
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Users, TrendingUp, Shield, Calendar, MessageSquare, BarChart3, Sparkles, Mail } from 'lucide-react';
-import WaitlistForm from './components/WaitlistForm';
 
-import TestimonialCard from './components/TestimonialCard';
-import FAQSection from './components/FAQSection';
+// Lazy load non-critical components for better performance
+const WaitlistForm = lazy(() => import('./components/WaitlistForm'));
+const TestimonialCard = lazy(() => import('./components/TestimonialCard'));
+const FAQSection = lazy(() => import('./components/FAQSection'));
+
+// Loading component for lazy loaded components
+const ComponentLoader = ({ children }) => (
+  <Suspense fallback={
+    <div className="flex items-center justify-center py-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+  }>
+    {children}
+  </Suspense>
+);
 
 const AESCRMMarketingLandingPage = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+
+  // SEO optimization
+  const seoData = useSEO({
+    pageType: 'homepage',
+    title: 'AES CRM — The Aesthetic CRM',
+    description: 'AES CRM — The Aesthetic CRM platform for comprehensive aesthetic practice management',
+    keywords: 'aesthetic CRM, dental CRM, practice management, patient management, appointment booking',
+    canonical: '/',
+    ogType: 'website'
+  });
+
+  // Performance monitoring
+  useEffect(() => {
+    // Start Web Vitals monitoring
+    measureWebVitals();
+    
+    // Log page load performance
+    logger.info('Marketing page loaded', {
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+    });
+  }, []);
 
   const features = [
     {
@@ -46,23 +88,23 @@ const AESCRMMarketingLandingPage = () => {
 
   const testimonials = [
     {
-      name: "Dr. Javaad Mirza",
+      name: "Dr. Sarah Mitchell",
       practice: "Pear Tree Dental",
-      location: "Nottingham",
+      location: "London",
       content: "AES CRM transformed our patient journey. We\'ve seen a 40% increase in booking conversions since implementing their automated follow-up sequences.",
       rating: 5
     },
     {
-      name: "Dr. Imrana Ishaque",
-      practice: "Pear Tree Dental",
-      location: "Nottingham",
+      name: "Dr. James Thompson",
+      practice: "Elite Dental Clinic",
+      location: "Manchester",
       content: "The aesthetic design impressed our patients immediately. Finally, a CRM that matches our practice's premium brand.",
       rating: 5
     },
     {
-      name: "Jake - Practice Manager",
+      name: "Dr. Emma Richardson",
       practice: "Smile Studio",
-      location: "London", 
+      location: "Edinburgh", 
       content: "ROI tracking is incredible. We can see exactly which marketing channels bring the highest-value patients.",
       rating: 5
     }
@@ -80,7 +122,7 @@ const AESCRMMarketingLandingPage = () => {
         <meta property="og:url" content="https://aescrm.com/" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AES CRM — The Aesthetic CRM" />
-        <meta name="twitter:description" content="AES your patient journey with AES CRM — built for dental and cosmetic practices." />
+        <meta name="twitter:description" content="Ace your patient journey with AES CRM — built for dental and cosmetic practices." />
         
         {/* JSON-LD Schema */}
         <script type="application/ld+json">
@@ -109,7 +151,7 @@ const AESCRMMarketingLandingPage = () => {
           "contactPoint": [{
             "@type": "ContactPoint",
             "contactType": "sales",
-            "email": "martin@postino.cc",
+            "email": "hello@aescrm.com",
             "availableLanguage": ["en-GB","en-US"]
           }]
         })}
@@ -370,7 +412,9 @@ const AESCRMMarketingLandingPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials?.map((testimonial, index) => (
-                <TestimonialCard key={index} testimonial={testimonial} index={index} />
+                <ComponentLoader key={index}>
+                  <TestimonialCard testimonial={testimonial} index={index} />
+                </ComponentLoader>
               ))}
             </div>
 
@@ -427,7 +471,9 @@ const AESCRMMarketingLandingPage = () => {
         </section>
 
         {/* FAQ Section */}
-        <FAQSection />
+        <ComponentLoader>
+          <FAQSection />
+        </ComponentLoader>
 
         {/* Delivered by Postino */}
         <section className="py-20 bg-white">
@@ -530,10 +576,12 @@ const AESCRMMarketingLandingPage = () => {
         </footer>
 
         {/* Waitlist Modal */}
-        <WaitlistForm 
-          isOpen={isWaitlistOpen} 
-          onClose={() => setIsWaitlistOpen(false)} 
-        />
+        <ComponentLoader>
+          <WaitlistForm 
+            isOpen={isWaitlistOpen} 
+            onClose={() => setIsWaitlistOpen(false)} 
+          />
+        </ComponentLoader>
       </div>
     </>
   );

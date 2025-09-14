@@ -96,10 +96,10 @@ const PatientInformation = ({ initialData, onComplete, onBack, compact = false }
   };
 
   const handleSubmit = async (e) => {
-    e?.preventDefault();
+    e.preventDefault();
     
     const newErrors = validateForm();
-    if (Object.keys(newErrors)?.length > 0) {
+    if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }

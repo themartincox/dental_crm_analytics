@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, User, Building, CheckCircle, Loader } from 'lucide-react';
-import { leadsService } from '../../../services/dentalCrmService';
+import { waitlistService } from '../../../services/waitlistService';
+import { logger } from '../../../utils/logger';
 
 const WaitlistForm = ({ isOpen, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,34 +17,33 @@ const WaitlistForm = ({ isOpen, onClose }) => {
     setSubmitError(null);
 
     try {
-      // Generate a unique lead number
-      const leadNumber = `AES-${Date.now()}-${Math.random()?.toString(36)?.substr(2, 9)?.toUpperCase()}`;
-      
-      const leadData = {
-        first_name: data?.firstName,
-        last_name: data?.lastName,
+      // Use the waitlist service which handles both database storage and email notifications
+      const result = await waitlistService.addToWaitlist({
+        firstName: data?.firstName,
+        lastName: data?.lastName,
         email: data?.email,
         phone: data?.phone || null,
-        source: 'website',
-        status: 'new',
-        notes: `Waitlist signup from AES CRM marketing page. Practice: ${data?.practiceName || 'Not specified'}. Interest: ${data?.interest || 'General CRM'}`,
-        lead_number: leadNumber,
-        treatment_interest: data?.interest === 'cosmetic' ? 'cosmetic' : 
-                           data?.interest === 'general' ? 'general' : 
-                           data?.interest === 'orthodontics' ? 'orthodontics' : null,
+        practiceName: data?.practiceName || null,
+        interest: data?.interest || 'General CRM',
         utm_source: 'aescrm_landing',
         utm_medium: 'waitlist_form',
         utm_campaign: 'pre_launch_waitlist'
-      };
+      });
 
-      const { data: result, error } = await leadsService?.create(leadData);
-
-      if (error) {
-        throw new Error(error?.message || 'Failed to join waitlist');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to join waitlist');
       }
 
       setIsSuccess(true);
       reset();
+      
+      // Log success with email status
+      logger.info('Waitlist signup successful', {
+        leadNumber: result.leadNumber,
+        emailsSent: result.emailsSent,
+        formType: 'waitlist',
+        timestamp: new Date().toISOString()
+      });
       
       // Auto-close success message after 3 seconds
       setTimeout(() => {
@@ -52,7 +52,12 @@ const WaitlistForm = ({ isOpen, onClose }) => {
       }, 3000);
 
     } catch (error) {
-      console.error('Waitlist signup error:', error);
+      logger.error('Waitlist signup error', {
+        error: error.message,
+        stack: error.stack,
+        formType: 'waitlist',
+        timestamp: new Date().toISOString()
+      });
       setSubmitError(error?.message || 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);

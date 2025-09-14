@@ -123,17 +123,25 @@ const PracticePerformanceOverviewDashboard = () => {
   ];
 
   useEffect(() => {
+    let interval;
+    
     // Auto-refresh functionality
     if (autoRefresh && user) {
-      const interval = setInterval(() => {
+      const refreshData = () => {
         refetchStats();
         refetchRevenue();
         refetchPipeline();
         refetchActivities();
-      }, 300000); // 5 minutes
+      };
 
-      return () => clearInterval(interval);
+      interval = setInterval(refreshData, 300000); // 5 minutes
     }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [autoRefresh, user, refetchStats, refetchRevenue, refetchPipeline, refetchActivities]);
 
   const handleDateRangeChange = (range) => {
