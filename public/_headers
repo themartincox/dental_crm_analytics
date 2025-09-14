@@ -1,120 +1,113 @@
-# AES CRM - Netlify Security Headers
-# https://aescrm.com
+# Security Headers for AES CRM
+# Comprehensive security configuration for production deployment
 
+# Content Security Policy
 /*
-  # Security Headers
-  X-Frame-Options: DENY
-  X-XSS-Protection: 1; mode=block
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
-  
-  # Content Security Policy - Restrictive but allows necessary resources
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com; frame-src 'self' https://www.youtube.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: 
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://static.rocket.new https://application.rocket.new;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: https: blob:;
+    connect-src 'self' https://*.supabase.co https://*.supabase.com https://application.rocket.new;
+    frame-src 'self' https://application.rocket.new;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
 
-  # HSTS (HTTP Strict Transport Security)
+# Strict Transport Security
+/*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  
-  # Additional Security
-  X-Permitted-Cross-Domain-Policies: none
-  Cross-Origin-Embedder-Policy: credentialless
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Resource-Policy: same-origin
 
-# Marketing pages - Allow embedding for previews
-/
-  X-Frame-Options: SAMEORIGIN
+# X-Frame-Options
+/*
+  X-Frame-Options: DENY
 
-/aes-crm-marketing-landing-page
-  X-Frame-Options: SAMEORIGIN
+# X-Content-Type-Options
+/*
+  X-Content-Type-Options: nosniff
 
-# Public booking pages - More permissive for embedding
-/public-booking
-  X-Frame-Options: SAMEORIGIN
-  Cross-Origin-Resource-Policy: cross-origin
+# Referrer Policy
+/*
+  Referrer-Policy: strict-origin-when-cross-origin
 
-/booking-widget
-  X-Frame-Options: ALLOWALL
-  Cross-Origin-Resource-Policy: cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co; frame-ancestors *;
+# Permissions Policy
+/*
+  Permissions-Policy: 
+    camera=(),
+    microphone=(),
+    geolocation=(),
+    interest-cohort=()
 
-/booking-confirmation
-  X-Frame-Options: SAMEORIGIN
+# X-XSS-Protection
+/*
+  X-XSS-Protection: 1; mode=block
 
-# Static assets - Optimize caching
-/assets/*
+# Cache Control for static assets
+/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-/favicon.ico
-  Cache-Control: public, max-age=31536000
+# Cache Control for HTML
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
 
+# Cache Control for service worker
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cache Control for manifest
 /manifest.json
   Cache-Control: public, max-age=86400
 
-# Robots and sitemap
-/robots.txt
-  Cache-Control: public, max-age=86400
-  Content-Type: text/plain
+# Cache Control for images
+*.jpg
+  Cache-Control: public, max-age=31536000
 
-/sitemap.xml
-  Cache-Control: public, max-age=86400
-  Content-Type: application/xml
+*.jpeg
+  Cache-Control: public, max-age=31536000
 
-# API endpoints (when available)
+*.png
+  Cache-Control: public, max-age=31536000
+
+*.webp
+  Cache-Control: public, max-age=31536000
+
+*.avif
+  Cache-Control: public, max-age=31536000
+
+*.svg
+  Cache-Control: public, max-age=31536000
+
+# Cache Control for fonts
+*.woff
+  Cache-Control: public, max-age=31536000
+
+*.woff2
+  Cache-Control: public, max-age=31536000
+
+*.ttf
+  Cache-Control: public, max-age=31536000
+
+*.eot
+  Cache-Control: public, max-age=31536000
+
+# Cache Control for CSS
+*.css
+  Cache-Control: public, max-age=31536000
+
+# Cache Control for JavaScript
+*.js
+  Cache-Control: public, max-age=31536000
+
+# Cache Control for API responses
 /api/*
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-  
-# Authentication pages
-/login
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: public, max-age=300
 
-/auth/*
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-# CRM application pages - Block from search engines
-/get-started
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/dashboard
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/appointments
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/patients
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/leads
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/memberships
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/analytics/*
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/compliance
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/widgets
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/admin
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
-
-/matching-engine
-  X-Robots-Tag: noindex
-  Cache-Control: no-store, no-cache, must-revalidate
+# CORS headers for API
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
+  Access-Control-Max-Age: 86400
