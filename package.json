@@ -76,6 +76,7 @@
     "build": "vite build",
     "build:analyze": "vite build --mode analyze",
     "build:production": "NODE_ENV=production vite build",
+    "build:fix": "./fix-deployment.sh",
     "serve": "vite preview",
     "test": "vitest",
     "lint": "eslint src --ext .js,.jsx --fix",
