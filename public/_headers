@@ -52,6 +52,7 @@
 # Cache Control for HTML
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+  Content-Type: text/html; charset=utf-8
 
 # Cache Control for service worker
 /sw.js
