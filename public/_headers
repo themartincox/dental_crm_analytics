@@ -105,6 +105,10 @@
 /*.mjs
   Cache-Control: public, max-age=31536000
   Content-Type: text/javascript; charset=utf-8
+/index.jsx
+  Content-Type: text/javascript; charset=utf-8
+/src/index.jsx
+  Content-Type: text/javascript; charset=utf-8
 
 # Cache Control for API responses
 /api/*

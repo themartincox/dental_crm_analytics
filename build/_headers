@@ -52,7 +52,7 @@
 # Cache Control for HTML
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
-Content-Type: text/html; charset=utf-8
+  Content-Type: text/html; charset=utf-8
 
 # Cache Control for service worker
 /sw.js
@@ -100,11 +100,16 @@ Content-Type: text/html; charset=utf-8
 
 # Cache Control for JavaScript
 /*.js
-Cache-Control: public, max-age=31536000
-Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000
+  Content-Type: text/javascript; charset=utf-8
 /*.mjs
   Cache-Control: public, max-age=31536000
   Content-Type: text/javascript; charset=utf-8
+/index.jsx
+  Content-Type: text/javascript; charset=utf-8
+/src/index.jsx
+  Content-Type: text/javascript; charset=utf-8
+
 # Cache Control for API responses
 /api/*
   Cache-Control: public, max-age=300
