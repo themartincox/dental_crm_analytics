@@ -97,7 +97,7 @@ const AlternativeTimesModal = ({ alternativeTimes, onSelect, onClose }) => {
               </p>
               <div className="space-y-1 text-sm">
                 <p className="text-foreground">
-                  <span className="font-medium">Phone:</span> +44 20 7123 4567
+                  <span className="font-medium">Phone:</span> 08007723291
                 </p>
                 <p className="text-foreground">
                   <span className="font-medium">Email:</span> info@centraldental.co.uk

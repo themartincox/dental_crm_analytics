@@ -135,7 +135,7 @@ export function generateStructuredData(pageType, data = {}) {
             '@type': 'ContactPoint',
             telephone: '+44-xxx-xxx-xxxx',
             contactType: 'customer service',
-            const defaultEmail = "hello@postino.cc";
+              defaultEmail: "hello@postino.cc",
           }
         }
       };

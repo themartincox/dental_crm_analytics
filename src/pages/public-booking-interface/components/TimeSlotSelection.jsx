@@ -319,7 +319,7 @@ const TimeSlotSelection = ({
             <div>
               <h4 className="font-medium text-red-900 mb-1">Dental Emergency?</h4>
               <p className="text-sm text-red-800 mb-2">
-                Call immediately for urgent care: +44 20 7123 4567
+                Call immediately for urgent care: <a href={`tel:${clinicInfo.phone}`} className="text-indigo-600 hover:underline font-semibold">{clinicInfo.phone}</a>
               </p>
             </div>
           </div>
@@ -544,7 +544,7 @@ const TimeSlotSelection = ({
               Need an Emergency Appointment?
             </h3>
             <p className="text-sm text-red-800 mb-2">
-              For urgent dental care, call us immediately at +44 20 7123 4567
+              For urgent dental care, call us immediately at 08007723291
             </p>
             <Button variant="outline" size="sm" className="border-red-300 text-red-700">
               Call Emergency Line
