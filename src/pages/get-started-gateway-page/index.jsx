@@ -148,7 +148,7 @@ const GetStartedGatewayPage = () => {
               <p className="text-gray-500 text-sm">
                 Need help deciding? 
                 <a 
-                  href="mailto:support@aescrm.com" 
+                  href="mailto:hello@postino.cc" 
                   className="text-blue-600 hover:text-blue-700 ml-1 font-medium"
                 >
                   Contact our team

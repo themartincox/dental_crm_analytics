@@ -10,7 +10,7 @@ const ContactPage = () => {
     {
       icon: Mail,
       title: 'Email',
-      details: 'hello@aescrm.com',
+      details: 'hello@postino.cc',
       description: 'Send us an email anytime'
     },
     {

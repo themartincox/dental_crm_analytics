@@ -165,7 +165,7 @@ A: Data migration from existing systems is included in the installation fee.
 ## Contact Sales
 
 For custom quotes or questions about pricing:
-- **Email**: sales@aescrm.com
+- **Email**: hello@postino.cc
 - **Phone**: +44 20 7123 4567
 - **Schedule Demo**: [Book a call](https://aescrm.com/demo)
 

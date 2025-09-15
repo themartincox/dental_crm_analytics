@@ -151,7 +151,7 @@ const AESCRMMarketingLandingPage = () => {
           "contactPoint": [{
             "@type": "ContactPoint",
             "contactType": "sales",
-            "email": "hello@aescrm.com",
+            "email": "hello@postino.cc",
             "availableLanguage": ["en-GB","en-US"]
           }]
         })}
@@ -558,7 +558,7 @@ const AESCRMMarketingLandingPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-gray-400 text-sm">
                     <Mail className="h-4 w-4 mr-2" />
-                    hello@aescrm.com
+                    hello@postino.cc
                   </div>
                   <div className="text-gray-400 text-sm">
                     <em>Delivered by Postino</em>

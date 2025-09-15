@@ -155,7 +155,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Email Configuration (for production)
 EMAIL_SERVICE_API_KEY=your_email_service_key
-EMAIL_FROM_ADDRESS=noreply@aescrm.com
+EMAIL_FROM_ADDRESS=hello@postino.cc
 ```
 
 ### Email Service Integration

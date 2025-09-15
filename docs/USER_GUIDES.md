@@ -424,7 +424,7 @@ As a patient, you can book appointments, view your treatment history, and manage
 ### Getting Help
 
 #### Support Channels
-- **Email**: support@aescrm.com
+- **Email**: hello@postino.cc
 - **Phone**: +44 20 1234 5678
 - **Live Chat**: Available in the system
 - **Help Center**: https://help.aescrm.com
@@ -489,4 +489,4 @@ As a patient, you can book appointments, view your treatment history, and manage
 
 ---
 
-*For additional support or questions, please contact our support team at support@aescrm.com or visit our help center at https://help.aescrm.com*
+*For additional support or questions, please contact our support team at hello@postino.cc or visit our help center at https://help.aescrm.com*

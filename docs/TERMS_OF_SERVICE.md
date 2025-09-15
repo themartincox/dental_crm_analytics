@@ -229,7 +229,7 @@ Your continued use of the Service after such modifications constitutes acceptanc
 If you have any questions about these Terms, please contact us:
 
 **AES CRM Limited**  
-Email: legal@aescrm.com  
+Email: hello@postino.cc  
 Phone: +44 20 1234 5678  
 Address: 123 Business Street, London, SW1A 1AA, United Kingdom
 

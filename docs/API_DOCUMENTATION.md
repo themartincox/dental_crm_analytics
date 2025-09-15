@@ -550,7 +550,7 @@ patients = client.patients.list()
 ## Support
 
 - **Documentation**: https://docs.aescrm.com
-- **Support Email**: support@aescrm.com
+- **Support Email**: hello@postino.cc
 - **Status Page**: https://status.aescrm.com
 - **API Status**: https://api.aescrm.com/health
 
