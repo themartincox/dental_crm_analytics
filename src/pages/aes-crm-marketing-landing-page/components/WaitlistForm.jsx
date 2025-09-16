@@ -26,6 +26,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
       <input type="checkbox" name="gdprConsent" />
     </form>
   );
+}
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
