@@ -26,7 +26,6 @@ const WaitlistForm = ({ isOpen, onClose }) => {
       <input type="checkbox" name="gdprConsent" />
     </form>
   );
-  </>
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -95,7 +94,6 @@ const WaitlistForm = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
-
   return (
     <>
       {netlifyForm}
@@ -123,15 +121,24 @@ const WaitlistForm = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-          {/* Success State */}
-          {isSuccess && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-6 text-center"
-            >
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">You're on the waitlist! 🎉</h4>
-              <p className="text-gray-600 text-sm">
+            {/* Success State */}
+            {isSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-6 text-center"
+              >
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-green-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">You're on the waitlist! 🎉</h4>
+                <p className="text-gray-600 text-sm">
+                  Thank you for joining! We'll notify you as soon as AES CRM is available.
+                </p>
+              </motion.div>
+            )}
+            {/* ...other form/modal content here... */}
+          </motion.div>
+        </div>
+      </AnimatePresence>
+  </>
