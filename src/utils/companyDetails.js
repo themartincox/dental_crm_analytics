@@ -1,7 +1,7 @@
 
 const companyDetails = {
   contact: {
-    email: 'hello@postino.cc',
+    email: '<a href="mailto:hello@postino.cc">hello@postino.cc</a>',
     telephone: '+44 08007723291',
   },
   company: {

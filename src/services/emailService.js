@@ -301,7 +301,7 @@ export const emailService = {
             
             <p>We'll keep you updated on our progress and notify you as soon as we're ready to onboard your practice.</p>
             
-            <p>If you have any questions, feel free to reply to this email or contact us at hello@postino.cc</p>
+            <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:hello@postino.cc">hello@postino.cc</a></p>
             
             <p>Best regards,<br>
             The AES CRM Team</p>

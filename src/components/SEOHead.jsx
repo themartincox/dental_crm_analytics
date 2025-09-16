@@ -2,13 +2,13 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 
 const SEOHead = ({ 
-  title = 'Dental CRM', 
+  title = 'AES CRM', 
   description = 'Professional dental practice management system', 
   keywords = 'dental, crm, practice management, appointments, patients',
   image = null,
   url = null 
 }) => {
-  const siteUrl = window?.location?.origin || 'https://dentalcrm.com';
+  const siteUrl = window?.location?.origin || 'https://aescrm.com';
   const fullUrl = url || window?.location?.href || siteUrl;
   const imageUrl = image || `${siteUrl}/assets/images/dental-crm-og.jpg`;
 
@@ -36,7 +36,7 @@ const SEOHead = ({
       <meta name="twitter:image" content={imageUrl} />
       
       {/* Additional Meta Tags */}
-      <meta name="author" content="Dental CRM Team" />
+      <meta name="author" content="AES CRM Team" />
       <meta name="theme-color" content="#2563eb" />
       <link rel="canonical" href={fullUrl} />
       
