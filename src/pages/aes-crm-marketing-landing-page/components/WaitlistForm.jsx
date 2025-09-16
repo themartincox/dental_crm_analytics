@@ -141,4 +141,5 @@ const WaitlistForm = ({ isOpen, onClose }) => {
           </motion.div>
         </div>
       </AnimatePresence>
-  </>
+    </>
+  );
