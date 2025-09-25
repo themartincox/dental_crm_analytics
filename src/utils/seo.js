@@ -135,7 +135,7 @@ export function generateStructuredData(pageType, data = {}) {
             '@type': 'ContactPoint',
             telephone: '+44-xxx-xxx-xxxx',
             contactType: 'customer service',
-              defaultEmail: "hello@postino.cc",
+            email: 'hello@aescrm.com'
           }
         }
       };
