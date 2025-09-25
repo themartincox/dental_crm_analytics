@@ -299,7 +299,7 @@ setup_ssl() {
         # Check if certificates exist
         if [ ! -f "$SSL_CERT_PATH/fullchain.pem" ]; then
             log "Obtaining SSL certificates..."
-            sudo certbot certonly --nginx -d aescrm.com -d www.aescrm.com --non-interactive --agree-tos --email hello@postino.cc
+            sudo certbot certonly --nginx -d aescrm.com -d www.aescrm.com --non-interactive --agree-tos --email admin@aescrm.com
             
             if [ $? -eq 0 ]; then
                 success "SSL certificates obtained"

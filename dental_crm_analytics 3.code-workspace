@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "src/pages/dental-crm-dashboard"
+		},
+		{
+			"path": "src/pages/aes-crm-marketing-landing-page"
+		}
+	]
+}

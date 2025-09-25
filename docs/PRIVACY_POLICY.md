@@ -222,7 +222,7 @@ You can:
 ### 8.4 Exercising Your Rights
 To exercise your rights:
 
-- Contact us at [hello@postino.cc](mailto:hello@postino.cc)
+- Contact us at privacy@aescrm.com
 - Use the privacy controls in your account
 - Submit a data subject request form
 - Contact our Data Protection Officer
@@ -315,7 +315,7 @@ For privacy-related inquiries:
 
 **Data Protection Officer**  
 AES CRM Limited  
-Email: [hello@postino.cc](mailto:hello@postino.cc)  
+Email: dpo@aescrm.com  
 Phone: +44 20 1234 5678  
 Address: 123 Business Street, London, SW1A 1AA, United Kingdom
 
@@ -323,7 +323,7 @@ Address: 123 Business Street, London, SW1A 1AA, United Kingdom
 For general privacy questions:
 
 **Privacy Team**  
-Email: [hello@postino.cc](mailto:hello@postino.cc)  
+Email: privacy@aescrm.com  
 Phone: +44 20 1234 5678
 
 ### 15.3 Regulatory Authority
