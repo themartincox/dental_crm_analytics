@@ -16,7 +16,7 @@ A modern React-based aesthetic practice management platform utilizing the latest
 
 ## 📋 Prerequisites
 
-- Node.js (v14.x or higher)
+- Node.js (v18.x or higher)
 - npm or yarn
 
 ## 🛠️ Installation

@@ -94,6 +94,16 @@ self.addEventListener('fetch', event => {
   if (!url.protocol.startsWith('http')) {
     return;
   }
+
+  // Security: never cache authenticated/API/PII-prone requests
+  const isApi = url.pathname.startsWith('/api/');
+  const isSupabase = url.hostname.includes('supabase');
+  const hasAuth = request.headers && request.headers.get('authorization');
+  if (isApi || isSupabase || hasAuth) {
+    // Bypass caches entirely
+    event.respondWith(fetch(request));
+    return;
+  }
   
   // Determine caching strategy based on request type
   if (isStaticAsset(request)) {
@@ -101,7 +111,8 @@ self.addEventListener('fetch', event => {
   } else if (isImageRequest(request)) {
     event.respondWith(cacheFirst(request, IMAGE_CACHE));
   } else if (isAPIRequest(request)) {
-    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
+    // Additional guard (kept for completeness, but fetch used above)
+    event.respondWith(fetch(request));
   } else {
     event.respondWith(staleWhileRevalidate(request, DYNAMIC_CACHE));
   }
