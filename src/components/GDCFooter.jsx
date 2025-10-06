@@ -283,16 +283,10 @@ const GDCFooter = () => {
             <div className="text-sm text-gray-600">
               <div className="mb-2">
                 <span className="font-semibold">AES CRM — The Aesthetic CRM</span>
-                <span className="mx-2">|</span>
-                <a 
-                  href="https://postino.cc" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Delivered by Postino
-                </a>
-              </div>
+                <p className="text-xs text-gray-500"> Delivered by{' '} <a href="https://postino.cc" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700"> Postino </a> </p>
+If you prefer a bottom bar:
+
+<div className="mt-4 flex items-center justify-between text-xs text-gray-500"> <span>© {currentYear} AES CRM</span> <span> Delivered by{' '} <a href="https://postino.cc" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700"> Postino </a> </span> </div>
               <div>© {currentYear} AES Aesthetic Practice Management. All rights reserved.</div>
               <div className="mt-1">
                 <span className="font-medium">Principal:</span> Dr. Sarah Johnson BDS MFDS RCS(Ed) | 
