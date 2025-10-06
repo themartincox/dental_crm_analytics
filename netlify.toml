@@ -49,3 +49,7 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Max-Age = "86400"
 
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

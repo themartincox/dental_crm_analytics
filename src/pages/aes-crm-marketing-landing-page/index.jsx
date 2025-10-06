@@ -220,10 +220,10 @@ const AESCRMMarketingLandingPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <div className="flex-shrink-0 flex items-center">
+                <a href="/" aria-label="AES CRM home" className="flex-shrink-0 flex items-center focus:outline-none focus:ring-2 focus:ring-blue-600 rounded">
                   <Sparkles className="h-8 w-8 text-blue-600" />
                   <span className="ml-2 text-xl font-bold text-gray-900">AES CRM</span>
-                </div>
+                </a>
               </div>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
@@ -557,22 +557,15 @@ const AESCRMMarketingLandingPage = () => {
               <div>
                 <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Contact</h3>
                 <div className="space-y-2">
-                  <div className="flex items-center text-gray-400 text-sm">
+                  <a href="mailto:hello@aescrm.com" className="flex items-center text-gray-400 hover:text-white text-sm">
                     <Mail className="h-4 w-4 mr-2" />
                     hello@aescrm.com
-                  </div>
-                  <div className="text-gray-400 text-sm">
-                    <em>Delivered by Postino</em>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>
             
-            <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-              <p className="text-gray-400 text-sm">
-                © 2025 AES CRM. <em>Delivered by Postino</em> (postino.cc)
-              </p>
-            </div>
+            {/* Bottom copyright bar intentionally removed per request */}
           </div>
         </footer>
 
