@@ -30,7 +30,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
   const practiceInfo = {
     name: "Central Dental Practice",
     address: "123 High Street, London SW1A 1AA",
-    phone: '08007723291',
+    phone: "+44 20 7123 4567",
     email: "bookings@centraldental.co.uk",
     rating: 4.8,
     reviewCount: 247

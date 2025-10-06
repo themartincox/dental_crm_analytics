@@ -12,7 +12,7 @@ import SecurityIndicators from './components/SecurityIndicators';
 import ConfirmationModal from './components/ConfirmationModal';
 import AlternativeTimesModal from './components/AlternativeTimesModal';
 import { format, addMinutes } from 'date-fns';
-import { supabase } from '../../lib/supabase';
+import secureApiService from '../../services/secureApiService';
 
 const BookingConfirmationPaymentProcessing = () => {
   const [searchParams] = useSearchParams();
@@ -91,15 +91,11 @@ const BookingConfirmationPaymentProcessing = () => {
       try {
         setIsLoading(true);
         
-        // Load appointment with related data
-        const { data: appointmentData, error: appointmentError } = await supabase?.from('appointments')?.select(`
-            *,
-            patient:patients(*),
-            dentist:user_profiles(*),
-            practice_location:practice_locations(*)
-          `)?.eq('id', appointmentId)?.single();
+        // Load appointment summary via secure API
+        const summaryRes = await secureApiService.makeSecureRequest(`/appointments/${appointmentId}/summary`, { method: 'GET' });
+        const appointmentData = summaryRes?.data?.appointment || summaryRes?.appointment || null;
 
-        if (appointmentError) throw appointmentError;
+        if (!appointmentData) throw new Error('Appointment not found');
 
         setAppointment(appointmentData);
         setPatient(appointmentData?.patient);
@@ -108,8 +104,7 @@ const BookingConfirmationPaymentProcessing = () => {
 
         // Load saved payment methods for returning patients
         if (appointmentData?.patient?.id) {
-          const { data: paymentsData } = await supabase?.from('payments')?.select('payment_method, payment_reference')?.eq('patient_id', appointmentData?.patient?.id)?.eq('status', 'paid')?.limit(3);
-
+          const paymentsData = (summaryRes?.data?.payments || []);
           if (paymentsData?.length > 0) {
             setSavedPayments(paymentsData?.map(payment => ({
               value: payment?.payment_reference,
@@ -119,8 +114,7 @@ const BookingConfirmationPaymentProcessing = () => {
         }
 
         // Load treatment preparation instructions
-        const { data: treatmentData } = await supabase?.from('treatments')?.select('description, notes')?.eq('appointment_id', appointmentId)?.single();
-
+        const treatmentData = (summaryRes?.data?.treatments || [])?.[0] || null;
         if (treatmentData) {
           setPreparationInstructions(treatmentData?.notes || treatmentData?.description || '');
         }
@@ -146,7 +140,8 @@ const BookingConfirmationPaymentProcessing = () => {
       const appointmentEnd = new Date(`${appointmentData?.appointment_date}T${appointmentData?.end_time}`);
 
       // Check for conflicting appointments
-      const { data: conflicts } = await supabase?.from('appointments')?.select('*')?.eq('dentist_id', appointmentData?.dentist_id)?.eq('appointment_date', appointmentData?.appointment_date)?.neq('id', appointmentData?.id)?.in('status', ['confirmed', 'scheduled']);
+      const conflictsRes = await secureApiService.makeSecureRequest(`/appointments/conflicts?dentist_id=${appointmentData?.dentist_id}&appointment_date=${appointmentData?.appointment_date}&exclude_id=${appointmentData?.id}`, { method: 'GET' });
+      const conflicts = conflictsRes?.data || [];
 
       if (conflicts?.length > 0) {
         const hasTimeConflict = conflicts?.some(conflict => {
@@ -182,7 +177,8 @@ const BookingConfirmationPaymentProcessing = () => {
         const timeSlots = ['09:00', '11:00', '14:00', '16:00'];
         
         for (const timeSlot of timeSlots) {
-          const { data: available } = await supabase?.from('appointments')?.select('id')?.eq('dentist_id', appointmentData?.dentist_id)?.eq('appointment_date', format(altDate, 'yyyy-MM-dd'))?.gte('start_time', timeSlot)?.lt('start_time', addMinutes(new Date(`2000-01-01T${timeSlot}`), duration)?.toTimeString()?.slice(0, 5));
+          const availableRes = await secureApiService.makeSecureRequest(`/appointments/availability?dentist_id=${appointmentData?.dentist_id}&date=${format(altDate, 'yyyy-MM-dd')}&start_time=${timeSlot}&duration=${duration}`, { method: 'GET' });
+          const available = availableRes?.data || [];
 
           if (!available?.length && alternatives?.length < 3) {
             alternatives?.push({
@@ -235,16 +231,16 @@ const BookingConfirmationPaymentProcessing = () => {
       };
 
       // Process payment in database
-      const { data: payment, error: paymentError } = await supabase?.from('payments')?.insert(paymentData)?.select()?.single();
+      const { data: payment, error: paymentError } = await secureApiService.makeSecureRequest('/payments', { method: 'POST', body: JSON.stringify(paymentData) });
 
       if (paymentError) throw paymentError;
 
       // Update appointment status and deposit status
-      const { error: appointmentError } = await supabase?.from('appointments')?.update({
+      const { error: appointmentError } = await secureApiService.makeSecureRequest(`/appointments/${appointment?.id}`, { method: 'PUT', body: JSON.stringify({
           status: 'confirmed',
           deposit_paid: appointment?.deposit_required || appointment?.estimated_cost,
           updated_at: new Date()?.toISOString()
-        })?.eq('id', appointment?.id);
+        }) }, 'receptionist');
 
       if (appointmentError) throw appointmentError;
 
@@ -292,12 +288,12 @@ const BookingConfirmationPaymentProcessing = () => {
       const newEndTime = addMinutes(new Date(`2000-01-01T${newStartTime}`), duration)?.toTimeString()?.slice(0, 5);
 
       // Update appointment time
-      const { error } = await supabase?.from('appointments')?.update({
+      const { error } = await secureApiService.makeSecureRequest(`/appointments/${appointment?.id}`, { method: 'PUT', body: JSON.stringify({
           appointment_date: newDate,
           start_time: newStartTime,
           end_time: newEndTime,
           updated_at: new Date()?.toISOString()
-        })?.eq('id', appointment?.id);
+        }) }, 'receptionist');
 
       if (error) throw error;
 

@@ -237,7 +237,7 @@ const ServiceSelection = ({ services = [], selectedService, onServiceSelect, com
                 Our dental experts can help you select the right treatment during your consultation.
               </p>
               <button className="text-sm text-blue-700 underline hover:text-blue-800">
-                Call us: <a href={`tel:${clinicInfo.phone}`} className="text-indigo-600 hover:underline font-semibold">{clinicInfo.phone}</a>
+                Call us: +44 20 7123 4567
               </button>
             </div>
           </div>
@@ -392,7 +392,7 @@ const ServiceSelection = ({ services = [], selectedService, onServiceSelect, com
           Not sure which treatment you need? Our team can help you choose during your consultation.
         </p>
         <Button variant="outline" size="sm">
-          Call us: <a href={`tel:${clinicInfo.phone}`} className="text-indigo-600 hover:underline font-semibold">{clinicInfo.phone}</a>
+          Call us: +44 20 7123 4567
         </Button>
       </div>
     </div>

@@ -9,6 +9,7 @@ import RecentActivity from './components/RecentActivity';
 import { usePracticeStats, useRevenueData, useLeadPipelineData, useRecentActivities } from '../../hooks/useSupabaseData';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAccessibility } from '../../hooks/useAccessibility';
+import { logger } from '../../utils/logger';
 
 const PracticePerformanceOverviewDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -146,21 +147,37 @@ const PracticePerformanceOverviewDashboard = () => {
 
   const handleDateRangeChange = (range) => {
     setSelectedDateRange(range);
-    console.log('Date range changed to:', range);
+    logger.info('Date range changed', { 
+      newRange: range, 
+      userId: user?.id,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const handleLocationChange = (location) => {
     setSelectedLocation(location);
-    console.log('Location changed to:', location);
+    logger.info('Location changed', { 
+      newLocation: location, 
+      userId: user?.id,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const handleRefreshToggle = (enabled) => {
     setAutoRefresh(enabled);
-    console.log('Auto-refresh:', enabled ? 'enabled' : 'disabled');
+    logger.info('Auto-refresh toggled', { 
+      enabled, 
+      userId: user?.id,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const handleChartDataClick = (data) => {
-    console.log('Chart data clicked:', data);
+    logger.info('Chart data clicked', { 
+      data, 
+      userId: user?.id,
+      timestamp: new Date().toISOString()
+    });
     // Implement drill-down functionality
   };
 

@@ -4,6 +4,7 @@ import { measureWebVitals } from '../../utils/performance';
 import { logger } from '../../utils/logger';
 import { useSEO } from '../../utils/seo';
 import OptimizedImage from '../../components/OptimizedImage';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../../utils/constants';
 
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Users, TrendingUp, Shield, Calendar, MessageSquare, BarChart3, Sparkles, Mail } from 'lucide-react';
@@ -151,7 +152,7 @@ const AESCRMMarketingLandingPage = () => {
           "contactPoint": [{
             "@type": "ContactPoint",
             "contactType": "sales",
-            "email": "mailto:hello@postino.cc",
+            "email": "hello@aescrm.com",
             "availableLanguage": ["en-GB","en-US"]
           }]
         })}
@@ -558,7 +559,7 @@ const AESCRMMarketingLandingPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-gray-400 text-sm">
                     <Mail className="h-4 w-4 mr-2" />
-                    <a href="mailto:hello@postino.cc" className="text-blue-600 hover:underline">hello@postino.cc</a>
+                    hello@aescrm.com
                   </div>
                   <div className="text-gray-400 text-sm">
                     <em>Delivered by Postino</em>

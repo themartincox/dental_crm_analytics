@@ -239,7 +239,7 @@ END:VCALENDAR`;
         {/* Contact Information */}
         <div className="mt-6 pt-4 border-t border-border text-center">
           <p className="text-sm text-muted-foreground">
-            Questions? Contact us at <span className="font-semibold text-foreground">08007723291</span> or{' '}
+            Questions? Contact us at <span className="font-semibold text-foreground">+44 20 7123 4567</span> or{' '}
             <span className="font-semibold text-foreground">info@centraldental.co.uk</span>
           </p>
         </div>

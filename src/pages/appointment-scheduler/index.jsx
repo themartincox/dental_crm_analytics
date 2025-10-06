@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import Select from '../../components/ui/Select';
@@ -9,7 +9,9 @@ import BookingModal from './components/BookingModal';
 
 import ReminderSettings from './components/ReminderSettings';
 import DepositCollection from './components/DepositCollection';
-import { format, isSameDay } from 'date-fns';
+import { format, isSameDay, startOfWeek, addDays, endOfWeek } from 'date-fns';
+import secureApiService from '../../services/secureApiService';
+import { appointmentsRealtimeService } from '../../services/dentalCrmService';
 
 const AppointmentScheduler = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -44,89 +46,42 @@ const AppointmentScheduler = () => {
     { value: 'surgery', label: 'Surgery' }
   ];
 
-  // Mock appointments data
-  const mockAppointments = [
-    {
-      id: 1,
-      patientName: 'Sarah Johnson',
-      patientId: 'P001',
-      provider: 'dr-smith',
-      type: 'consultation',
-      date: new Date(2025, 0, 2, 9, 0), // Jan 2, 2025 9:00 AM
-      duration: 60,
-      status: 'confirmed',
-      depositRequired: 50,
-      depositPaid: true,
-      reminderSent: true,
-      notes: 'New patient consultation',
-      phone: '+44 7700 900123',
-      email: 'sarah.johnson@email.com'
-    },
-    {
-      id: 2,
-      patientName: 'Michael Brown',
-      patientId: 'P002',
-      provider: 'dr-johnson',
-      type: 'treatment',
-      date: new Date(2025, 0, 2, 10, 30), // Jan 2, 2025 10:30 AM
-      duration: 90,
-      status: 'confirmed',
-      depositRequired: 100,
-      depositPaid: false,
-      reminderSent: true,
-      notes: 'Root canal treatment',
-      phone: '+44 7700 900456',
-      email: 'michael.brown@email.com'
-    },
-    {
-      id: 3,
-      patientName: 'Emma Wilson',
-      patientId: 'P003',
-      provider: 'dr-smith',
-      type: 'cleaning',
-      date: new Date(2025, 0, 2, 14, 0), // Jan 2, 2025 2:00 PM
-      duration: 45,
-      status: 'pending',
+  const mapApiAppointment = (a) => {
+    const start = new Date(`${a.appointment_date}T${a.start_time}`);
+    const end = new Date(`${a.appointment_date}T${a.end_time}`);
+    return {
+      id: a.id,
+      patientName: a.patients?.first_name ? `${a.patients.first_name} ${a.patients.last_name || ''}`.trim() : 'Patient',
+      patientId: a.patient_id,
+      provider: a.dentist_id || a.dentist?.id || 'provider',
+      type: a.treatment_type || 'appointment',
+      date: start,
+      duration: Math.max(15, Math.round((end - start) / 60000)),
+      status: a.status || 'scheduled',
       depositRequired: 0,
       depositPaid: false,
       reminderSent: false,
-      notes: 'Regular cleaning appointment',
-      phone: '+44 7700 900789',
-      email: 'emma.wilson@email.com'
-    },
-    {
-      id: 4,
-      patientName: 'James Thompson',
-      patientId: 'P004',
-      provider: 'dr-wilson',
-      type: 'followup',
-      date: new Date(2025, 0, 3, 11, 0), // Jan 3, 2025 11:00 AM
-      duration: 30,
-      status: 'confirmed',
-      depositRequired: 25,
-      depositPaid: true,
-      reminderSent: true,
-      notes: 'Post-surgery follow-up',
-      phone: '+44 7700 900012',
-      email: 'james.thompson@email.com'
-    },
-    {
-      id: 5,
-      patientName: 'Lisa Davis',
-      patientId: 'P005',
-      provider: 'dr-smith',
-      type: 'surgery',
-      date: new Date(2025, 0, 4, 9, 0), // Jan 4, 2025 9:00 AM
-      duration: 120,
-      status: 'confirmed',
-      depositRequired: 200,
-      depositPaid: true,
-      reminderSent: true,
-      notes: 'Wisdom tooth extraction',
-      phone: '+44 7700 900345',
-      email: 'lisa.davis@email.com'
+      notes: a.notes || '',
+      phone: a.patients?.phone,
+      email: a.patients?.email
+    };
+  };
+
+  const fetchAppointments = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const end = endOfWeek(selectedDate, { weekStartsOn: 1 });
+      const params = new URLSearchParams({ date_from: format(start, 'yyyy-MM-dd'), date_to: format(end, 'yyyy-MM-dd') });
+      const res = await secureApiService.makeSecureRequest(`/appointments?${params.toString()}`, { method: 'GET' }, 'receptionist');
+      const list = (res?.data || []).map(mapApiAppointment);
+      setAppointments(list);
+      setIsLoading(false);
+    } catch (e) {
+      // keep previous data if fetch fails
+      setIsLoading(false);
     }
-  ];
+  }, [selectedDate]);
 
   // Mock upcoming alerts
   const mockAlerts = [
@@ -154,13 +109,16 @@ const AppointmentScheduler = () => {
   ];
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setAppointments(mockAppointments);
-      setUpcomingAlerts(mockAlerts);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    fetchAppointments();
+    setUpcomingAlerts([]);
+  }, [fetchAppointments]);
+
+  useEffect(() => {
+    const unsub = appointmentsRealtimeService.subscribe(() => {
+      fetchAppointments();
+    });
+    return () => unsub && unsub();
+  }, [fetchAppointments]);
 
   // Filter appointments based on selected date and filters
   useEffect(() => {
@@ -197,31 +155,41 @@ const AppointmentScheduler = () => {
     setIsBookingModalOpen(true);
   };
 
-  const handleAppointmentCancel = (appointmentId) => {
-    setAppointments(prev => prev?.filter(apt => apt?.id !== appointmentId));
-    setSelectedAppointment(null);
+  const handleAppointmentCancel = async (appointmentId) => {
+    try {
+      await secureApiService.makeSecureRequest(`/appointments/${appointmentId}`, { method: 'DELETE' }, 'practice_admin');
+      setAppointments(prev => prev?.filter(apt => apt?.id !== appointmentId));
+      setSelectedAppointment(null);
+    } catch (e) {}
   };
 
-  const handleBookingSave = (bookingData) => {
-    if (selectedAppointment) {
-      // Update existing appointment
-      setAppointments(prev => prev?.map(apt => 
-        apt?.id === selectedAppointment?.id 
-          ? { ...apt, ...bookingData }
-          : apt
-      ));
-    } else {
-      // Add new appointment
-      const newAppointment = {
-        ...bookingData,
-        id: Date.now(),
-        status: 'confirmed',
-        reminderSent: false
+  const handleBookingSave = async (bookingData) => {
+    try {
+      const startTime = format(bookingData.date, 'HH:mm');
+      const endDate = new Date(bookingData.date.getTime() + (bookingData.duration || 60) * 60000);
+      const endTime = format(endDate, 'HH:mm');
+      const payload = {
+        appointment_date: format(bookingData.date, 'yyyy-MM-dd'),
+        start_time: startTime,
+        end_time: endTime,
+        status: bookingData.status || 'confirmed',
+        treatment_type: bookingData.type || 'appointment',
+        notes: bookingData.notes || '',
+        patient_id: bookingData.patientId,
+        dentist_id: bookingData.provider,
+        practice_location_id: 'default-location'
       };
-      setAppointments(prev => [...prev, newAppointment]);
+      if (selectedAppointment?.id) {
+        await secureApiService.makeSecureRequest(`/appointments/${selectedAppointment.id}`, { method: 'PUT', body: JSON.stringify(payload) }, 'receptionist');
+      } else {
+        await secureApiService.makeSecureRequest('/appointments', { method: 'POST', body: JSON.stringify(payload) }, 'receptionist');
+      }
+      setIsBookingModalOpen(false);
+      setSelectedAppointment(null);
+      fetchAppointments();
+    } catch (e) {
+      alert('Failed to save appointment');
     }
-    setIsBookingModalOpen(false);
-    setSelectedAppointment(null);
   };
 
   const handleDragStart = (appointment) => {
