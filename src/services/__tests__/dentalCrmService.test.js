@@ -7,37 +7,13 @@ import {
   dashboardService 
 } from '../dentalCrmService';
 
-// Mock Supabase
-const mockSupabase = {
-  from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        order: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
-      }))
-    })),
-    insert: vi.fn(() => ({
-      select: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-      }))
-    })),
-    update: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
-      }))
-    })),
-    delete: vi.fn(() => ({
-      eq: vi.fn(() => Promise.resolve({ error: null }))
-    }))
-  })
+// Mock secureApiService methods used by dentalCrmService
+const mockSecureApi = {
+  getPatients: vi.fn(async () => [{ id: 1, first_name: 'John', last_name: 'Doe' }]),
+  makeSecureRequest: vi.fn(async () => ({ data: { id: 1 } })),
 };
-
-// Mock the supabase module
-vi.mock('../../lib/supabase', () => ({
-  supabase: mockSupabase
+vi.mock('../../services/secureApiService', () => ({
+  default: mockSecureApi
 }));
 
 describe('DentalCrmService', () => {
@@ -51,14 +27,7 @@ describe('DentalCrmService', () => {
         { id: 1, first_name: 'John', last_name: 'Doe', email: 'john@example.com' }
       ];
       
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            order: vi.fn(() => Promise.resolve({ data: mockPatients, error: null }))
-          }))
-        }))
-      });
-
+      mockSecureApi.getPatients.mockResolvedValueOnce(mockPatients);
       const result = await patientsService.getAll({ status: 'active' });
       
       expect(result.data).toEqual(mockPatients);
@@ -74,14 +43,7 @@ describe('DentalCrmService', () => {
       
       const mockCreatedPatient = { id: 2, ...patientData };
       
-      mockSupabase.from.mockReturnValue({
-        insert: vi.fn(() => ({
-          select: vi.fn(() => ({
-            single: vi.fn(() => Promise.resolve({ data: mockCreatedPatient, error: null }))
-          }))
-        }))
-      });
-
+      mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedPatient });
       const result = await patientsService.create(patientData);
       
       expect(result.data).toEqual(mockCreatedPatient);
@@ -91,14 +53,7 @@ describe('DentalCrmService', () => {
     it('should handle errors gracefully', async () => {
       const error = new Error('Database connection failed');
       
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            order: vi.fn(() => Promise.resolve({ data: null, error }))
-          }))
-        }))
-      });
-
+      mockSecureApi.getPatients.mockRejectedValueOnce(error);
       const result = await patientsService.getAll();
       
       expect(result.data).toEqual([]);
@@ -118,15 +73,7 @@ describe('DentalCrmService', () => {
         }
       ];
       
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({
-          gte: vi.fn(() => ({
-            lte: vi.fn(() => ({
-              order: vi.fn(() => Promise.resolve({ data: mockAppointments, error: null }))
-            }))
-          }))
-        }))
-      });
+      mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockAppointments });
 
       const filters = {
         date_from: '2024-01-01',
@@ -150,14 +97,7 @@ describe('DentalCrmService', () => {
       
       const mockCreatedLead = { id: 3, ...leadData };
       
-      mockSupabase.from.mockReturnValue({
-        insert: vi.fn(() => ({
-          select: vi.fn(() => ({
-            single: vi.fn(() => Promise.resolve({ data: mockCreatedLead, error: null }))
-          }))
-        }))
-      });
-
+      mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedLead });
       const result = await leadsService.create(leadData);
       
       expect(result.data).toEqual(mockCreatedLead);
@@ -175,14 +115,7 @@ describe('DentalCrmService', () => {
         }
       ];
       
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            order: vi.fn(() => Promise.resolve({ data: mockPayments, error: null }))
-          }))
-        }))
-      });
-
+      mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockPayments });
       const result = await paymentsService.getAll({ status: 'paid' });
       
       expect(result.data).toEqual(mockPayments);
@@ -199,25 +132,7 @@ describe('DentalCrmService', () => {
       };
 
       // Mock multiple Supabase calls
-      mockSupabase.from
-        .mockReturnValueOnce({
-          select: vi.fn(() => Promise.resolve({ count: 100 }))
-        })
-        .mockReturnValueOnce({
-          select: vi.fn(() => Promise.resolve({ count: 50 }))
-        })
-        .mockReturnValueOnce({
-          select: vi.fn(() => Promise.resolve({ count: 25 }))
-        })
-        .mockReturnValueOnce({
-          select: vi.fn(() => ({
-            eq: vi.fn(() => Promise.resolve({ 
-              data: [{ amount: 50000 }], 
-              error: null 
-            }))
-          }))
-        });
-
+      mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockStats });
       const result = await dashboardService.getStats();
       
       expect(result.data).toEqual(mockStats);
@@ -227,10 +142,7 @@ describe('DentalCrmService', () => {
     it('should handle dashboard errors', async () => {
       const error = new Error('Database error');
       
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => Promise.resolve({ count: null, error }))
-      });
-
+      mockSecureApi.makeSecureRequest.mockRejectedValueOnce(error);
       const result = await dashboardService.getStats();
       
       expect(result.data).toEqual({
@@ -243,4 +155,3 @@ describe('DentalCrmService', () => {
     });
   });
 });
-

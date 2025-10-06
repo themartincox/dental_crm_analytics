@@ -31,16 +31,12 @@ export const SecureAuthProvider = ({ children }) => {
                 setUser(null);
                 setUserProfile(null);
                 setIsAuthenticated(false);
-                localStorage.removeItem('sb-auth-token');
                 return;
             }
 
-            // Store token for API requests
-            localStorage.setItem('sb-auth-token', session?.access_token);
-
             // Validate with server and get enhanced profile
             try {
-                const profile = await secureApiService?.user?.getProfile();
+                const profile = await secureApiService?.getProfile();
                 
                 setUser(session?.user);
                 setUserProfile(profile);
@@ -96,7 +92,6 @@ export const SecureAuthProvider = ({ children }) => {
             setUser(null);
             setUserProfile(null);
             setIsAuthenticated(false);
-            localStorage.removeItem('sb-auth-token');
 
             // Sign out from Supabase
             await supabase?.auth?.signOut();
@@ -141,7 +136,6 @@ export const SecureAuthProvider = ({ children }) => {
                 setUser(null);
                 setUserProfile(null);
                 setIsAuthenticated(false);
-                localStorage.removeItem('sb-auth-token');
             } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 await checkAuth();
             }
@@ -158,7 +152,7 @@ export const SecureAuthProvider = ({ children }) => {
     useEffect(() => {
         const checkApiHealth = async () => {
             try {
-                await secureApiService?.checkHealth();
+                await secureApiService?.checkApiHealth();
                 setApiHealthy(true);
             } catch (error) {
                 console.warn('API health check failed:', error);

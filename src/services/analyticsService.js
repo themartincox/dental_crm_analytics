@@ -4,7 +4,8 @@
  */
 
 import { logger } from '../utils/logger';
-import { supabase } from '../lib/supabase';
+// Supabase direct writes removed for secure API routing
+import secureApiService from './secureApiService';
 
 // Event types
 export const EVENT_TYPES = {
@@ -260,15 +261,10 @@ class AnalyticsService {
     this.eventQueue = [];
 
     try {
-      const { error } = await supabase
-        .from('analytics_events')
-        .insert(eventsToFlush);
+      // Send via secure API to enforce RBAC and avoid exposing table structure
+      const result = await secureApiService.sendAnalyticsEvents(eventsToFlush);
 
-      if (error) {
-        throw error;
-      }
-
-      logger.info(`Flushed ${eventsToFlush.length} events to server`);
+      logger.info(`Flushed ${eventsToFlush.length} events to server`, result);
     } catch (error) {
       logger.error('Failed to flush events to server', error);
       // Re-add events to queue for retry

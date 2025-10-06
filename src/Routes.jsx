@@ -3,11 +3,14 @@ import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 
-import { AuthProvider } from "contexts/AuthContext";
 import Login from "pages/Login";
 import CookieConsent from "components/CookieConsent";
 import GDCFooter from "components/GDCFooter";
+import CompactFooter from "components/CompactFooter";
 import AIUsagePolicyPage from './pages/AIUsagePolicy';
+import ProtectedRoute from "components/ProtectedRoute";
+import { uiConfig } from './config/uiConfig';
+import { UiSettingsProvider, useUiSettings } from './contexts/UiSettingsContext';
 
 // Lazy load all non-critical pages for better performance
 const SystemOwnerAdminDashboard = lazy(() => import('./pages/system-owner-admin-dashboard/index'));
@@ -36,6 +39,7 @@ const ServiceProviderMatchingEngine = lazy(() => import('./pages/service-provide
 const EmbeddableBookingWidget = lazy(() => import('./pages/embeddable-booking-widget'));
 const WidgetConfigurationDashboard = lazy(() => import('./pages/widget-configuration-dashboard'));
 const CrossSiteAnalyticsDashboard = lazy(() => import('./pages/cross-site-analytics-dashboard'));
+const TenantBrandingSettings = lazy(() => import('./pages/tenant-branding-settings'));
 
 // Add new OAuth callback import
 const OAuthAuthenticationCallbackHandler = lazy(() => import('./pages/o-auth-authentication-callback-handler'));
@@ -53,11 +57,38 @@ const PageLoader = () => (
   </div>
 );
 
+const Footers = () => {
+  const { settings } = useUiSettings();
+  const PublicFooter = settings.publicFooterVariant === 'full' ? GDCFooter : CompactFooter;
+  return (
+    <>
+      <RouterRoutes>
+        <Route path="/" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="/aes-crm-marketing-landing-page" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="/pricing" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="/contact" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="/public-booking" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="/booking-widget" element={settings.publicFooterEnabled ? <PublicFooter /> : <CompactFooter />} />
+        <Route path="*" element={null} />
+      </RouterRoutes>
+      <RouterRoutes>
+        <Route path="/" element={null} />
+        <Route path="/aes-crm-marketing-landing-page" element={null} />
+        <Route path="/pricing" element={null} />
+        <Route path="/contact" element={null} />
+        <Route path="/public-booking" element={null} />
+        <Route path="/booking-widget" element={null} />
+        <Route path="*" element={settings.internalFooterEnabled ? <CompactFooter /> : null} />
+      </RouterRoutes>
+    </>
+  );
+};
+
 const Routes = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
         <ErrorBoundary>
+          <UiSettingsProvider>
           <ScrollToTop />
           <div className="min-h-screen flex flex-col">
             <div className="flex-1">
@@ -83,19 +114,20 @@ const Routes = () => {
 
                   {/* CRM Application Routes */}
                   <Route path="/get-started" element={<GetStartedGatewayPage />} />
-                  <Route path="/dashboard" element={<DentalCrmDashboard />} />
-                  <Route path="/appointments" element={<AppointmentScheduler />} />
-                  <Route path="/patients" element={<PatientManagementDashboard />} />
-                  <Route path="/leads" element={<LeadManagementScreen />} />
-                  <Route path="/memberships" element={<MembershipProgramManagement />} />
-                  <Route path="/analytics/leads" element={<LeadGenerationConversionAnalyticsDashboard />} />
-                  <Route path="/analytics/patient-journey" element={<PatientJourneyRevenueOptimizationDashboard />} />
-                  <Route path="/analytics/cross-site" element={<CrossSiteAnalyticsDashboard />} />
-                  <Route path="/analytics/practice-overview" element={<PracticePerformanceOverviewDashboard />} />
-                  <Route path="/compliance" element={<ComplianceOperationsMonitoringDashboard />} />
-                  <Route path="/widgets" element={<WidgetConfigurationDashboard />} />
-                  <Route path="/admin" element={<SystemOwnerAdminDashboard />} />
-                  <Route path="/matching-engine" element={<ServiceProviderMatchingEngine />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><DentalCrmDashboard /></ProtectedRoute>} />
+                  <Route path="/appointments" element={<ProtectedRoute><AppointmentScheduler /></ProtectedRoute>} />
+                  <Route path="/patients" element={<ProtectedRoute><PatientManagementDashboard /></ProtectedRoute>} />
+                  <Route path="/leads" element={<ProtectedRoute><LeadManagementScreen /></ProtectedRoute>} />
+                  <Route path="/memberships" element={<ProtectedRoute><MembershipProgramManagement /></ProtectedRoute>} />
+                  <Route path="/analytics/leads" element={<ProtectedRoute><LeadGenerationConversionAnalyticsDashboard /></ProtectedRoute>} />
+                  <Route path="/analytics/patient-journey" element={<ProtectedRoute><PatientJourneyRevenueOptimizationDashboard /></ProtectedRoute>} />
+                  <Route path="/analytics/cross-site" element={<ProtectedRoute><CrossSiteAnalyticsDashboard /></ProtectedRoute>} />
+                  <Route path="/analytics/practice-overview" element={<ProtectedRoute><PracticePerformanceOverviewDashboard /></ProtectedRoute>} />
+                  <Route path="/compliance" element={<ProtectedRoute><ComplianceOperationsMonitoringDashboard /></ProtectedRoute>} />
+                  <Route path="/widgets" element={<ProtectedRoute><WidgetConfigurationDashboard /></ProtectedRoute>} />
+                  <Route path="/settings/branding" element={<ProtectedRoute><TenantBrandingSettings /></ProtectedRoute>} />
+                  <Route path="/admin" element={<ProtectedRoute requiredRoles={["super_admin"]}><SystemOwnerAdminDashboard /></ProtectedRoute>} />
+                  <Route path="/matching-engine" element={<ProtectedRoute><ServiceProviderMatchingEngine /></ProtectedRoute>} />
 
                   {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
@@ -103,14 +135,7 @@ const Routes = () => {
               </Suspense>
             </div>
             
-            {/* Only show footer on non-marketing pages */}
-            <RouterRoutes>
-              <Route path="/" element={null} />
-              <Route path="/aes-crm-marketing-landing-page" element={null} />
-              <Route path="/get-started" element={null} />
-              <Route path="/get-started-gateway-page" element={null} />
-              <Route path="*" element={<GDCFooter />} />
-            </RouterRoutes>
+            <Footers />
             
             {/* Only show cookie consent on non-marketing pages */}
             <RouterRoutes>
@@ -121,8 +146,8 @@ const Routes = () => {
               <Route path="*" element={<CookieConsent />} />
             </RouterRoutes>
           </div>
+          </UiSettingsProvider>
         </ErrorBoundary>
-      </AuthProvider>
     </BrowserRouter>
   );
 };

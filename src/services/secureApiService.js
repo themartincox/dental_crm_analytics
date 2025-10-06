@@ -1,5 +1,6 @@
 // Secure API service to replace direct Supabase calls - addresses F2
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
 const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -12,18 +13,22 @@ const apiClient = axios?.create({
     },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add Supabase JWT
 apiClient?.interceptors?.request?.use(
-    (config) => {
-        const token = localStorage.getItem('sb-auth-token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+    async (config) => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            if (token) {
+                config.headers = config.headers || {};
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        } catch (_) {
+            // ignore token retrieval errors
         }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 // Response interceptor for error handling
@@ -32,7 +37,7 @@ apiClient?.interceptors?.response?.use(
     (error) => {
         if (error?.response?.status === 401) {
             // Clear invalid token and redirect to login
-            localStorage.removeItem('sb-auth-token');
+            // optional: supabase.auth.signOut() could be called here
             window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -59,35 +64,21 @@ const decryptSensitiveData = (encryptedData) => {
 // F3 Resolution - Enhanced server-side RBAC validation
 class SecureApiService {
     constructor() {
-        this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+        this.baseUrl = API_BASE_URL;
         this.requestId = 0;
     }
 
     // Enhanced authentication with server-side role validation
     async validateServerSideAccess(requiredRole = null, requiredPermissions = []) {
         try {
-            const token = await this.getAuthToken();
-            
-            const response = await fetch(`${this.baseUrl}/auth/validate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'X-Request-ID': `${Date.now()}-${++this.requestId}`
-                },
-                body: JSON.stringify({
-                    requiredRole,
-                    requiredPermissions,
-                    endpoint: window.location?.pathname,
-                    timestamp: new Date().toISOString()
-                })
+            const { data: validation } = await apiClient.post('/auth/validate', {
+                requiredRole,
+                requiredPermissions,
+                endpoint: window.location?.pathname,
+                timestamp: new Date().toISOString()
+            }, {
+                headers: { 'X-Request-ID': `${Date.now()}-${++this.requestId}` }
             });
-
-            if (!response?.ok) {
-                throw new Error(`Server-side validation failed: ${response?.status}`);
-            }
-
-            const validation = await response?.json();
             
             // Log security event
             await this.logSecurityEvent('access_validation', {
@@ -125,35 +116,32 @@ class SecureApiService {
                 }
 
                 // Step 2: Make authenticated request with role headers
-                const token = await this.getAuthToken();
-                
-                const response = await fetch(`${this.baseUrl}${url}`, {
-                    ...options,
+                const response = await apiClient.request({
+                    url,
+                    method: options?.method || 'GET',
+                    data: options?.body ? JSON.parse(options.body) : options?.data,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
                         'X-Request-ID': `${Date.now()}-${++this.requestId}`,
                         'X-Required-Role': requiredRole || '',
                         'X-Client-Validation': 'true',
-                        ...options?.headers
-                    }
+                        ...(options?.headers || {})
+                    },
+                    params: options?.params
                 });
 
-                if (!response?.ok) {
+                if (!response || response.status >= 400) {
                     if (response?.status === 401 && retryCount < maxRetries) {
                         retryCount++;
                         continue;
                     }
-                    
                     if (response?.status === 403) {
                         throw new Error('Server-side RBAC validation failed - access denied');
                     }
-                    
-                    const errorData = await response?.json?.().catch(() => ({}));
-                    throw new Error(errorData?.message || `HTTP ${response?.status}: ${response?.statusText}`);
+                    const errorData = response?.data || {};
+                    throw new Error(errorData?.message || `HTTP ${response?.status}`);
                 }
-
-                const data = await response?.json();
+                const data = response?.data;
                 
                 // Log successful authenticated request
                 await this.logSecurityEvent('authenticated_request', {
@@ -182,25 +170,16 @@ class SecureApiService {
     // Enhanced security event logging
     async logSecurityEvent(eventType, metadata = {}) {
         try {
-            const token = await this.getAuthToken();
-            
-            await fetch(`${this.baseUrl}/security/log`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+            await apiClient.post('/security/log', {
+                event: eventType,
+                metadata: {
+                    ...metadata,
+                    userAgent: navigator?.userAgent,
+                    timestamp: new Date().toISOString(),
+                    url: window.location?.href,
+                    referrer: document?.referrer
                 },
-                body: JSON.stringify({
-                    event: eventType,
-                    metadata: {
-                        ...metadata,
-                        userAgent: navigator?.userAgent,
-                        timestamp: new Date().toISOString(),
-                        url: window.location?.href,
-                        referrer: document?.referrer
-                    },
-                    riskLevel: this.calculateRiskLevel(eventType, metadata)
-                })
+                riskLevel: this.calculateRiskLevel(eventType, metadata)
             });
         } catch (error) {
             console.warn('Security logging failed:', error);
@@ -284,6 +263,18 @@ class SecureApiService {
         } catch (error) {
             console.error('API health check failed:', error);
             throw new Error('API server unavailable');
+        }
+    }
+
+    // Send analytics events via secure API
+    async sendAnalyticsEvents(events = []) {
+        if (!Array.isArray(events) || events.length === 0) return { ok: true, count: 0 };
+        try {
+            const response = await apiClient?.post('/analytics/events', events);
+            return response?.data || { ok: true };
+        } catch (error) {
+            console.error('sendAnalyticsEvents error:', error);
+            throw error;
         }
     }
 
@@ -401,12 +392,9 @@ class SecureApiService {
     // F11 - Enhanced cookie consent service
     async recordConsent(consentData) {
         try {
-            // Add this function to check if user is logged in
-            const isLoggedIn = () => {
-                return localStorage.getItem('sb-auth-token') !== null;
-            };
-
-            if (!isLoggedIn()) return;
+            // Check if user is logged in via Supabase session
+            const token = await this.getAuthToken();
+            if (!token) return;
 
             const response = await apiClient?.post('/consent/cookie', {
                 preferences: consentData,
@@ -589,7 +577,12 @@ class SecureApiService {
     }
 
     async getAuthToken() {
-        return localStorage.getItem('sb-auth-token');
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            return session?.access_token || null;
+        } catch {
+            return null;
+        }
     }
 }
 
