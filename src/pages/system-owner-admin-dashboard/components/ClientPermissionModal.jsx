@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, Save, Shield, AlertCircle } from 'lucide-react';
-import { supabase } from '../../../lib/supabase';
+import secureApiService from '../../../services/secureApiService';
 
 const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
   const [permissions, setPermissions] = useState({});
@@ -8,25 +8,36 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
   const [error, setError] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
 
+  const modulesWithFinance = useMemo(() => {
+    const financeModule = {
+      id: 'finance-module-virtual',
+      module_name: 'finance',
+      display_name: 'Finance',
+      description: 'Control access to revenue, payments, and P&L features',
+      is_core_module: true,
+      base_price: 0,
+      tier_availability: ['basic','pro','enterprise']
+    };
+    const names = new Set((systemModules || []).map(m => m?.module_name));
+    return names.has('finance') ? systemModules : [...(systemModules || []), financeModule];
+  }, [systemModules]);
+
   useEffect(() => {
-    // Initialize permissions state from current client permissions
+    // Initialize permissions state from current client permissions including finance
     const currentPermissions = {};
-    
-    systemModules?.forEach(module => {
+    modulesWithFinance?.forEach(module => {
       const existingPermission = client?.client_module_permissions?.find(
         p => p?.module_name === module?.module_name
       );
-      
       currentPermissions[module?.module_name] = {
         permission_level: existingPermission?.permission_level || 'none',
-        is_enabled: existingPermission?.is_enabled || false,
+        is_enabled: existingPermission?.is_enabled ?? (module?.module_name === 'finance' ? false : false),
         usage_quota: existingPermission?.usage_quota || null,
         expires_at: existingPermission?.expires_at || null
       };
     });
-    
     setPermissions(currentPermissions);
-  }, [client, systemModules]);
+  }, [client, modulesWithFinance]);
 
   const handlePermissionChange = (moduleName, field, value) => {
     setPermissions(prev => ({
@@ -44,17 +55,11 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
     setError('');
     
     try {
-      // First, delete existing permissions for this client
-      const { error: deleteError } = await supabase?.from('client_module_permissions')?.delete()?.eq('client_organization_id', client?.id);
-
-      if (deleteError) throw deleteError;
-
-      // Then insert new permissions
+      // Build new permissions and upsert through secure API
       const newPermissions = [];
       Object.entries(permissions)?.forEach(([moduleName, permission]) => {
         if (permission?.permission_level !== 'none') {
           newPermissions?.push({
-            client_organization_id: client?.id,
             module_name: moduleName,
             permission_level: permission?.permission_level,
             is_enabled: permission?.is_enabled,
@@ -63,23 +68,8 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
           });
         }
       });
-
-      if (newPermissions?.length > 0) {
-        const { error: insertError } = await supabase?.from('client_module_permissions')?.insert(newPermissions);
-
-        if (insertError) throw insertError;
-      }
-
-      // Log the action
-      await supabase?.rpc('log_system_owner_action', {
-        action_type_param: 'client_permissions_updated',
-        target_client_param: client?.id,
-        target_user_param: null,
-        details_param: {
-          organization_name: client?.organization_name,
-          permissions_count: newPermissions?.length
-        }
-      });
+      await secureApiService.makeSecureRequest(`/admin/clients/${client?.id}/permissions`, { method: 'PUT', body: JSON.stringify({ permissions: newPermissions }) }, 'super_admin');
+      await secureApiService.makeSecureRequest('/admin/log', { method: 'POST', body: JSON.stringify({ action_type: 'client_permissions_updated', target_client_id: client?.id, details: { organization_name: client?.organization_name, permissions_count: newPermissions?.length } }) }, 'super_admin');
 
       onSave?.();
     } catch (err) {
@@ -139,7 +129,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
 
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           <div className="grid grid-cols-1 gap-6">
-            {systemModules?.map((module) => {
+            {modulesWithFinance?.map((module) => {
               const isAvailable = isModuleAvailableForTier(module, client?.subscription_tier);
               const permission = permissions?.[module?.module_name] || {};
               
