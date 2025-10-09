@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { dashboardService, appointmentsService } from '../../services/dentalCrmService';
 import { Calendar, Users, UserPlus, DollarSign, Clock, MapPin } from 'lucide-react';
@@ -13,6 +14,7 @@ import { ScreenReader, KeyboardNavigation } from '../../utils/accessibility';
 
 const DentalCrmDashboard = () => {
   const { user, userProfile, loading } = useAuth();
+  const navigate = useNavigate();
   const { isLoading, loadingMessage, withLoading, setData } = useLoadingState(false);
   const [stats, setStats] = useState({ totalPatients: 0, totalAppointments: 0, totalLeads: 0, totalRevenue: 0 });
   const [recentAppointments, setRecentAppointments] = useState([]);
@@ -30,6 +32,13 @@ const DentalCrmDashboard = () => {
   useEffect(() => {
     loadDashboardData();
   }, [user]);
+
+  // Super admins should see tenant/system owner insights
+  useEffect(() => {
+    if (userProfile?.role === 'super_admin') {
+      navigate('/admin', { replace: true });
+    }
+  }, [userProfile, navigate]);
 
   useEffect(() => {
     const interval = setInterval(throttledPerformanceCheck, 5000);
@@ -265,8 +274,8 @@ const DentalCrmDashboard = () => {
                 <p className="mt-2 text-sm text-gray-500">View, add, and manage patient records</p>
                 <button
                   className="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  onClick={() => ScreenReader.announce('Navigating to patient management', 'polite')}
-                  onKeyDown={(e) => KeyboardNavigation.handleActivation(e, () => ScreenReader.announce('Navigating to patient management', 'polite'))}
+                  onClick={() => { ScreenReader.announce('Navigating to patient management', 'polite'); navigate('/patients'); }}
+                  onKeyDown={(e) => KeyboardNavigation.handleActivation(e, () => { ScreenReader.announce('Navigating to patient management', 'polite'); navigate('/patients'); })}
                   aria-describedby="patients-description"
                 >
                   Go to Patients
@@ -280,7 +289,12 @@ const DentalCrmDashboard = () => {
                 <Calendar className="mx-auto h-12 w-12 text-green-600" />
                 <h3 className="mt-4 text-lg font-medium text-gray-900">Schedule Appointments</h3>
                 <p className="mt-2 text-sm text-gray-500">Book and manage appointments</p>
-                <button className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">Schedule Now</button>
+                <button 
+                  className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                  onClick={() => navigate('/appointments')}
+                >
+                  Schedule Now
+                </button>
               </div>
             </div>
 
@@ -289,7 +303,12 @@ const DentalCrmDashboard = () => {
                 <UserPlus className="mx-auto h-12 w-12 text-yellow-600" />
                 <h3 className="mt-4 text-lg font-medium text-gray-900">Manage Leads</h3>
                 <p className="mt-2 text-sm text-gray-500">Track and convert potential patients</p>
-                <button className="mt-4 w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors">View Leads</button>
+                <button 
+                  className="mt-4 w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors"
+                  onClick={() => navigate('/leads')}
+                >
+                  View Leads
+                </button>
               </div>
             </div>
           </section>
