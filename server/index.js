@@ -75,6 +75,37 @@ app?.use(cors({
     allowedHeaders: ['Content-Type','Authorization','X-Request-ID','X-Required-Role']
 }));
 app?.use(express?.json({ limit: '10mb' }));
+// Additional security headers (server responses)
+try {
+    app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true }));
+    app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
+    app.use((req, res, next) => { res.set('Permissions-Policy', 'geolocation=(), camera=(), microphone=()'); next(); });
+} catch (_) {}
+// Optional CSRF protection (feature-flagged)
+if (process.env.ENABLE_CSRF === '1') {
+    try {
+        const cookieParser = require('cookie-parser');
+        const csrf = require('csurf');
+        app.use(cookieParser());
+        const csrfProtection = csrf({
+            cookie: {
+                key: process.env.CSRF_COOKIE_NAME || '_csrf',
+                httpOnly: true,
+                sameSite: 'lax',
+                secure: process.env.NODE_ENV === 'production'
+            }
+        });
+        app.get('/api/csrf-token', csrfProtection, (req, res) => {
+            res.json({ csrfToken: req.csrfToken() });
+        });
+        app.use('/api', (req, res, next) => {
+            if (['GET','HEAD','OPTIONS'].includes(req.method)) return next();
+            return csrfProtection(req, res, next);
+        });
+    } catch (e) {
+        console.warn('CSRF middleware not enabled (missing deps):', e?.message);
+    }
+}
 
 // Basic server-side validation and rate limiting (no external deps)
 const makeRateLimit = (windowMs = 15 * 60 * 1000, max = 300) => {
@@ -126,6 +157,14 @@ const validateJsonContentType = (req, res, next) => {
 app?.use(makeRateLimit());
 app?.use(validateJsonContentType);
 app?.use(sanitizeInput);
+// Optional distributed rate limiting (feature-flagged)
+try {
+    const createRateLimiter = require('./middleware/rateLimit');
+    const apiLimiter = createRateLimiter();
+    app?.use('/api', apiLimiter);
+} catch (_e) {
+    // ignore if middleware is unavailable
+}
 
 // Simple Zod validation helper
 const validateBody = (schema) => (req, res, next) => {
@@ -230,29 +269,77 @@ const requireModulePermission = (moduleName, minLevel = 'read') => {
 
 // F2 - Secure API endpoints replacing direct Supabase client calls
 
+// Pagination helpers
+const getPaging = (req) => {
+    const page = Math.max(parseInt(req.query.page || '1', 10) || 1, 1);
+    const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '25', 10) || 25, 1), 200);
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    return { page, pageSize, from, to };
+};
+
+const setPagingHeaders = (res, { page, pageSize }, totalCount) => {
+    const lastPage = Math.max(Math.ceil((totalCount || 0) / (pageSize || 1)), 1);
+    res.set('X-Total-Count', String(totalCount || 0));
+    res.set('X-Page', String(page));
+    res.set('X-Page-Size', String(pageSize));
+    res.set('X-Last-Page', String(lastPage));
+};
+
+// Simple ETag + cache helper for safe GET responses
+const sendCached = (req, res, payload, cacheControl) => {
+    try {
+        const body = JSON.stringify(payload);
+        const etag = crypto.SHA1(body).toString();
+        if (cacheControl) res.set('Cache-Control', cacheControl);
+        res.set('ETag', etag);
+        if ((req.headers['if-none-match'] || '') === etag) {
+            return res.status(304).end();
+        }
+        return res.json(payload);
+    } catch (_e) {
+        return res.json(payload);
+    }
+};
+
 // Patient management - restricted to clinical staff
 app?.get('/api/patients', validateAuth, requireRole(['super_admin', 'practice_admin', 'dentist', 'hygienist']), async (req, res) => {
     try {
         res.set('Cache-Control', 'no-store');
-        const { data, error } = await supabase?.from('patients')?.select(`
-                id, patient_number, first_name, last_name, email, phone, 
-                date_of_birth, status, treatment_type, insurance_provider,
-                created_at, updated_at,
-                assigned_dentist:user_profiles!assigned_dentist_id(id, full_name)
-            `)?.order('created_at', { ascending: false });
+        const { page, pageSize, from, to } = getPaging(req);
+        const q = (req.query.q || '').toString().trim();
+        const allowedSort = ['created_at','last_name','first_name'];
+        const sortField = allowedSort.includes((req.query.sortField || '').toString()) ? (req.query.sortField || '').toString() : 'created_at';
+        const sortAsc = ((req.query.sortDir || 'desc').toString().toLowerCase() === 'asc');
+
+        let query = supabase.from('patients').select(`
+            id, patient_number, first_name, last_name, email, phone,
+            date_of_birth, status, treatment_type, insurance_provider,
+            created_at, updated_at,
+            assigned_dentist:user_profiles!assigned_dentist_id(id, full_name)
+        `, { count: 'exact' });
+
+        if (q) {
+            query = query.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`);
+        }
+
+        const { data, error, count } = await query
+            .order(sortField, { ascending: sortAsc })
+            .range(from, to);
 
         if (error) throw error;
 
         // F6 - Encrypt sensitive data in transit
-        const sanitizedData = data?.map(patient => ({
+        const sanitizedData = (data || []).map(patient => ({
             ...patient,
-            // Encrypt PII fields
             email: patient?.email ? encryptSensitiveData(patient?.email) : null,
             phone: patient?.phone ? encryptSensitiveData(patient?.phone) : null,
             date_of_birth: patient?.date_of_birth ? encryptSensitiveData(patient?.date_of_birth) : null
         }));
 
-        res?.json({ data: sanitizedData, count: data?.length });
+        const total = typeof count === 'number' ? count : (sanitizedData?.length || 0);
+        setPagingHeaders(res, { page, pageSize }, total);
+        res.json({ data: sanitizedData, page, pageSize, total, count: total });
     } catch (error) {
         console.error('Get patients error:', error);
         res?.status(500)?.json({ error: 'Failed to fetch patients' });
@@ -263,16 +350,38 @@ app?.get('/api/patients', validateAuth, requireRole(['super_admin', 'practice_ad
 app?.get('/api/leads', validateAuth, requireRole(['super_admin', 'practice_admin', 'manager', 'receptionist']), async (req, res) => {
     try {
         res.set('Cache-Control', 'no-store');
-        const { data, error } = await supabase?.from('leads')?.select(`
-                id, lead_number, first_name, last_name, email, phone,
-                source, status, treatment_interest, estimated_value,
-                created_at, consent_withdrawn_date,
-                assigned_to:user_profiles!assigned_to_id(id, full_name)
-            `)?.order('created_at', { ascending: false });
+        const { page, pageSize, from, to } = getPaging(req);
+        const q = (req.query.q || '').toString().trim();
+        const allowedSort = ['created_at','last_name','first_name','estimated_value'];
+        const sortField = allowedSort.includes((req.query.sortField || '').toString()) ? (req.query.sortField || '').toString() : 'created_at';
+        const sortAsc = ((req.query.sortDir || 'desc').toString().toLowerCase() === 'asc');
+
+        let query = supabase.from('leads').select(`
+            id, lead_number, first_name, last_name, email, phone,
+            source, status, treatment_interest, estimated_value,
+            created_at, consent_withdrawn_date,
+            assigned_to:user_profiles!assigned_to_id(id, full_name)
+        `, { count: 'exact' });
+
+        if (q) {
+            query = query.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`);
+        }
+
+        const { data, error, count } = await query
+            .order(sortField, { ascending: sortAsc })
+            .range(from, to);
 
         if (error) throw error;
 
-        res?.json({ data, count: data?.length });
+        const out = (data || []).map(l => ({
+            ...l,
+            email: l?.email ? encryptSensitiveData(l.email) : null,
+            phone: l?.phone ? encryptSensitiveData(l.phone) : null
+        }));
+
+        const total = typeof count === 'number' ? count : (out?.length || 0);
+        setPagingHeaders(res, { page, pageSize }, total);
+        res.json({ data: out, page, pageSize, total, count: total });
     } catch (error) {
         console.error('Get leads error:', error);
         res?.status(500)?.json({ error: 'Failed to fetch leads' });
@@ -938,7 +1047,6 @@ app?.delete('/api/memberships/applications/:id', validateAuth, requireRole(['sup
 // Plans
 app?.get('/api/memberships/plans', validateAuth, requireRole(['super_admin','practice_admin','manager']), async (req, res) => {
     try {
-        res.set('Cache-Control', 'no-store');
         const { practice_location_id } = req.query;
         let query = supabase.from('membership_plans').select(`
             *,
@@ -948,7 +1056,7 @@ app?.get('/api/memberships/plans', validateAuth, requireRole(['super_admin','pra
         if (practice_location_id) query = query.eq('practice_location_id', practice_location_id);
         const { data, error } = await query;
         if (error) throw error;
-        res.json({ data });
+        return sendCached(req, res, { data }, 'public, max-age=300, s-maxage=300, stale-while-revalidate=30');
     } catch (error) {
         console.error('Get plans error:', error);
         res.status(500).json({ error: 'Failed to fetch plans' });

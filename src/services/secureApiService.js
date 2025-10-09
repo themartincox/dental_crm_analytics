@@ -8,10 +8,26 @@ const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001/api
 const apiClient = axios?.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
+    withCredentials: import.meta.env?.VITE_ENABLE_CSRF === '1',
     headers: {
         'Content-Type': 'application/json',
     },
 });
+
+// Optional CSRF token handling (feature-flagged via VITE_ENABLE_CSRF)
+let __csrfToken = null;
+const ensureCsrfToken = async () => {
+    if (import.meta.env?.VITE_ENABLE_CSRF !== '1') return null;
+    try {
+        if (!__csrfToken) {
+            const { data } = await apiClient.get('/csrf-token');
+            __csrfToken = data?.csrfToken || null;
+        }
+        return __csrfToken;
+    } catch (_) {
+        return null;
+    }
+};
 
 // Request interceptor to add Supabase JWT
 apiClient?.interceptors?.request?.use(
@@ -116,15 +132,24 @@ class SecureApiService {
                 }
 
                 // Step 2: Make authenticated request with role headers
+                const method = (options?.method || 'GET').toUpperCase();
+                // Attach CSRF token for mutating calls when enabled
+                const csrfHeader = {};
+                if (['POST','PUT','PATCH','DELETE'].includes(method)) {
+                    const token = await ensureCsrfToken();
+                    if (token) csrfHeader['X-CSRF-Token'] = token;
+                }
+
                 const response = await apiClient.request({
                     url,
-                    method: options?.method || 'GET',
+                    method,
                     data: options?.body ? JSON.parse(options.body) : options?.data,
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Request-ID': `${Date.now()}-${++this.requestId}`,
                         'X-Required-Role': requiredRole || '',
                         'X-Client-Validation': 'true',
+                        ...(csrfHeader),
                         ...(options?.headers || {})
                     },
                     params: options?.params

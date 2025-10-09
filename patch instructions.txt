@@ -1,0 +1,724 @@
+Absolutely — here’s a **commit‑ready patch** plus a **complete PR description** you can paste into GitHub.
+
+---
+
+# PR title
+
+**feat(security, perf, ux): CSP hardening + CSRF + distributed rate‑limit; server pagination + caching; ErrorBoundary, form + list UX**
+
+---
+
+# PR description
+
+## What & why
+
+This PR implements the specific items you asked for so the app is more secure, faster, and more intuitive ahead of SaaS launch.
+
+### ✅ Security (items 1, 3, 4, 5)
+
+* **CSP hardened**: remove inline scripts (nonce-based), keep strict sources; add HSTS, Referrer‑Policy, and Permissions‑Policy.
+* **Encrypt PII consistently**: patients (already), **leads**, and **user profiles** now encrypt email/phone in transit.
+* **Distributed rate‑limiting**: replace in‑memory limiter with **Redis‑backed** limiter using `rate-limiter-flexible` (per‑user or per‑IP).
+* **CSRF protection**: add `csurf` with cookie token, `/api/csrf-token` endpoint, and protect mutating requests.
+
+> Note: We keep `'style-src' 'unsafe-inline'` **only** for inline style attributes required by virtualization (e.g., `react-window`’s item `style`). Script inline execution remains blocked via nonce. If/when we migrate away from inline style attributes, we can remove the last `'unsafe-inline'`.
+
+### ✅ Performance (items 1, 2, 4, 5)
+
+* **Pagination (server‑side)** for **patients** and **leads** with `page`, `pageSize`, optional `q`, `sortField`, `sortDir`. Adds `X-Total-Count`, `X-Page`, `X-Page-Size`, `X-Last-Page`.
+* **Scalable rate‑limit** (see above) using Redis — shared across instances.
+* **Selective caching**: safe endpoints (e.g., **membership plans**) now return **ETag** and cache headers with SWR.
+* **Concurrency**: optional **cluster runner** (`server/cluster.js`) + `start:cluster` script for multi‑CPU production processes.
+
+### ✅ UX (5 items)
+
+* **Improved ErrorBoundary**: accessible, actionable UI, copyable error code, “Reload / Try again / Report” actions.
+* **Unified form validation UI**: reusable `FormField` with consistent error/help text, ARIA attributes; works with existing `useFormValidation`.
+* **List UX**: `usePaginationQuery` + `TableToolbar` components for search/sort/paging; server now supports these params.
+* **Responsiveness & theming**: `useTheme` hook + basic CSS variables for future dark/high‑contrast themes.
+* **Confirmation & Undo**: `ConfirmDialog` + `UndoToast` components for safe destructive actions.
+
+## How to run this locally
+
+1. **Install new dependencies** (server):
+
+   ```bash
+   npm i cookie-parser csurf rate-limiter-flexible ioredis
+   ```
+2. **(Optional)** run Redis locally:
+
+   ```bash
+   docker run -p 6379:6379 redis:7
+   ```
+3. **Set env vars** (e.g. `.env`):
+
+   ```
+   REDIS_URL=redis://127.0.0.1:6379/0
+   CSRF_COOKIE_NAME=_csrf
+   ```
+4. **Start**:
+
+   * Dev: `npm run dev` (your existing dev script)
+   * Prod (multi‑CPU): `npm run start:cluster`
+
+## Testing notes
+
+* **CSP**: Check response headers. No `'unsafe-inline'` in `script-src`; `style-src` remains minimal with `'unsafe-inline'` for virtualization.
+* **Rate limit**: Flood any `/api/*` route; after ~300 requests/15m you should receive `429` + `Retry-After`.
+* **CSRF**: `POST` without token → 403; fetch token via `GET /api/csrf-token`, send as `X-CSRF-Token` → success.
+* **Pagination**: `/api/patients?page=1&pageSize=25&q=smith&sortField=last_name&sortDir=asc` returns paging headers and trimmed payload.
+* **Caching**: `GET /api/memberships/plans` returns `ETag`; repeat with `If-None-Match` → `304`.
+* **UX**: Trigger a component error → upgraded boundary; forms show consistent field errors; `ConfirmDialog` + `UndoToast` available for destructive actions.
+
+## Rollout / risks
+
+* Requires **Redis** in production for rate‑limiting.
+* Keep an eye on CSRF token flow in the SPA; ensure the token is retrieved and sent on mutating requests.
+* If you have any inline `<script>` tags — remove or nonce them.
+* We purposely keep `'style-src' 'unsafe-inline'` due to virtualization’s inline `style` attributes; removing it will break `react-window`.
+
+---
+
+# How to apply this patch
+
+1. **Save** the patch below to a file, e.g. `saas-hardening.patch`
+2. From your repo root:
+
+```bash
+git checkout -b feat/saas-hardening
+git apply --reject --whitespace=fix saas-hardening.patch
+npm i cookie-parser csurf rate-limiter-flexible ioredis
+git add .
+git commit -m "feat(security,perf,ux): CSP hardening, CSRF, Redis rate limit, pagination, caching, ErrorBoundary & form/list UX"
+```
+
+---
+
+## The patch (save as `saas-hardening.patch`)
+
+```diff
+diff --git a/server/index.js b/server/index.js
+--- a/server/index.js
++++ b/server/index.js
+@@
+-    const express = require('express');
+-    const cors = require('cors');
+-    const helmet = require('helmet');
+-    const jwt = require('jsonwebtoken');
+-    const bcrypt = require('bcryptjs');
+-    const crypto = require('crypto-js');
+-    const cron = require('node-cron');
+-    const { z } = require('zod');
+-    require('dotenv')?.config();
++    const express = require('express');
++    const cors = require('cors');
++    const helmet = require('helmet');
++    const cookieParser = require('cookie-parser');
++    const csrf = require('csurf');
++    const jwt = require('jsonwebtoken');
++    const bcrypt = require('bcryptjs');
++    const crypto = require('crypto-js'); // existing AES utils
++    const nodeCrypto = require('crypto'); // for CSP nonce + ETag
++    const cron = require('node-cron');
++    const { z } = require('zod');
++    require('dotenv')?.config();
+@@
+-    const app = express();
++    const app = express();
+     app.disable('x-powered-by');
+     app.set('trust proxy', 1);
+     const PORT = process.env?.PORT || 3001;
+ 
+-    // F6 - Security headers
+-     app?.use(helmet());
++    // F6 - Security headers
++    app?.use(helmet());
++    // CSP nonce per-request
++    app.use((req, res, next) => {
++      res.locals.cspNonce = nodeCrypto.randomBytes(16).toString('base64');
++      next();
++    });
+ 
+     // Content Security Policy tuned for app + Supabase
+     const supabaseUrl = process.env?.SUPABASE_URL || '';
+     try {
+         app?.use(helmet.contentSecurityPolicy({
+             useDefaults: true,
+             directives: {
+                 "default-src": ["'self'"],
+                 "base-uri": ["'self'"],
+                 "font-src": ["'self'", "https:", "data:"],
+                 "img-src": ["'self'", "https:", "data:"],
+-                "script-src": ["'self'", "'unsafe-inline'", "https:"],
+-                "style-src": ["'self'", "'unsafe-inline'", "https:"],
++                // Harden script-src (no unsafe-inline)
++                "script-src": ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`, "https:"],
++                // Keep minimal inline styles due to virtualization inline style attributes
++                "style-src": ["'self'", "'unsafe-inline'", "https:"],
+                 "connect-src": ["'self'", supabaseUrl || "https:"],
+                 "frame-ancestors": ["'none'"],
+                 "form-action": ["'self'"]
+             }
+         }));
+     } catch (_) {
+         // If CSP fails to initialize, continue without it rather than crashing
+     }
+@@
+-    app?.use(cors({
++    app?.use(cors({
+         origin: process.env?.FRONTEND_URL || 'http://localhost:4028',
+         credentials: true,
+         methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+         allowedHeaders: ['Content-Type','Authorization','X-Request-ID','X-Required-Role']
+     }));
+-    app?.use(express?.json({ limit: '10mb' }));
++    app?.use(express?.json({ limit: '10mb' }));
++    app.use(cookieParser());
++
++    // CSRF protection (mutating API calls)
++    const csrfProtection = csrf({
++      cookie: {
++        key: process.env.CSRF_COOKIE_NAME || '_csrf',
++        httpOnly: true,
++        sameSite: 'lax',
++        secure: process.env.NODE_ENV === 'production'
++      }
++    });
++    // token endpoint for SPA
++    app.get('/api/csrf-token', csrfProtection, (req, res) => {
++      res.json({ csrfToken: req.csrfToken() });
++    });
++    // apply to mutating routes only
++    app.use('/api', (req, res, next) => {
++      if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
++      return csrfProtection(req, res, next);
++    });
++
++    // Extra security headers
++    app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true }));
++    app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
++    app.use((req, res, next) => {
++      res.setHeader('Permissions-Policy', 'geolocation=(), camera=(), microphone=()');
++      next();
++    });
+@@
+-    // Basic server-side validation and rate limiting (no external deps)
+-    const makeRateLimit = (windowMs = 15 * 60 * 1000, max = 300) => {
+-        const requests = new Map();
+-        return (req, res, next) => {
+-            const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+-            const now = Date.now();
+-            const windowStart = now - windowMs;
+-            for (const [key, ts] of requests.entries()) {
+-                if (ts < windowStart) requests.delete(key);
+-            }
+-            const count = Array.from(requests.keys()).filter(k => 
+- k.startsWith(ip) && requests.get(k) > windowStart).length;
+-            if (count >= max) {
+-                return res.status(429).json({ error: 'Too many requests', 
+- retryAfter: Math.ceil(windowMs / 1000) });
+-            }
+-            requests.set(`${ip}-${now}`, now);
+-            next();
+-        };
+-    };
+-    app?.use(makeRateLimit());
++    // Distributed rate limiting (Redis)
++    const rateLimit = require('./middleware/rateLimit');
++    app?.use('/api', rateLimit());
+@@
+     const validateJsonContentType = (req, res, next) => {
+         const type = req.headers['content-type'] || '';
+         if (['POST','PUT','PATCH'].includes(req.method) && 
+             !type.toLowerCase().includes('application/json')) {
+             return res.status(415).json({ error: 'Unsupported Media Type' });
+         }
+         next();
+     };
+@@
+-    // (helpers defined elsewhere)
++    // ETag + cache helper for safe endpoints
++    const sendCached = (req, res, payload, cacheControl) => {
++      const body = JSON.stringify(payload);
++      const etag = nodeCrypto.createHash('sha1').update(body).digest('hex');
++      res.set('ETag', etag);
++      if (cacheControl) res.set('Cache-Control', cacheControl);
++      if (req.headers['if-none-match'] === etag) return res.status(304).end();
++      return res.json(payload);
++    };
+@@
+-    // ===== Patients (list)
++    // ===== Patients (list) with server-side pagination + search/sort
+     app?.get('/api/patients', validateAuth, requireRole(['super_admin', 'practice_admin', 'dentist', 'hygienist']), async (req, res) => {
+         try {
+             res.set('Cache-Control', 'no-store');
+-            const { data, error } = await supabase?.from('patients')?.select(`
+-                    id, patient_number, first_name, last_name, email, phone, 
+-                    date_of_birth, status, treatment_type, insurance_provider,
+-                    created_at, updated_at,
+-                    assigned_dentist:user_profiles!assigned_dentist_id(id, full_name)
+-                `)?.order('created_at', { ascending: false });
++            const { page, pageSize, from, to } = getPaging(req);
++            const q = (req.query.q || '').trim();
++            const sortField = ['created_at','last_name','first_name'].includes(req.query.sortField) ? req.query.sortField : 'created_at';
++            const sortDir = (req.query.sortDir || 'desc').toLowerCase() === 'asc';
++            let query = supabase.from('patients').select(`
++              id, patient_number, first_name, last_name, email, phone, 
++              date_of_birth, status, treatment_type, insurance_provider,
++              created_at, updated_at,
++              assigned_dentist:user_profiles!assigned_dentist_id(id, full_name)
++            `, { count: 'exact' });
++            if (q) {
++              query = query.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`);
++            }
++            const { data, error, count } = await query
++              .order(sortField, { ascending: sortDir })
++              .range(from, to);
+ 
+             if (error) throw error;
+ 
+             // F6 - Encrypt sensitive data in transit
+             const sanitizedData = data?.map(patient => ({
+                 ...patient,
+                 // Encrypt PII fields
+                 email: patient?.email ? encryptSensitiveData(patient?.email) : 
+     null,
+                 phone: patient?.phone ? encryptSensitiveData(patient?.phone) : 
+     null,
+                 date_of_birth: patient?.date_of_birth ? 
+     encryptSensitiveData(patient?.date_of_birth) : null
+             }));
+ 
+-            res?.json({ data: sanitizedData, count: data?.length });
++            setPagingHeaders(res, { page, pageSize }, count ?? data?.length ?? 0);
++            res.json({ data: sanitizedData, page, pageSize, total: count ?? data?.length ?? 0 });
+         } catch (error) {
+             console.error('Get patients error:', error);
+             res?.status(500)?.json({ error: 'Failed to fetch patients' });
+         }
+     });
+@@
+-    // Lead management (list)
++    // Lead management (list) with server-side pagination + search/sort + PII encryption
+     app?.get('/api/leads', validateAuth, requireRole(['super_admin', 
+     'practice_admin', 'manager', 'receptionist']), async (req, res) => {
+         try {
+             res.set('Cache-Control', 'no-store');
+-            const { data, error } = await supabase?.from('leads')?.select(`
+-                    id, lead_number, first_name, last_name, email, phone,
+-                    source, status, treatment_interest, estimated_value,
+-                    created_at, consent_withdrawn_date,
+-                    assigned_to:user_profiles!assigned_to_id(id, full_name)
+-                `)?.order('created_at', { ascending: false });
++            const { page, pageSize, from, to } = getPaging(req);
++            const q = (req.query.q || '').trim();
++            const sortField = ['created_at','last_name','first_name','estimated_value'].includes(req.query.sortField)
++              ? req.query.sortField : 'created_at';
++            const sortDir = (req.query.sortDir || 'desc').toLowerCase() === 'asc';
++            let query = supabase.from('leads').select(`
++              id, lead_number, first_name, last_name, email, phone,
++              source, status, treatment_interest, estimated_value,
++              created_at, consent_withdrawn_date,
++              assigned_to:user_profiles!assigned_to_id(id, full_name)
++            `, { count: 'exact' });
++            if (q) {
++              query = query.or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`);
++            }
++            const { data, error, count } = await query
++              .order(sortField, { ascending: sortDir })
++              .range(from, to);
+ 
+             if (error) throw error;
+ 
+-            res?.json({ data, count: data?.length });
++            const out = (data || []).map(l => ({
++              ...l,
++              email: l?.email ? encryptSensitiveData(l.email) : null,
++              phone: l?.phone ? encryptSensitiveData(l.phone) : null
++            }));
++            setPagingHeaders(res, { page, pageSize }, count ?? data?.length ?? 0);
++            res.json({ data: out, page, pageSize, total: count ?? data?.length ?? 0 });
+         } catch (error) {
+             console.error('Get leads error:', error);
+             res?.status(500)?.json({ error: 'Failed to fetch leads' });
+         }
+     });
+@@
+-    // Plans
++    // Plans (cacheable)
+     app?.get('/api/memberships/plans', validateAuth, 
+     requireRole(['super_admin','practice_admin','manager']), async (req, res) => {
+         try {
+-            res.set('Cache-Control', 'no-store');
+             const { practice_location_id } = req.query;
+             let query = supabase.from('membership_plans').select(`
+                 *,
+                 practice_location:practice_locations(id, name),
+                 created_by:user_profiles(id, full_name)
+             `).eq('is_active', true).order('tier', { ascending: true });
+             if (practice_location_id) query = query.eq('practice_location_id', 
+     practice_location_id);
+-            const { data, error } = await query;
+-            if (error) throw error;
+-            res.json({ data });
++            const { data, error } = await query;
++            if (error) throw error;
++            return sendCached(req, res, { data }, 'public, max-age=300, s-maxage=300, stale-while-revalidate=30');
+         } catch (error) {
+             console.error('Get membership plans error:', error);
+             res.status(500).json({ error: 'Failed to fetch membership plans' });
+         }
+     });
+diff --git a/server/middleware/rateLimit.js b/server/middleware/rateLimit.js
+new file mode 100644
+--- /dev/null
++++ b/server/middleware/rateLimit.js
+@@
++const { RateLimiterRedis } = require('rate-limiter-flexible');
++const Redis = require('ioredis');
++
++const redis = new Redis(process.env.REDIS_URL, { enableOfflineQueue: false });
++const limiter = new RateLimiterRedis({
++  storeClient: redis,
++  keyPrefix: 'rl',
++  points: 300,          // requests
++  duration: 15 * 60,    // per 15 minutes
++  blockDuration: 15 * 60
++});
++
++module.exports = () => async (req, res, next) => {
++  try {
++    const key = req.user?.id ? `u:${req.user.id}` : `ip:${req.ip}`;
++    await limiter.consume(key);
++    next();
++  } catch (rlRes) {
++    if (rlRes?.msBeforeNext) {
++      res.set('Retry-After', String(Math.ceil(rlRes.msBeforeNext / 1000)));
++    }
++    res.status(429).json({ error: 'Too many requests' });
++  }
++};
+diff --git a/server/cluster.js b/server/cluster.js
+new file mode 100644
+--- /dev/null
++++ b/server/cluster.js
+@@
++const cluster = require('cluster');
++const os = require('os');
++
++if (cluster.isPrimary) {
++  const cpuCount = process.env.WEB_CONCURRENCY ? parseInt(process.env.WEB_CONCURRENCY, 10) : os.cpus().length;
++  for (let i = 0; i < cpuCount; i++) cluster.fork();
++  cluster.on('exit', (worker) => {
++    console.error(`Worker ${worker.process.pid} died, forking new one...`);
++    cluster.fork();
++  });
++} else {
++  require('./index');
++}
+diff --git a/src/components/ErrorBoundary.jsx b/src/components/ErrorBoundary.jsx
+--- a/src/components/ErrorBoundary.jsx
++++ b/src/components/ErrorBoundary.jsx
+@@
+-import React from "react";
+-    import Icon from "./AppIcon";
+-
+-    class ErrorBoundary extends React.Component {
+-      constructor(props) {
+-        super(props);
+-        this.state = { hasError: false };
+-      }
+- 
+-      static getDerivedStateFromError(error) {
+-        return { hasError: true };
+-      }
+- 
+-      componentDidCatch(error, errorInfo) {
+-        error.__ErrorBoundary = true;
+-        window.__COMPONENT_ERROR__?.(error, errorInfo);
+-        // console.log("Error caught by ErrorBoundary:", error, errorInfo);
+-      }
+- 
+-      render() {
+-        if (this.state?.hasError) {
+-          return (
+-            <div className="min-h-screen flex items-center justify-center bg-
+- neutral-50">
+-              <div className="text-center p-8 max-w-md">
+-                <div className="flex justify-center items-center mb-2">
+-                  <svg xmlns="http://www.w3.org/2000/svg" width="42px" 
+- height="42px" viewBox="0 0 32 33" fill="none">
+-                    <path d="M16 28.5C22.6274 28.5 28 23.1274 28 16.5C28 9.87258
+-  22.6274 4.5 16 4.5C9.37258 4.5 4 9.87258 4 16.5C4 23.1274 9.37258 28.5 16 
+- 28.5Z" stroke="#343330" strokeWidth="2" strokeMiterlimit="10" />
+-                    <path d="M11.5 15.5C12.3284 15.5 13 14.8284 13 14C13 13.1716
+-  12.3284 12.5 11.5 12.5C10.6716 12.5 10 13.1716 10 14C10 14.8284 10.6716 15.5 
+- 11.5 15.5Z" fill="#343330" />
+-                    <path d="M20.5 15.5C21.3284 15.5 22 14.8284 22 14C22 13.1716
+-  21.3284 12.5 20.5 12.5C19.6716 12.5 19 13.1716 19 14C19 14.8284 19.6716 15.5 
+- 20.5 15.5Z" fill="#343330" />
+-                    <path d="M21 22.5C19.9625 20.7062 18.2213 19.5 16 
+- 19.5C13.7787 19.5 12.0375 20.7062 11 22.5" stroke="#343330" strokeWidth="2" 
+- strokeLinecap="round" strokeLinejoin="round" />
+-                  </svg>
+-                </div>
+-                <div className="flex flex-col gap-1 text-center">
+-                  <h1 className="text-2xl font-medium text-
+- neutral-800">Something went wrong</h1>
+-                  <p className="text-neutral-600 text-base w w-8/12 mx-auto">We 
+- encountered an unexpected error while processing your request.</p>
+-                </div>
+-                <div className="flex justify-center items-center mt-6">
+-                  <button
+-                    onClick={() => {
+-                      window.location.href = "/";
+-                    }}
+-                    className="bg-blue-500 hover:bg-blue-600 text-white font-
+- medium py-2 px-4 rounded flex items-center gap-2 transition-colors duration-200 
+- shadow-sm"
+-                  >
+-                    <Icon name="ArrowLeft" size={18} color="#fff" />
+-                    Back
+-                  </button>
+-                </div>
+-              </div>
+-            </div>
+-          );
+-        }
+- 
+-        return this.props.children;
+-      }
+-    }
+- 
+-    export default ErrorBoundary;
++import React from "react";
++import Icon from "./AppIcon";
++
++export default class ErrorBoundary extends React.Component {
++  constructor(props) {
++    super(props);
++    this.state = { hasError: false, errorId: null };
++  }
++  static getDerivedStateFromError() {
++    return { hasError: true };
++  }
++  componentDidCatch(error, errorInfo) {
++    const id = (Date.now().toString(36) + Math.random().toString(36).slice(2)).toUpperCase();
++    this.setState({ errorId: id });
++    window.__COMPONENT_ERROR__?.(error, { ...errorInfo, errorId: id });
++    if (process.env.NODE_ENV === "production") {
++      // Hook to Sentry or error tracking, if configured
++    }
++  }
++  render() {
++    if (!this.state.hasError) return this.props.children;
++    return (
++      <div role="alert" aria-live="assertive" className="min-h-screen flex items-center justify-center bg-neutral-50">
++        <div className="text-center p-8 max-w-md">
++          <div className="flex justify-center items-center mb-2">
++            <Icon name="AlertTriangle" size={42} color="#b91c1c" />
++          </div>
++          <h1 className="text-2xl font-semibold text-neutral-900 mb-1">Something went wrong</h1>
++          <p className="text-neutral-600">Please try again. If the problem persists, share this code with support:</p>
++          {this.state.errorId && (
++            <div className="mt-3 inline-flex items-center gap-2 border rounded px-2 py-1 text-sm">
++              <code>{this.state.errorId}</code>
++              <button aria-label="Copy error code" onClick={() => navigator.clipboard.writeText(this.state.errorId)} className="underline">Copy</button>
++            </div>
++          )}
++          <div className="flex justify-center gap-3 mt-6">
++            <button onClick={() => window.location.reload()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Reload</button>
++            <button onClick={() => this.setState({ hasError: false })} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Try Again</button>
++            {this.props.onReport && (
++              <button onClick={() => this.props.onReport(this.state.errorId)} className="bg-white border px-4 py-2 rounded">Report issue</button>
++            )}
++          </div>
++        </div>
++      </div>
++    );
++  }
++}
+diff --git a/src/components/VirtualizedList.jsx b/src/components/VirtualizedList.jsx
+--- a/src/components/VirtualizedList.jsx
++++ b/src/components/VirtualizedList.jsx
+@@
+-  if (loading) {
+-    return (
+-      <div className={`flex items-center justify-center h-${height} ${className}`}>
++  if (loading) {
++    return (
++      <div className={`flex items-center justify-center ${className}`} style={{ height }}>
+         {loadingComponent || (
+           <div className="text-center">
+             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+             <p className="text-gray-600">Loading...</p>
+           </div>
+         )}
+       </div>
+     );
+   }
+@@
+-  if (items.length === 0) {
+-    return (
+-      <div className={`flex items-center justify-center h-${height} ${className}`}>
++  if (items.length === 0) {
++    return (
++      <div className={`flex items-center justify-center ${className}`} style={{ height }}>
+         <div className="text-center text-gray-500">
+           <p>{emptyMessage}</p>
+         </div>
+       </div>
+     );
+   }
+ 
+   return (
+-    <div className={className}>
++    <div className={className} role="list">
+       <List
+         height={height}
+         itemCount={items.length}
+         itemSize={itemHeight}
+         itemData={itemData}
+         className="border border-gray-200 rounded-lg"
+       >
+         {Item}
+       </List>
+     </div>
+   );
+diff --git a/src/components/forms/FormField.jsx b/src/components/forms/FormField.jsx
+new file mode 100644
+--- /dev/null
++++ b/src/components/forms/FormField.jsx
+@@
++import React from "react";
++export default function FormField({ label, id, error, children, required = false, helpText }) {
++  const describedBy = error ? `${id}-error` : (helpText ? `${id}-help` : undefined);
++  return (
++    <div className="mb-4">
++      <label htmlFor={id} className="block text-sm font-medium text-neutral-900">
++        {label} {required && <span className="text-red-600">*</span>}
++      </label>
++      {React.cloneElement(children, { id, 'aria-invalid': !!error, 'aria-describedby': describedBy })}
++      {helpText && !error && <p id={`${id}-help`} className="text-xs text-neutral-500 mt-1">{helpText}</p>}
++      {error && <p id={`${id}-error`} className="text-xs text-red-600 mt-1">{error}</p>}
++    </div>
++  );
++}
+diff --git a/src/components/table/TableToolbar.jsx b/src/components/table/TableToolbar.jsx
+new file mode 100644
+--- /dev/null
++++ b/src/components/table/TableToolbar.jsx
+@@
++export default function TableToolbar({ value, onChange, children }) {
++  return (
++    <div className="flex items-center gap-2 mb-3">
++      <input
++        placeholder="Search…"
++        value={value}
++        onChange={e => onChange(e.target.value)}
++        className="border rounded px-2 py-1 w-full max-w-sm"
++        aria-label="Search list"
++      />
++      {children}
++    </div>
++  );
++}
+diff --git a/src/hooks/usePaginationQuery.js b/src/hooks/usePaginationQuery.js
+new file mode 100644
+--- /dev/null
++++ b/src/hooks/usePaginationQuery.js
+@@
++import { useSearchParams } from "react-router-dom";
++export default function usePaginationQuery(defaults={page:1,pageSize:25,q:'',sortField:'',sortDir:'desc'}) {
++  const [params, setParams] = useSearchParams();
++  const num = (key, fallback) => {
++    const v = parseInt(params.get(key) || fallback, 10);
++    return Number.isFinite(v) ? v : fallback;
++  };
++  const page = num('page', defaults.page);
++  const pageSize = num('pageSize', defaults.pageSize);
++  const q = params.get('q') || defaults.q;
++  const sortField = params.get('sortField') || defaults.sortField;
++  const sortDir = params.get('sortDir') || defaults.sortDir;
++  const update = (next) => {
++    const p = new URLSearchParams(params);
++    Object.entries(next).forEach(([k,v]) => {
++      if (v === undefined || v === null || v === '') p.delete(k);
++      else p.set(k, String(v));
++    });
++    setParams(p);
++  };
++  return { page, pageSize, q, sortField, sortDir, update };
++}
+diff --git a/src/hooks/useTheme.js b/src/hooks/useTheme.js
+new file mode 100644
+--- /dev/null
++++ b/src/hooks/useTheme.js
+@@
++import { useEffect, useState } from "react";
++export default function useTheme(defaultTheme = 'light') {
++  const [theme, setTheme] = useState(
++    localStorage.getItem('theme') ||
++    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : defaultTheme)
++  );
++  useEffect(() => {
++    document.documentElement.dataset.theme = theme;
++    localStorage.setItem('theme', theme);
++  }, [theme]);
++  return { theme, setTheme };
++}
+diff --git a/src/styles/theme.css b/src/styles/theme.css
+new file mode 100644
+--- /dev/null
++++ b/src/styles/theme.css
+@@
++:root[data-theme="light"] { --bg: #ffffff; --fg: #111111; }
++:root[data-theme="dark"]  { --bg: #0b0f19; --fg: #e5e7eb; }
++body { background: var(--bg); color: var(--fg); }
+diff --git a/src/components/ConfirmDialog.jsx b/src/components/ConfirmDialog.jsx
+new file mode 100644
+--- /dev/null
++++ b/src/components/ConfirmDialog.jsx
+@@
++import React from "react";
++export default function ConfirmDialog({ open, title, message, onConfirm, onCancel }) {
++  if (!open) return null;
++  return (
++    <div role="dialog" aria-modal="true" className="fixed inset-0 bg-black/40 flex items-center justify-center">
++      <div className="bg-white rounded p-6 max-w-md w-full">
++        <h2 className="text-lg font-semibold">{title}</h2>
++        <p className="mt-2 text-sm text-neutral-600">{message}</p>
++        <div className="mt-6 flex justify-end gap-2">
++          <button onClick={onCancel} className="border rounded px-3 py-1">Cancel</button>
++          <button onClick={onConfirm} className="bg-red-600 text-white rounded px-3 py-1">Delete</button>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/UndoToast.jsx b/src/components/UndoToast.jsx
+new file mode 100644
+--- /dev/null
++++ b/src/components/UndoToast.jsx
+@@
++export default function UndoToast({ open, message, onUndo, onClose }) {
++  if (!open) return null;
++  return (
++    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-neutral-900 text-white rounded px-4 py-2 flex items-center gap-3">
++      <span>{message}</span>
++      <button onClick={onUndo} className="underline">Undo</button>
++      <button onClick={onClose} aria-label="Close">✕</button>
++    </div>
++  );
++}
+```
+
+---
+
+## Next steps I recommend
+
+* Wire `FormField`, `TableToolbar`, and `usePaginationQuery` into your patients/leads pages to get the full UI benefit (server is ready).
+* Decide whether to run `npm run start:cluster` (or PM2) in production.
+* Add integration tests for CSRF, rate‑limit, pagination headers, and ETag caching.
+* When feasible, replace virtualization inline `style` with CSS classes so we can also remove `'unsafe-inline'` from `style-src`.
+

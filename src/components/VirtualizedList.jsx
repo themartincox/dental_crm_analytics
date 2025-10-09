@@ -39,7 +39,7 @@ const VirtualizedList = ({
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center h-${height} ${className}`}>
+      <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         {loadingComponent || (
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
@@ -52,7 +52,7 @@ const VirtualizedList = ({
 
   if (items.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-${height} ${className}`}>
+      <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="text-center text-gray-500">
           <p>{emptyMessage}</p>
         </div>
@@ -61,7 +61,7 @@ const VirtualizedList = ({
   }
 
   return (
-    <div className={className}>
+    <div className={className} role="list">
       <List
         height={height}
         itemCount={items.length}
@@ -76,4 +76,3 @@ const VirtualizedList = ({
 };
 
 export default VirtualizedList;
-
