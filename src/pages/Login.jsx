@@ -80,8 +80,7 @@ const Login = () => {
     
     try {
       const { error } = await signInWithOAuth('google', {
-        redirectTo: 'https://crm-by-postino-6eko889.public.builtwithrocket.new/auth/callback'
-        // For local dev you can switch this to: http://localhost:3000/auth/callback
+        redirectTo: `${window.location?.origin}/auth/callback`
       });
       
       if (error) {
