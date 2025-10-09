@@ -144,6 +144,8 @@ export const AuthProvider = ({ children }) => {
     user,
     userProfile,
     loading,
+    // Expose a stable boolean for route guards
+    isAuthenticated: !!user,
     profileLoading,
     signUp,
     signIn,

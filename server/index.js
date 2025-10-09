@@ -1528,6 +1528,73 @@ app?.post('/api/admin/log', validateAuth, requireRole(['super_admin']), async (r
         res.status(500).json({ error: 'Failed to log admin action' });
     }
 });
+
+// Client security log endpoint used by the SPA
+app?.post('/api/security/log', validateAuth, async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+        const schema = z.object({
+            event: z.string(),
+            riskLevel: z.enum(['low','medium','high']).optional(),
+            metadata: z.any().optional()
+        });
+        const parsed = schema.safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ error: 'Validation failed' });
+
+        const { event, riskLevel = 'low', metadata = {} } = parsed.data;
+        await supabase?.rpc('log_security_event', {
+            action_type: event,
+            resource_type: 'client',
+            risk_level: riskLevel,
+            additional_metadata: {
+                ...(metadata || {}),
+                user_id: req?.user?.id,
+                user_role: req?.user?.role,
+                user_agent: req?.get('User-Agent')
+            }
+        });
+
+        res.json({ ok: true });
+    } catch (error) {
+        console.error('Security log error:', error);
+        res.status(500).json({ error: 'Failed to record security log' });
+    }
+});
+
+// AI usage audit endpoint used by the SPA
+app?.post('/api/ai-usage/log', validateAuth, async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+        const schema = z.object({
+            provider: z.string().default('internal'),
+            dataType: z.string().optional(),
+            purpose: z.string().optional(),
+            approved: z.boolean().default(false),
+            timestamp: z.string().optional(),
+            gdprCompliance: z.boolean().optional(),
+            dataMinimization: z.boolean().optional()
+        });
+        const parsed = schema.safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ error: 'Validation failed' });
+
+        const payload = parsed.data;
+        await supabase?.rpc('log_security_event', {
+            action_type: 'ai_usage',
+            resource_type: 'ai',
+            risk_level: payload.approved ? 'low' : 'medium',
+            additional_metadata: {
+                ...payload,
+                user_id: req?.user?.id,
+                user_role: req?.user?.role
+            }
+        });
+
+        res.json({ ok: true });
+    } catch (error) {
+        console.error('AI usage log error:', error);
+        res.status(500).json({ error: 'Failed to record AI usage' });
+    }
+});
 // Health check endpoint
 app?.get('/api/health', (req, res) => {
     res?.json({ 

@@ -4,6 +4,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, requiredRoles = [], requireAuth = true }) => {
   const { user, userProfile, loading, isAuthenticated } = useAuth();
+  // Be defensive: fall back to user presence if isAuthenticated isn't provided
+  const authed = typeof isAuthenticated === 'boolean' ? isAuthenticated : !!user;
   const location = useLocation();
 
   if (loading) {
@@ -18,7 +20,7 @@ const ProtectedRoute = ({ children, requiredRoles = [], requireAuth = true }) =>
   }
 
   // Check authentication requirement
-  if (requireAuth && !isAuthenticated) {
+  if (requireAuth && !authed) {
     // Redirect to login with return URL
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
