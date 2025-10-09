@@ -1,4 +1,4 @@
-import secureApiService from './secureApiService';
+import secureApiService, { API_BASE_URL } from './secureApiService';
 
 // User Profiles Service
 export const userProfilesService = {
@@ -242,7 +242,7 @@ export const dashboardService = {
 // Appointments realtime (SSE)
 export const appointmentsRealtimeService = {
   subscribe(callback) {
-    const base = (import.meta.env?.VITE_API_URL || '').replace(/\/$/, '');
+    const base = (API_BASE_URL || '').replace(/\/$/, '');
     const es = new EventSource(`${base}/events/appointments/stream`, { withCredentials: true });
     const handler = (e) => {
       try {

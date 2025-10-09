@@ -1,4 +1,4 @@
-import secureApiService from './secureApiService';
+import secureApiService, { API_BASE_URL } from './secureApiService';
 
 /**
  * Membership Program Service
@@ -186,7 +186,7 @@ export const membershipAnalyticsService = {
 export const membershipRealtimeService = {
   // Subscribe to membership applications changes
   subscribeToApplications(callback) {
-    const base = (import.meta.env?.VITE_API_URL || '').replace(/\/$/, '');
+    const base = (API_BASE_URL || '').replace(/\/$/, '');
     const es = new EventSource(`${base}/events/memberships/stream`, { withCredentials: true });
     const handler = (e) => {
       try {
@@ -200,7 +200,7 @@ export const membershipRealtimeService = {
 
   // Subscribe to memberships changes  
   subscribeToMemberships(callback) {
-    const base = (import.meta.env?.VITE_API_URL || '').replace(/\/$/, '');
+    const base = (API_BASE_URL || '').replace(/\/$/, '');
     const es = new EventSource(`${base}/events/memberships/stream`, { withCredentials: true });
     const handler = (e) => {
       try {

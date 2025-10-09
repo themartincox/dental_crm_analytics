@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 const isBrowser = typeof window !== 'undefined';
 const currentOrigin = isBrowser ? window.location.origin : '';
 const isLocalhost = isBrowser && /localhost|127\.0\.0\.1/.test(window.location.hostname);
-const API_BASE_URL = import.meta.env?.VITE_API_URL || (isLocalhost ? 'http://localhost:3001/api' : `${currentOrigin}/api`);
+export const API_BASE_URL = import.meta.env?.VITE_API_URL || (isLocalhost ? 'http://localhost:3001/api' : `${currentOrigin}/api`);
 
 // Create axios instance with default config
 const apiClient = axios?.create({
