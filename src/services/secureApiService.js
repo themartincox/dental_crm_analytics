@@ -2,7 +2,11 @@
 import axios from 'axios';
 import { supabase } from '../lib/supabase';
 
-const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:3001/api';
+// Prefer explicit env; otherwise, in production use same-origin '/api', and in dev fallback to localhost
+const isBrowser = typeof window !== 'undefined';
+const currentOrigin = isBrowser ? window.location.origin : '';
+const isLocalhost = isBrowser && /localhost|127\.0\.0\.1/.test(window.location.hostname);
+const API_BASE_URL = import.meta.env?.VITE_API_URL || (isLocalhost ? 'http://localhost:3001/api' : `${currentOrigin}/api`);
 
 // Create axios instance with default config
 const apiClient = axios?.create({
