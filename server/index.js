@@ -1595,6 +1595,102 @@ app?.post('/api/ai-usage/log', validateAuth, async (req, res) => {
         res.status(500).json({ error: 'Failed to record AI usage' });
     }
 });
+
+// ===================== Public, unauthenticated endpoints =====================
+// Public waitlist signup (marketing site)
+app?.post('/api/public/waitlist', async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+        const schema = z.object({
+            firstName: z.string().min(1),
+            lastName: z.string().min(1),
+            email: z.string().email(),
+            phone: z.string().optional().nullable(),
+            practiceName: z.string().optional().nullable(),
+            interest: z.string().optional().nullable(),
+            utm_source: z.string().optional().nullable(),
+            utm_medium: z.string().optional().nullable(),
+            utm_campaign: z.string().optional().nullable()
+        });
+        const parsed = schema.safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ error: 'Validation failed', details: parsed.error.flatten() });
+
+        const leadNumber = `AES-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+        const payload = {
+            lead_number: leadNumber,
+            first_name: parsed.data.firstName,
+            last_name: parsed.data.lastName,
+            email: parsed.data.email,
+            phone: parsed.data.phone || null,
+            source: 'website',
+            status: 'new',
+            treatment_interest: parsed.data.interest || null,
+            notes: `Waitlist signup${parsed.data.practiceName ? ` - Practice: ${parsed.data.practiceName}` : ''}`,
+            utm_source: parsed.data.utm_source || 'aescrm_landing',
+            utm_medium: parsed.data.utm_medium || 'waitlist_form',
+            utm_campaign: parsed.data.utm_campaign || 'pre_launch_waitlist'
+        };
+
+        const { data, error } = await supabase.from('leads').insert(payload).select().single();
+        if (error) throw error;
+
+        // Best-effort security log (no auth context available)
+        try {
+            await supabase?.rpc('log_security_event', {
+                action_type: 'public_waitlist_signup',
+                resource_type: 'marketing',
+                risk_level: 'low',
+                additional_metadata: { lead_number: leadNumber, email: parsed.data.email }
+            });
+        } catch (_) {}
+
+        res.status(201).json({ ok: true, data });
+    } catch (err) {
+        console.error('Public waitlist error:', err);
+        res.status(500).json({ error: 'Failed to submit waitlist' });
+    }
+});
+
+// Public self-serve tenant signup (stores pending client_organizations)
+app?.post('/api/public/tenants/signup', async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+        const schema = z.object({
+            organization_name: z.string().min(2),
+            contact_email: z.string().email(),
+            contact_phone: z.string().optional().nullable(),
+            subscription_tier: z.string().optional().nullable()
+        });
+        const parsed = schema.safeParse(req.body);
+        if (!parsed.success) return res.status(400).json({ error: 'Validation failed', details: parsed.error.flatten() });
+
+        const payload = {
+            organization_name: parsed.data.organization_name,
+            contact_email: parsed.data.contact_email,
+            contact_phone: parsed.data.contact_phone || null,
+            status: 'pending_approval',
+            subscription_tier: parsed.data.subscription_tier || 'basic'
+        };
+
+        const { data, error } = await supabase.from('client_organizations').insert(payload).select('id, organization_name, status, subscription_tier, contact_email, contact_phone, created_at').single();
+        if (error) throw error;
+
+        // Log tenant signup
+        try {
+            await supabase?.rpc('log_security_event', {
+                action_type: 'public_tenant_signup',
+                resource_type: 'client_organizations',
+                risk_level: 'low',
+                additional_metadata: { id: data?.id, email: data?.contact_email }
+            });
+        } catch (_) {}
+
+        res.status(201).json({ ok: true, data });
+    } catch (err) {
+        console.error('Public tenant signup error:', err);
+        res.status(500).json({ error: 'Failed to submit tenant signup' });
+    }
+});
 // Health check endpoint
 app?.get('/api/health', (req, res) => {
     res?.json({ 

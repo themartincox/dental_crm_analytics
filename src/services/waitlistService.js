@@ -1,4 +1,5 @@
 import { leadsService } from './dentalCrmService';
+import { API_BASE_URL } from './secureApiService';
 import { emailService } from './emailService';
 
 // Waitlist Service - Extends leads service for marketing page functionality
@@ -31,12 +32,27 @@ export const waitlistService = {
         utm_campaign: waitlistData?.utm_campaign || 'pre_launch_waitlist'
       };
 
-      // Store lead in database
-      const result = await leadsService?.create(leadData);
-      
-      if (result?.error) {
-        throw new Error(result.error.message || 'Failed to create lead record');
+      // Store waitlist via public API (no auth required)
+      const resp = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/public/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: waitlistData?.firstName,
+          lastName: waitlistData?.lastName,
+          email: waitlistData?.email,
+          phone: waitlistData?.phone || null,
+          practiceName: waitlistData?.practiceName || null,
+          interest: waitlistData?.interest || 'General CRM',
+          utm_source: waitlistData?.utm_source || 'aescrm_landing',
+          utm_medium: waitlistData?.utm_medium || 'waitlist_form',
+          utm_campaign: waitlistData?.utm_campaign || 'pre_launch_waitlist'
+        })
+      });
+      if (!resp.ok) {
+        const errBody = await resp.text();
+        throw new Error(errBody || 'Failed to submit waitlist');
       }
+      const result = await resp.json();
 
       // Send notification email to admin (martin@postino.cc)
       const notificationResult = await emailService.sendWaitlistNotification(waitlistData, leadNumber);

@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Users, LogIn } from 'lucide-react';
 import SEOHead from '../../components/SEOHead';
 import WaitlistModal from './components/WaitlistModal';
+import TenantSignupModal from './components/TenantSignupModal';
 import OptionCard from './components/OptionCard';
 
 const GetStartedGatewayPage = () => {
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [isTenantModalOpen, setIsTenantModalOpen] = useState(false);
 
   const openWaitlistModal = () => {
     setIsWaitlistModalOpen(true);
@@ -16,6 +18,9 @@ const GetStartedGatewayPage = () => {
   const closeWaitlistModal = () => {
     setIsWaitlistModalOpen(false);
   };
+
+  const openTenantModal = () => setIsTenantModalOpen(true);
+  const closeTenantModal = () => setIsTenantModalOpen(false);
 
   return (
     <>
@@ -110,6 +115,25 @@ const GetStartedGatewayPage = () => {
                 linkTo="/login"
                 variant="secondary"
               />
+
+              {/* Self-serve clinic sign-up */}
+              <OptionCard
+                icon={Users}
+                iconColor="text-indigo-600"
+                iconBg="bg-indigo-100"
+                title="Create Your Clinic"
+                subtitle="Self‑serve sign up"
+                description="Spin up a tenant for your practice. Your request enters pending approval and we’ll email you next steps."
+                features={[
+                  "Tenant created as pending",
+                  "Basic tier by default",
+                  "Approval and onboarding by admin",
+                  "Branding + modules configurable later"
+                ]}
+                actionLabel="Create Clinic"
+                onClick={openTenantModal}
+                variant="primary"
+              />
             </motion.div>
 
             {/* Trust Indicators */}
@@ -163,6 +187,7 @@ const GetStartedGatewayPage = () => {
           isOpen={isWaitlistModalOpen}
           onClose={closeWaitlistModal}
         />
+        <TenantSignupModal isOpen={isTenantModalOpen} onClose={closeTenantModal} />
       </div>
     </>
   );
