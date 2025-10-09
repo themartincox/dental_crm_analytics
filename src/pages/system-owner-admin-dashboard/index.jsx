@@ -180,6 +180,11 @@ const SystemOwnerAdminDashboard = () => {
           });
           await loadClients();
           break;
+        case 'approve':
+          await secureApiService.makeSecureRequest(`/admin/clients/${clientId}/approve`, { method: 'POST' }, 'super_admin');
+          await logSystemAction('client_approved', clientId, { organization_name: data?.organization_name });
+          await loadClients();
+          break;
 
         case 'delete':
           await secureApiService.makeSecureRequest(`/admin/clients/${clientId}`, { method: 'DELETE' }, 'super_admin');
@@ -336,6 +341,7 @@ const SystemOwnerAdminDashboard = () => {
                     <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                     <option value="trial">Trial</option>
+                    <option value="pending_approval">Pending approval</option>
                   </select>
 
                   <select

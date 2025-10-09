@@ -162,6 +162,14 @@ const ClientCard = ({ client, systemModules, isSelected, onSelect, onAction }) =
           </div>
 
           <div className="flex flex-col space-y-2 ml-4">
+            {client?.status === 'pending_approval' && (
+              <button
+                onClick={() => onAction?.('approve', client?.id, client)}
+                className="flex items-center space-x-2 px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              >
+                Approve
+              </button>
+            )}
             <button
               onClick={() => onAction?.('edit_permissions', client?.id)}
               className="flex items-center space-x-2 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"

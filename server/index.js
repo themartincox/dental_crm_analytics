@@ -1644,6 +1644,26 @@ app?.post('/api/public/waitlist', async (req, res) => {
             });
         } catch (_) {}
 
+        // Best-effort email logs for admin and contact
+        try {
+            await supabase.from('email_logs').insert([
+                {
+                    to_email: 'martin@postino.cc',
+                    subject: `New Waitlist Signup - ${leadNumber}`,
+                    template: 'waitlist_notification',
+                    data: payload,
+                    status: 'pending'
+                },
+                {
+                    to_email: parsed.data.email,
+                    subject: 'Welcome to AES CRM Waitlist - You\'re In!',
+                    template: 'waitlist_welcome',
+                    data: { lead_number: leadNumber, first_name: parsed.data.firstName, last_name: parsed.data.lastName },
+                    status: 'pending'
+                }
+            ]);
+        } catch (_) {}
+
         res.status(201).json({ ok: true, data });
     } catch (err) {
         console.error('Public waitlist error:', err);
@@ -1685,10 +1705,84 @@ app?.post('/api/public/tenants/signup', async (req, res) => {
             });
         } catch (_) {}
 
+        // Email logs (admin + applicant)
+        try {
+            await supabase.from('email_logs').insert([
+                {
+                    to_email: 'martin@postino.cc',
+                    subject: `New Clinic Signup - ${data.organization_name}`,
+                    template: 'tenant_signup_notification',
+                    data,
+                    status: 'pending'
+                },
+                {
+                    to_email: data.contact_email,
+                    subject: 'Thanks for signing up — pending approval',
+                    template: 'tenant_signup_thanks',
+                    data: { organization_name: data.organization_name },
+                    status: 'pending'
+                }
+            ]);
+        } catch (_) {}
+
         res.status(201).json({ ok: true, data });
     } catch (err) {
         console.error('Public tenant signup error:', err);
         res.status(500).json({ error: 'Failed to submit tenant signup' });
+    }
+});
+
+// Approve pending client and seed default permissions
+app?.post('/api/admin/clients/:id/approve', validateAuth, requireRole(['super_admin']), async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+        const { id } = req.params;
+        // Set active
+        const { data: client, error: statusErr } = await supabase
+            .from('client_organizations')
+            .update({ status: 'active', updated_at: new Date().toISOString() })
+            .eq('id', id)
+            .select('id, organization_name, contact_email')
+            .single();
+        if (statusErr) throw statusErr;
+
+        // Seed defaults (upsert minimal permissions)
+        const defaults = [
+            { module_name: 'patient_management', permission_level: 'admin', is_enabled: true },
+            { module_name: 'appointment_scheduling', permission_level: 'write', is_enabled: true },
+            { module_name: 'lead_management', permission_level: 'write', is_enabled: true },
+            { module_name: 'analytics_dashboard', permission_level: 'read', is_enabled: true },
+            { module_name: 'embeddable_widget', permission_level: 'read', is_enabled: true }
+        ];
+        const rows = defaults.map(d => ({ ...d, client_organization_id: id, granted_at: new Date().toISOString() }));
+        // Upsert by (client_organization_id, module_name) if supported; otherwise insert ignoring conflicts
+        await supabase.from('client_module_permissions').upsert(rows, { onConflict: 'client_organization_id,module_name' });
+
+        // Email logs (approval)
+        try {
+            await supabase.from('email_logs').insert([
+                {
+                    to_email: client.contact_email,
+                    subject: 'Your clinic has been approved',
+                    template: 'tenant_approved',
+                    data: { organization_name: client.organization_name },
+                    status: 'pending'
+                }
+            ]);
+        } catch (_) {}
+
+        // Audit log
+        await supabase?.rpc('log_security_event', {
+            action_type: 'client_approved',
+            resource_type: 'client_organizations',
+            risk_level: 'low',
+            additional_metadata: { id, organization_name: client.organization_name }
+        });
+
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('Client approve error:', err);
+        res.status(500).json({ error: 'Failed to approve client' });
     }
 });
 // Health check endpoint

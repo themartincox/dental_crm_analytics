@@ -58,7 +58,11 @@ const WaitlistForm = ({ isOpen, onClose }) => {
         formType: 'waitlist',
         timestamp: new Date().toISOString()
       });
-      setSubmitError(error?.message || 'Something went wrong. Please try again.');
+      const raw = error?.message || '';
+      const friendly = raw.includes('<!DOCTYPE') || raw.includes('<html')
+        ? 'Unable to submit waitlist — API endpoint not reachable. Please try again shortly.'
+        : raw;
+      setSubmitError(friendly || 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
