@@ -165,15 +165,24 @@ async function handleTenantSignup(event) {
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return text(200, 'OK');
 
-  // Path will look like "/.netlify/functions/api/public/waitlist" when called via redirect
-  const subpath = pathAfter(event.path, '/.netlify/functions/api');
-  if (subpath.startsWith('/public/waitlist')) {
-    return handleWaitlist(event);
-  }
-  if (subpath.startsWith('/public/tenants/signup')) {
-    return handleTenantSignup(event);
-  }
+// Support both redirected path (/api/...) and direct function path (/\.netlify/functions/api/...)
+let subpath = '';
+if (event.path.startsWith('/.netlify/functions/api')) {
+  subpath = pathAfter(event.path, '/.netlify/functions/api');
+} else if (event.path.startsWith('/api')) {
+  subpath = pathAfter(event.path, '/api');
+} else {
+  subpath = event.path || ''; // fallback
+}
+if (subpath.endsWith('/')) subpath = subpath.slice(0, -1);
+
+const rawUrl = event.rawUrl || '';
+if (subpath.startsWith('/public/waitlist') || rawUrl.includes('/public/waitlist')) {
+  return handleWaitlist(event);
+}
+if (subpath.startsWith('/public/tenants/signup') || rawUrl.includes('/public/tenants/signup')) {
+  return handleTenantSignup(event);
+}
 
   return json(404, { error: 'Not found' });
 };
-
