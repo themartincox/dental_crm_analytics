@@ -38,7 +38,7 @@ const text = (statusCode, body, extraHeaders = {}) => ({
 
 const DEBUG = process.env.DEBUG_API_ERRORS === '1';
 function makeClient() {
-  const url = process.env.SUPABASE_URL;
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     const msg = 'Supabase env vars missing (SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY)';
