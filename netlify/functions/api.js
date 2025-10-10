@@ -78,6 +78,21 @@ async function handleWaitlist(event) {
     if (!body[r]) return json(400, { error: `Missing ${r}` });
   }
 
+  // Normalize interest to match enum public.treatment_type
+  const validInterests = new Set([
+    'general', 'orthodontics', 'implants', 'cosmetic', 'endodontics', 'periodontics', 'oral_surgery', 'pediatric'
+  ]);
+  let normalizedInterest = null;
+  if (typeof body.interest === 'string' && body.interest.trim()) {
+    const lower = body.interest.trim().toLowerCase().replace(/\s+/g, '_');
+    // map common synonyms
+    const mapped = (
+      lower === 'aesthetics' || lower === 'aesthetic' ? 'cosmetic' :
+      lower === 'general_crm' || lower === 'crm' ? null : lower
+    );
+    if (mapped && validInterests.has(mapped)) normalizedInterest = mapped;
+  }
+
   const leadNumber = `AES-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
   const payload = {
     id: randomUUID(),
@@ -88,7 +103,7 @@ async function handleWaitlist(event) {
     phone: body.phone || null,
     source: 'website',
     status: 'new',
-    treatment_interest: body.interest || null,
+    treatment_interest: normalizedInterest,
     notes: `Waitlist signup${body.practiceName ? ` - Practice: ${body.practiceName}` : ''}`,
     utm_source: body.utm_source || 'aescrm_landing',
     utm_medium: body.utm_medium || 'waitlist_form',
