@@ -36,7 +36,24 @@ const text = (statusCode, body, extraHeaders = {}) => ({
   body,
 });
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const DEBUG = process.env.DEBUG_API_ERRORS === '1';
+function makeClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    const msg = 'Supabase env vars missing (SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY)';
+    if (DEBUG) console.error(msg, { urlPresent: !!url, keyPresent: !!key });
+  }
+  return createClient(url, key);
+}
+const supabase = makeClient();
+
+const fail = (msg, err) => {
+  if (DEBUG && err) {
+    return json(500, { error: msg, details: err?.message || err, code: err?.code });
+  }
+  return json(500, { error: msg });
+};
 
 const parseBody = (event) => {
   try {
@@ -79,7 +96,7 @@ async function handleWaitlist(event) {
   };
 
   const { data, error } = await supabase.from('leads').insert(payload).select().single();
-  if (error) return json(500, { error: 'Failed to submit waitlist' });
+  if (error) return fail('Failed to submit waitlist', error);
 
   // Best-effort logs
   try {
@@ -132,7 +149,7 @@ async function handleTenantSignup(event) {
     .insert(insert)
     .select('id, organization_name, status, subscription_tier, contact_email, contact_phone, created_at')
     .single();
-  if (error) return json(500, { error: 'Failed to submit tenant signup' });
+  if (error) return fail('Failed to submit tenant signup', error);
 
   try {
     await supabase.rpc('log_security_event', {
