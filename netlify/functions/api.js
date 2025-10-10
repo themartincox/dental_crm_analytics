@@ -8,6 +8,7 @@
 //  - SUPABASE_SERVICE_ROLE_KEY
 //
 const { createClient } = require('@supabase/supabase-js');
+const { randomUUID } = require('crypto');
 
 const json = (statusCode, body, extraHeaders = {}) => ({
   statusCode,
@@ -62,6 +63,7 @@ async function handleWaitlist(event) {
 
   const leadNumber = `AES-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
   const payload = {
+    id: randomUUID(),
     lead_number: leadNumber,
     first_name: body.firstName,
     last_name: body.lastName,
@@ -117,6 +119,7 @@ async function handleTenantSignup(event) {
   if (!body.organization_name || !body.contact_email) return json(400, { error: 'Missing organization_name or contact_email' });
 
   const insert = {
+    id: randomUUID(),
     organization_name: body.organization_name,
     contact_email: body.contact_email,
     contact_phone: body.contact_phone || null,
