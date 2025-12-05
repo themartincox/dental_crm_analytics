@@ -106,7 +106,7 @@ class ClientPermissionService {
   async updateClient(clientId, updates) {
     try {
       const { data, error } = await supabase.from('client_organizations').update({
-        ...updates,
+        .updates,
         updated_at: new Date().toISOString()
       }).eq('id', clientId).select().single();
 

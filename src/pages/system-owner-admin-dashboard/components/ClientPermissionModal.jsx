@@ -19,7 +19,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
       tier_availability: ['basic','pro','enterprise']
     };
     const names = new Set((systemModules || []).map(m => m?.module_name));
-    return names.has('finance') ? systemModules : [...(systemModules || []), financeModule];
+    return names.has('finance') ? systemModules : [.(systemModules || []), financeModule];
   }, [systemModules]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
     setPermissions(prev => ({
       ...prev,
       [moduleName]: {
-        ...prev?.[moduleName],
+        .prev?.[moduleName],
         [field]: value
       }
     }));
@@ -262,7 +262,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+              <span>{loading ? 'Saving.' : 'Save Changes'}</span>
             </button>
           </div>
         </div>

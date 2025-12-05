@@ -250,7 +250,7 @@ const SystemOwnerAdminDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading system dashboard...</p>
+          <p className="text-gray-600">Loading system dashboard.</p>
         </div>
       </div>
     );
@@ -325,7 +325,7 @@ const SystemOwnerAdminDashboard = () => {
                   <Search className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search clients..."
+                    placeholder="Search clients."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e?.target?.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -375,7 +375,7 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Public Footer Variant</label>
-                  <select className="w-full border rounded px-3 py-2" value={uiSettingsEditing.publicFooterVariant} onChange={(e) => setUiSettingsEditing(prev => ({ ...prev, publicFooterVariant: e.target.value }))}>
+                  <select className="w-full border rounded px-3 py-2" value={uiSettingsEditing.publicFooterVariant} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, publicFooterVariant: e.target.value }))}>
                     <option value="compact">Compact</option>
                     <option value="full">Full (GDC)</option>
                   </select>
@@ -383,11 +383,11 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <label className="inline-flex items-center text-sm">
-                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.publicFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ ...prev, publicFooterEnabled: e.target.checked }))} />
+                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.publicFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, publicFooterEnabled: e.target.checked }))} />
                     Public Footer Enabled
                   </label>
                   <label className="inline-flex items-center text-sm">
-                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.internalFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ ...prev, internalFooterEnabled: e.target.checked }))} />
+                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.internalFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, internalFooterEnabled: e.target.checked }))} />
                     Internal Footer Enabled
                   </label>
                 </div>
@@ -421,7 +421,7 @@ const SystemOwnerAdminDashboard = () => {
                     if (id) {
                       try {
                         const { data } = await secureApiService.makeSecureRequest(`/admin/branding/${id}`, { method: 'GET' }, 'super_admin');
-                        if (data) setBrandingForm(prev => ({ ...prev, ...data }));
+                        if (data) setBrandingForm(prev => ({ .....prev, .data }));
                       } catch (_) { }
                     }
                   }}>
@@ -433,11 +433,11 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Practice Name</label>
-                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.practice_name} onChange={(e) => setBrandingForm(prev => ({ ...prev, practice_name: e.target.value }))} />
+                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.practice_name} onChange={(e) => setBrandingForm(prev => ({ .....prev, practice_name: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.logo_url} onChange={(e) => setBrandingForm(prev => ({ ...prev, logo_url: e.target.value }))} placeholder="https://..." />
+                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.logo_url} onChange={(e) => setBrandingForm(prev => ({ .....prev, logo_url: e.target.value }))} placeholder="https://." />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -445,8 +445,8 @@ const SystemOwnerAdminDashboard = () => {
                   <div key={key}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{key.replace(/_/g, ' ')}</label>
                     <div className="flex items-center gap-2">
-                      <input type="color" value={brandingForm[key] || '#ffffff'} onChange={(e) => setBrandingForm(prev => ({ ...prev, [key]: e.target.value }))} className="h-8 w-12 p-0 border rounded" />
-                      <input value={brandingForm[key] || ''} onChange={(e) => setBrandingForm(prev => ({ ...prev, [key]: e.target.value }))} className="flex-1 border rounded px-3 py-2 text-sm" />
+                      <input type="color" value={brandingForm[key] || '#ffffff'} onChange={(e) => setBrandingForm(prev => ({ .....prev, [key]: e.target.value }))} className="h-8 w-12 p-0 border rounded" />
+                      <input value={brandingForm[key] || ''} onChange={(e) => setBrandingForm(prev => ({ .....prev, [key]: e.target.value }))} className="flex-1 border rounded px-3 py-2 text-sm" />
                     </div>
                   </div>
                 ))}
@@ -454,7 +454,7 @@ const SystemOwnerAdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Font</label>
-                  <input value={brandingForm.font_family} onChange={(e) => setBrandingForm(prev => ({ ...prev, font_family: e.target.value }))} className="w-full border rounded px-3 py-2 text-sm" placeholder="Inter, Roboto, ..." />
+                  <input value={brandingForm.font_family} onChange={(e) => setBrandingForm(prev => ({ .....prev, font_family: e.target.value }))} className="w-full border rounded px-3 py-2 text-sm" placeholder="Inter, Roboto, ." />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Upload Logo</label>
@@ -466,7 +466,7 @@ const SystemOwnerAdminDashboard = () => {
                       const { error } = await supabase.storage.from('branding').upload(path, file, { upsert: true, cacheControl: '3600' });
                       if (error) throw error;
                       // store the path; display using signed URL
-                      setBrandingForm(prev => ({ ...prev, logo_url: path }));
+                      setBrandingForm(prev => ({ .....prev, logo_url: path }));
                     } catch (err) {
                       alert('Upload failed');
                     }

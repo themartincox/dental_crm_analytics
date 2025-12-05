@@ -92,7 +92,7 @@ const PatientJourneyRevenueDashboard = () => {
       const randomUpdate = updates?.[Math.floor(Math.random() * updates?.length)];
       setRealTimeUpdates(prev => [
         { id: Date.now(), message: randomUpdate, timestamp: new Date() },
-        ...prev?.slice(0, 4)
+        .prev?.slice(0, 4)
       ]);
     }, 15000);
 
@@ -119,7 +119,7 @@ const PatientJourneyRevenueDashboard = () => {
         <div className="flex items-center justify-center h-96">
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="text-muted-foreground">Loading patient analytics...</span>
+            <span className="text-muted-foreground">Loading patient analytics.</span>
           </div>
         </div>
       </div>
@@ -162,7 +162,7 @@ const PatientJourneyRevenueDashboard = () => {
                     ))
                   ) : (
                     <div className="text-xs text-muted-foreground">
-                      Waiting for updates...
+                      Waiting for updates.
                     </div>
                   )}
                 </div>
@@ -233,7 +233,7 @@ const PatientJourneyRevenueDashboard = () => {
                 ))
               ) : (
                 <div className="text-xs text-muted-foreground">
-                  Waiting for updates...
+                  Waiting for updates.
                 </div>
               )}
             </div>

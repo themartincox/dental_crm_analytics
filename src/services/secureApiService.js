@@ -153,8 +153,8 @@ class SecureApiService {
                         'X-Request-ID': `${Date.now()}-${++this.requestId}`,
                         'X-Required-Role': requiredRole || '',
                         'X-Client-Validation': 'true',
-                        ...(csrfHeader),
-                        ...(options?.headers || {})
+                        .(csrfHeader),
+                        .(options?.headers || {})
                     },
                     params: options?.params
                 });
@@ -202,7 +202,7 @@ class SecureApiService {
             await apiClient.post('/security/log', {
                 event: eventType,
                 metadata: {
-                    ...metadata,
+                    .metadata,
                     userAgent: navigator?.userAgent,
                     timestamp: new Date().toISOString(),
                     url: window.location?.href,
@@ -503,7 +503,7 @@ class SecureApiService {
 
             // Decrypt sensitive data for display
             return data?.map(patient => ({
-                ...patient,
+                .patient,
                 email: patient?.email ? decryptSensitiveData(patient?.email) : null,
                 phone: patient?.phone ? decryptSensitiveData(patient?.phone) : null,
                 dateOfBirth: patient?.date_of_birth ? decryptSensitiveData(patient?.date_of_birth) : null,

@@ -78,11 +78,11 @@ const BookingModal = ({
   ];
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ .....prev, [field]: value }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors(prev => ({ .....prev, [field]: '' }));
     }
 
     // Auto-calculate deposit based on treatment type
@@ -146,7 +146,7 @@ const BookingModal = ({
     const appointmentDateTime = new Date(`${formData?.date}T${formData?.time}`);
     
     const bookingData = {
-      ...formData,
+      .formData,
       date: appointmentDateTime,
       patientId: formData?.patientId || `P${Date.now()}`,
       status: 'pending',
@@ -383,7 +383,7 @@ const BookingModal = ({
               <textarea
                 value={formData?.notes}
                 onChange={(e) => handleChange('notes', e?.target?.value)}
-                placeholder="Add any special notes or instructions..."
+                placeholder="Add any special notes or instructions."
                 rows={3}
                 className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
               />

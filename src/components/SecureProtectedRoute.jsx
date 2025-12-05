@@ -31,7 +31,7 @@ const SecureProtectedRoute = ({
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center space-y-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    <span className="text-muted-foreground">Verifying secure access...</span>
+                    <span className="text-muted-foreground">Verifying secure access.</span>
                 </div>
             </div>
         );
@@ -81,7 +81,7 @@ const SecureProtectedRoute = ({
                     <div className="text-sm text-yellow-600 mb-6 space-y-2">
                         <p><strong>Required roles:</strong> {requiredRoles?.join(', ')}</p>
                         <p><strong>Your role:</strong> {userProfile?.role || 'No role assigned'}</p>
-                        <p><strong>User ID:</strong> {user?.id?.substring(0, 8)}...</p>
+                        <p><strong>User ID:</strong> {user?.id?.substring(0, 8)}.</p>
                     </div>
                     <div className="space-y-2">
                         <button 

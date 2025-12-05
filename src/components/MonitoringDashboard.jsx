@@ -99,7 +99,7 @@ const MonitoringDashboard = ({ isOpen, onClose }) => {
 
   // Performance tab content
   const PerformanceTab = () => {
-    if (!performanceData) return <div>Loading performance data...</div>;
+    if (!performanceData) return <div>Loading performance data.</div>;
 
     const { coreWebVitals, navigation, resources, alerts, memory } = performanceData;
 
@@ -238,7 +238,7 @@ const MonitoringDashboard = ({ isOpen, onClose }) => {
 
   // Analytics tab content
   const AnalyticsTab = () => {
-    if (!analyticsData) return <div>Loading analytics data...</div>;
+    if (!analyticsData) return <div>Loading analytics data.</div>;
 
     const { totalEvents, uniqueSessions, pageViews, conversions, topPages, topActions, conversionRate } = analyticsData;
 
@@ -319,7 +319,7 @@ const MonitoringDashboard = ({ isOpen, onClose }) => {
 
   // Errors tab content
   const ErrorsTab = () => {
-    if (!errorData) return <div>Loading error data...</div>;
+    if (!errorData) return <div>Loading error data.</div>;
 
     const { total, bySeverity, byCategory, last24Hours } = errorData;
 

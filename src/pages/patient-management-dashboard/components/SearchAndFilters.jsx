@@ -15,7 +15,7 @@ import React from 'react';
         }) => {
           const handleFilterChange = (key, value) => {
             onFiltersChange?.({
-              ...filters,
+              .filters,
               [key]: value
             });
           };
@@ -57,7 +57,7 @@ import React from 'react';
                   <Icon name="Search" size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search by name, email, or phone..."
+                    placeholder="Search by name, email, or phone."
                     value={searchQuery}
                     onChange={(e) => onSearchChange?.(e?.target?.value)}
                     className="pl-10"

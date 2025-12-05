@@ -168,7 +168,7 @@ import React, { useState, useEffect } from 'react';
               // Update lead status
               setLeads(prev => prev?.map(lead => 
                 lead?.id === draggedLead?.id 
-                  ? { ...lead, status: newStatus }
+                  ? { .lead, status: newStatus }
                   : lead
               ));
               setDraggedLead(null);
@@ -199,7 +199,7 @@ import React, { useState, useEffect } from 'react';
                 <div className="flex items-center justify-center h-96">
                   <div className="flex items-center space-x-3">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    <span className="text-muted-foreground">Loading lead data...</span>
+                    <span className="text-muted-foreground">Loading lead data.</span>
                   </div>
                 </div>
               </div>

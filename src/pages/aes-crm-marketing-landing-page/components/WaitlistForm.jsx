@@ -141,7 +141,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                   <input
                     id="firstName"
                     type="text"
-                    {...register('firstName', { 
+                    {.register('firstName', { 
                       required: 'First name is required',
                       minLength: { value: 2, message: 'First name must be at least 2 characters' }
                     })}
@@ -165,7 +165,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                   <input
                     id="lastName"
                     type="text"
-                    {...register('lastName', { 
+                    {.register('lastName', { 
                       required: 'Last name is required',
                       minLength: { value: 2, message: 'Last name must be at least 2 characters' }
                     })}
@@ -189,7 +189,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                   <input
                     id="email"
                     type="email"
-                    {...register('email', { 
+                    {.register('email', { 
                       required: 'Email is required',
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -214,7 +214,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                 <input
                   id="phone"
                   type="tel"
-                  {...register('phone')}
+                  {.register('phone')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="+44 7700 900123"
                   disabled={isSubmitting}
@@ -231,7 +231,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                   <input
                     id="practiceName"
                     type="text"
-                    {...register('practiceName')}
+                    {.register('practiceName')}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Your Practice Name"
                     disabled={isSubmitting}
@@ -246,7 +246,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                 </label>
                 <select
                   id="interest"
-                  {...register('interest')}
+                  {.register('interest')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isSubmitting}
                 >
@@ -264,7 +264,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                 <input
                   id="gdprConsent"
                   type="checkbox"
-                  {...register('gdprConsent', { required: 'Please agree to our privacy policy' })}
+                  {.register('gdprConsent', { required: 'Please agree to our privacy policy' })}
                   className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                   disabled={isSubmitting}
                 />
@@ -286,7 +286,7 @@ const WaitlistForm = ({ isOpen, onClose }) => {
                 {isSubmitting ? (
                   <>
                     <Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Joining waitlist...
+                    Joining waitlist.
                   </>
                 ) : (
                   'Join the Waitlist'

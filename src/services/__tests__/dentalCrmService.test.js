@@ -42,7 +42,7 @@ describe('DentalCrmService', () => {
         email: 'jane@example.com'
       };
 
-      const mockCreatedPatient = { id: 2, ...patientData };
+      const mockCreatedPatient = { id: 2, .patientData };
 
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedPatient });
       const result = await patientsService.create(patientData);
@@ -96,7 +96,7 @@ describe('DentalCrmService', () => {
         lead_source: 'google-ads'
       };
 
-      const mockCreatedLead = { id: 3, ...leadData };
+      const mockCreatedLead = { id: 3, .leadData };
 
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedLead });
       const result = await leadsService.create(leadData);

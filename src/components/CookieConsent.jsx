@@ -117,15 +117,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.analytics}
-                    onChange={(e) => setPreferences({...preferences, analytics: e?.target?.checked})}
+                    onChange={(e) => setPreferences({.preferences, analytics: e?.target?.checked })}
                     className="sr-only"
                   />
-                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                    preferences?.analytics ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}>
-                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                      preferences?.analytics ? 'translate-x-6' : 'translate-x-1'
-                    }`}></div>
+                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.analytics ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}>
+                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.analytics ? 'translate-x-6' : 'translate-x-1'
+                      }`}></div>
                   </div>
                 </label>
               </div>
@@ -143,15 +141,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.marketing}
-                    onChange={(e) => setPreferences({...preferences, marketing: e?.target?.checked})}
+                    onChange={(e) => setPreferences({.preferences, marketing: e?.target?.checked })}
                     className="sr-only"
                   />
-                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                    preferences?.marketing ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}>
-                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                      preferences?.marketing ? 'translate-x-6' : 'translate-x-1'
-                    }`}></div>
+                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.marketing ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}>
+                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.marketing ? 'translate-x-6' : 'translate-x-1'
+                      }`}></div>
                   </div>
                 </label>
               </div>
@@ -169,15 +165,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.functional}
-                    onChange={(e) => setPreferences({...preferences, functional: e?.target?.checked})}
+                    onChange={(e) => setPreferences({.preferences, functional: e?.target?.checked })}
                     className="sr-only"
                   />
-                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                    preferences?.functional ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}>
-                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                      preferences?.functional ? 'translate-x-6' : 'translate-x-1'
-                    }`}></div>
+                  <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.functional ? 'bg-blue-600' : 'bg-gray-300'
+                    }`}>
+                    <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.functional ? 'translate-x-6' : 'translate-x-1'
+                      }`}></div>
                   </div>
                 </label>
               </div>
@@ -193,7 +187,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
               <p className="text-sm text-gray-600 mb-4">
                 Granular opt-ins for different marketing channels (required by PECR):
               </p>
-              
+
               {/* Email Marketing */}
               <div className="border rounded-lg p-4 mb-3">
                 <div className="flex items-center justify-between mb-2">
@@ -202,15 +196,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.emailMarketing}
-                      onChange={(e) => setPreferences({...preferences, emailMarketing: e?.target?.checked})}
+                      onChange={(e) => setPreferences({.preferences, emailMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
-                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                      preferences?.emailMarketing ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}>
-                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                        preferences?.emailMarketing ? 'translate-x-6' : 'translate-x-1'
-                      }`}></div>
+                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.emailMarketing ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.emailMarketing ? 'translate-x-6' : 'translate-x-1'
+                        }`}></div>
                     </div>
                   </label>
                 </div>
@@ -227,15 +219,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.smsMarketing}
-                      onChange={(e) => setPreferences({...preferences, smsMarketing: e?.target?.checked})}
+                      onChange={(e) => setPreferences({.preferences, smsMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
-                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                      preferences?.smsMarketing ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}>
-                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                        preferences?.smsMarketing ? 'translate-x-6' : 'translate-x-1'
-                      }`}></div>
+                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.smsMarketing ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.smsMarketing ? 'translate-x-6' : 'translate-x-1'
+                        }`}></div>
                     </div>
                   </label>
                 </div>
@@ -252,15 +242,13 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.postalMarketing}
-                      onChange={(e) => setPreferences({...preferences, postalMarketing: e?.target?.checked})}
+                      onChange={(e) => setPreferences({.preferences, postalMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
-                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${
-                      preferences?.postalMarketing ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}>
-                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                        preferences?.postalMarketing ? 'translate-x-6' : 'translate-x-1'
-                      }`}></div>
+                    <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.postalMarketing ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${preferences?.postalMarketing ? 'translate-x-6' : 'translate-x-1'
+                        }`}></div>
                     </div>
                   </label>
                 </div>
@@ -302,7 +290,7 @@ const CookieConsent = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const { data: { session } } = await supabase.auth..getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         setIsLoggedIn(!!session?.user);
       } catch (error) {
         console.error('Auth check error:', error);
@@ -316,31 +304,31 @@ const CookieConsent = () => {
     if (!isLoggedIn) return;
 
     try {
-      const { data: { user } } = await supabase.auth..getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Record in compliance_records table
       const { error } = await supabase.from('compliance_records').insert({
-          record_type: 'cookie_consent',
-          compliance_date: new Date().toISOString()?.split('T')?.[0],
-          details: {
-            preferences,
-            timestamp: consentTimestamp,
-            userAgent: navigator?.userAgent,
-            ipAddress: 'client-side', // Server should capture real IP
-            consentMethod: 'explicit',
-            granularConsent: {
-              essential: preferences?.essential,
-              analytics: preferences?.analytics,
-              marketing: preferences?.marketing,
-              functional: preferences?.functional,
-              emailMarketing: preferences?.emailMarketing,
-              smsMarketing: preferences?.smsMarketing,
-              postalMarketing: preferences?.postalMarketing
-            }
-          },
-          status: 'compliant'
-        });
+        record_type: 'cookie_consent',
+        compliance_date: new Date().toISOString()?.split('T')?.[0],
+        details: {
+          preferences,
+          timestamp: consentTimestamp,
+          userAgent: navigator?.userAgent,
+          ipAddress: 'client-side', // Server should capture real IP
+          consentMethod: 'explicit',
+          granularConsent: {
+            essential: preferences?.essential,
+            analytics: preferences?.analytics,
+            marketing: preferences?.marketing,
+            functional: preferences?.functional,
+            emailMarketing: preferences?.emailMarketing,
+            smsMarketing: preferences?.smsMarketing,
+            postalMarketing: preferences?.postalMarketing
+          }
+        },
+        status: 'compliant'
+      });
 
       if (error) {
         console.error('Failed to record consent:', error);
@@ -348,16 +336,16 @@ const CookieConsent = () => {
 
       // Also log to security audit logs
       await supabase.from('security_audit_logs').insert({
-          action: 'cookie_consent_updated',
-          resource_type: 'user_consent',
-          resource_id: user?.id,
-          metadata: {
-            preferences,
-            timestamp: consentTimestamp,
-            consentType: 'explicit'
-          },
-          success: true
-        });
+        action: 'cookie_consent_updated',
+        resource_type: 'user_consent',
+        resource_id: user?.id,
+        metadata: {
+          preferences,
+          timestamp: consentTimestamp,
+          consentType: 'explicit'
+        },
+        success: true
+      });
 
     } catch (error) {
       console.error('Error recording consent to database:', error);
@@ -377,11 +365,11 @@ const CookieConsent = () => {
       timestamp: consentTimestamp,
       userIdentifier: isLoggedIn ? 'authenticated_user' : `anonymous_${Date.now()}`
     };
-    
+
     localStorage.setItem('cookieConsent', JSON.stringify(preferences));
     await recordConsentToDatabase(preferences, consentTimestamp);
     setShowBanner(false);
-    
+
     // Enable all scripts
     enableAnalytics();
     enableMarketing();
@@ -401,7 +389,7 @@ const CookieConsent = () => {
       timestamp: consentTimestamp,
       userIdentifier: isLoggedIn ? 'authenticated_user' : `anonymous_${Date.now()}`
     };
-    
+
     localStorage.setItem('cookieConsent', JSON.stringify(preferences));
     await recordConsentToDatabase(preferences, consentTimestamp);
     setShowBanner(false);
@@ -414,22 +402,22 @@ const CookieConsent = () => {
   const handleSavePreferences = async (preferences) => {
     const consentTimestamp = new Date().toISOString();
     const preferencesWithTimestamp = {
-      ...preferences,
+      .preferences,
       timestamp: consentTimestamp,
       userIdentifier: isLoggedIn ? 'authenticated_user' : `anonymous_${Date.now()}`
     };
-    
+
     localStorage.setItem('cookieConsent', JSON.stringify(preferencesWithTimestamp));
     await recordConsentToDatabase(preferencesWithTimestamp, consentTimestamp);
     setShowBanner(false);
-    
+
     // Enable/disable scripts based on preferences
     if (preferences?.analytics) {
       enableAnalytics();
     } else {
       disableAnalytics();
     }
-    
+
     if (preferences?.marketing) {
       enableMarketing();
     } else {

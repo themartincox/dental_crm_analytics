@@ -25,7 +25,7 @@ const OptimizedImage = ({
   placeholder = true,
   onLoad,
   onError,
-  ...props
+  .props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -90,7 +90,7 @@ const OptimizedImage = ({
     justifyContent: 'center',
     color: '#9ca3af',
     fontSize: '14px',
-    ...style
+    .style
   };
 
   // Error state
@@ -160,11 +160,11 @@ const OptimizedImage = ({
           objectFit: 'cover',
           transition: 'opacity 0.3s ease-in-out',
           opacity: isLoaded ? 1 : 0,
-          ...style
+          .style
         }}
         onLoad={handleLoad}
         onError={handleError}
-        {...props}
+        {.props}
       />
     </picture>
   );

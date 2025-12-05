@@ -12,7 +12,7 @@ const TenantSignupModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ .....prev, [name]: value }));
   };
 
   const submit = async (e) => {
@@ -86,7 +86,7 @@ const TenantSignupModal = ({ isOpen, onClose }) => {
               </div>
             </div>
             <button type="submit" disabled={submitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg flex items-center justify-center">
-              {submitting ? (<><Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />Submitting...</>) : 'Create Clinic'}
+              {submitting ? (<><Loader className="animate-spin -ml-1 mr-2 h-4 w-4" />Submitting.</>) : 'Create Clinic'}
             </button>
           </form>
         )}

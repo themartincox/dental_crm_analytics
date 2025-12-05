@@ -145,7 +145,7 @@ export const FORM_MESSAGES = {
   INVALID_PHONE: 'Please enter a valid phone number',
   SUBMISSION_SUCCESS: 'Message sent successfully!',
   SUBMISSION_ERROR: 'Something went wrong. Please try again.',
-  LOADING: 'Sending...',
+  LOADING: 'Sending.',
   RESPONSE_TIME: "We'll respond within 24 hours"
 };
 
@@ -164,7 +164,7 @@ export const FORM_PLACEHOLDERS = {
   EMAIL: 'your@email.com',
   PHONE: '+44 20 1234 5678',
   COMPANY: 'Your company name',
-  MESSAGE: 'Tell us how we can help you...',
+  MESSAGE: 'Tell us how we can help you.',
   SUBJECT_GENERAL: 'General Inquiry',
   SUBJECT_PRICING: 'Pricing Inquiry',
   SUBJECT_DEMO: 'Demo Request'

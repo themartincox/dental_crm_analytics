@@ -91,7 +91,7 @@ const DentalCrmDashboard = () => {
       } catch (err) {
         throw err;
       }
-    }, 'Loading dashboard data...').catch(err => {
+    }, 'Loading dashboard data.').catch(err => {
       logger.error('Dashboard loading failed', { error: err?.message || 'Unknown error', stack: err?.stack, userId: user?.id });
       setError(`Dashboard loading failed: ${err?.message || ERROR_MESSAGES?.GENERIC_ERROR || 'Unknown error'}`);
       ScreenReader.announce('Failed to load dashboard data. Please try again.', 'assertive');
@@ -113,7 +113,7 @@ const DentalCrmDashboard = () => {
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner size="lg" text={loadingMessage || 'Loading dental CRM dashboard...'} />
+        <LoadingSpinner size="lg" text={loadingMessage || 'Loading dental CRM dashboard.'} />
       </div>
     );
   }

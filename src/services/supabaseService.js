@@ -75,7 +75,7 @@ export const userProfileService = {
         .from('user_profiles')
         .upsert({
           id: userId,
-          ...updates,
+          .updates,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id',

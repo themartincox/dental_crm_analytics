@@ -71,7 +71,7 @@ export function generateStructuredData(pageType, data = {}) {
   switch (pageType) {
     case 'homepage':
       return {
-        ...baseStructuredData,
+        .baseStructuredData,
         '@type': 'WebSite',
         potentialAction: {
           '@type': 'SearchAction',
@@ -82,7 +82,7 @@ export function generateStructuredData(pageType, data = {}) {
 
     case 'product':
       return {
-        ...baseStructuredData,
+        .baseStructuredData,
         '@type': 'SoftwareApplication',
         name: 'AES CRM',
         applicationCategory: 'BusinessApplication',
@@ -97,7 +97,7 @@ export function generateStructuredData(pageType, data = {}) {
 
     case 'pricing':
       return {
-        ...baseStructuredData,
+        .baseStructuredData,
         '@type': 'Product',
         name: 'AES CRM Pricing',
         description: 'Transparent pricing for AES CRM practice management software',
@@ -126,7 +126,7 @@ export function generateStructuredData(pageType, data = {}) {
 
     case 'contact':
       return {
-        ...baseStructuredData,
+        .baseStructuredData,
         '@type': 'ContactPage',
         mainEntity: {
           '@type': 'Organization',

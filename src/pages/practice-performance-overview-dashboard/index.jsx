@@ -204,7 +204,7 @@ const PracticePerformanceOverviewDashboard = () => {
           <div className="animate-pulse space-y-6" aria-label="Loading dashboard content">
             <div className="h-20 bg-muted rounded-lg" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)]?.map((_, i) => (
+              {[.Array(4)]?.map((_, i) => (
                 <div key={i} className="h-32 bg-muted rounded-lg" />
               ))}
             </div>

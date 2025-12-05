@@ -17,7 +17,7 @@ const TestimonialCard = ({ testimonial, index }) => {
       </div>
       <div className="mb-4">
         <div className="flex items-center space-x-1 mb-2">
-          {[...Array(rating || 5)]?.map((_, i) => (
+          {[.Array(rating || 5)]?.map((_, i) => (
             <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
           ))}
         </div>

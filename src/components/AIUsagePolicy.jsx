@@ -50,7 +50,7 @@ const AIUsagePolicy = () => {
           resource_type: 'ai_usage',
           resource_id: user?.id,
           metadata: {
-            ...details,
+            .details,
             timestamp: new Date().toISOString(),
             policyVersion: '1.0',
             gdprCompliance: true,

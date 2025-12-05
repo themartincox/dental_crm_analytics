@@ -169,7 +169,7 @@ const ContactForm = ({
                 <input
                   type="text"
                   id="name"
-                  {...register('name', { required: 'Name is required' })}
+                  {.register('name', { required: 'Name is required' })}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={FORM_PLACEHOLDERS.NAME}
                   disabled={isLoading}
@@ -195,7 +195,7 @@ const ContactForm = ({
                 <input
                   type="email"
                   id="email"
-                  {...register('email', {
+                  {.register('email', {
                     required: 'Email is required',
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -228,7 +228,7 @@ const ContactForm = ({
                   <input
                     type="tel"
                     id="phone"
-                    {...register('phone')}
+                    {.register('phone')}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={FORM_PLACEHOLDERS.PHONE}
                     disabled={isLoading}
@@ -248,7 +248,7 @@ const ContactForm = ({
                   <input
                     type="text"
                     id="company"
-                    {...register('company')}
+                    {.register('company')}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={FORM_PLACEHOLDERS.COMPANY}
                     disabled={isLoading}
@@ -265,7 +265,7 @@ const ContactForm = ({
               <input
                 type="text"
                 id="subject"
-                {...register('subject')}
+                {.register('subject')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder={defaultSubject}
                 disabled={isSubmitting}
@@ -282,7 +282,7 @@ const ContactForm = ({
                 <textarea
                   id="message"
                   rows={4}
-                  {...register('message', { required: 'Message is required' })}
+                  {.register('message', { required: 'Message is required' })}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder={FORM_PLACEHOLDERS.MESSAGE}
                   disabled={isLoading}

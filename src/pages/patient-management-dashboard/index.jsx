@@ -30,7 +30,7 @@ const PatientManagementDashboard = () => {
 
   // Fetch patients with filters
   const patientFilters = {
-    ...filters,
+    .filters,
     search: searchQuery,
     sortBy: sortConfig?.key,
     sortDirection: sortConfig?.direction
@@ -53,7 +53,7 @@ const PatientManagementDashboard = () => {
   }) || [];
 
   // Sort patients (if additional sorting is needed)
-  const sortedPatients = [...filteredPatients]?.sort((a, b) => {
+  const sortedPatients = [.filteredPatients]?.sort((a, b) => {
     const aVal = a?.[sortConfig?.key];
     const bVal = b?.[sortConfig?.key];
     
@@ -130,7 +130,7 @@ const PatientManagementDashboard = () => {
         <div className="flex items-center justify-center h-96">
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="text-muted-foreground">Loading patient data...</span>
+            <span className="text-muted-foreground">Loading patient data.</span>
           </div>
         </div>
       </div>

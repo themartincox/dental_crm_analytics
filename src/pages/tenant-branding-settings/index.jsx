@@ -34,7 +34,7 @@ const BrandingSettings = () => {
     const load = async () => {
       try {
         const res = await secureApiService.makeSecureRequest('/ui/branding', { method: 'GET' });
-        if (res?.data) setForm(prev => ({ ...prev, ...res.data }));
+        if (res?.data) setForm(prev => ({ .....prev, ...res.data }));
       } catch (_) {}
       setLoading(false);
     };
@@ -74,33 +74,33 @@ const BrandingSettings = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Branding & Practice Details</h1>
         {loading ? (
-          <div className="text-gray-500">Loading...</div>
+          <div className="text-gray-500">Loading.</div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Form */}
             <div className="lg:col-span-2 bg-white border rounded-lg p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Practice Name</label>
-                <input value={form.practice_name} onChange={(e)=>setForm({ ...form, practice_name: e.target.value })} className="w-full border rounded px-3 py-2 text-sm" />
+                <input value={form.practice_name} onChange={(e)=>setForm({ .form, practice_name: e.target.value })} className="w-full border rounded px-3 py-2 text-sm" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                <input value={form.logo_url} onChange={(e)=>setForm({ ...form, logo_url: e.target.value })} className="w-full border rounded px-3 py-2 text-sm" placeholder="https://..." />
+                <input value={form.logo_url} onChange={(e)=>setForm({ .form, logo_url: e.target.value })} className="w-full border rounded px-3 py-2 text-sm" placeholder="https://." />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ColorInput label="Primary Color" value={form.primary_color} onChange={(v)=>setForm({ ...form, primary_color: v })} />
-                <ColorInput label="Secondary Color 1" value={form.secondary_color_1} onChange={(v)=>setForm({ ...form, secondary_color_1: v })} />
-                <ColorInput label="Secondary Color 2" value={form.secondary_color_2} onChange={(v)=>setForm({ ...form, secondary_color_2: v })} />
-                <ColorInput label="Secondary Color 3" value={form.secondary_color_3} onChange={(v)=>setForm({ ...form, secondary_color_3: v })} />
+                <ColorInput label="Primary Color" value={form.primary_color} onChange={(v)=>setForm({ .form, primary_color: v })} />
+                <ColorInput label="Secondary Color 1" value={form.secondary_color_1} onChange={(v)=>setForm({ .form, secondary_color_1: v })} />
+                <ColorInput label="Secondary Color 2" value={form.secondary_color_2} onChange={(v)=>setForm({ .form, secondary_color_2: v })} />
+                <ColorInput label="Secondary Color 3" value={form.secondary_color_3} onChange={(v)=>setForm({ .form, secondary_color_3: v })} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Font (Google Fonts)</label>
-                <select value={form.font_family} onChange={(e)=>setForm({ ...form, font_family: e.target.value })} className="w-full border rounded px-3 py-2 text-sm">
+                <select value={form.font_family} onChange={(e)=>setForm({ .form, font_family: e.target.value })} className="w-full border rounded px-3 py-2 text-sm">
                   {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
                 </select>
               </div>
               <div>
-                <button onClick={save} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+                <button onClick={save} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">{saving ? 'Saving.' : 'Save'}</button>
               </div>
             </div>
             {/* Preview */}

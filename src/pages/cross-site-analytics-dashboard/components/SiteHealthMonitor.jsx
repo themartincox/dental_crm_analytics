@@ -63,7 +63,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
     { value: 'lastBooking', label: 'Last Booking' }
   ];
 
-  const sortedSites = [...selectedSitesData]?.sort((a, b) => {
+  const sortedSites = [.selectedSitesData]?.sort((a, b) => {
     switch (sortBy) {
       case 'status': {
         const statusOrder = { error: 0, warning: 1, active: 2 };

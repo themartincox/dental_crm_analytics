@@ -72,11 +72,11 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
       formattedValue = value?.replace(/\D/g, '')?.substring(0, 4); // Limit to 4 digits
     }
 
-    setCardData(prev => ({ ...prev, [field]: formattedValue }));
+    setCardData(prev => ({ .....prev, [field]: formattedValue }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({ .....prev, [field]: null }));
     }
   };
 
@@ -389,7 +389,7 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
                 {isProcessing ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                    Processing Payment...
+                    Processing Payment.
                   </div>
                 ) : (
                   `Pay £${paymentAmount} Now`
@@ -566,7 +566,7 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
                   disabled={isProcessing}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  {isProcessing ? 'Processing...' : `Pay £${paymentAmount} with PayPal`}
+                  {isProcessing ? 'Processing.' : `Pay £${paymentAmount} with PayPal`}
                 </Button>
               </div>
             </div>
@@ -595,7 +595,7 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
                   disabled={isProcessing}
                   className="bg-pink-600 hover:bg-pink-700"
                 >
-                  {isProcessing ? 'Processing...' : 'Continue with Klarna'}
+                  {isProcessing ? 'Processing.' : 'Continue with Klarna'}
                 </Button>
               </div>
             </div>
@@ -696,7 +696,7 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
               {isProcessing ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  Processing Payment...
+                  Processing Payment.
                 </div>
               ) : (
                 `Pay £${paymentAmount} Now`

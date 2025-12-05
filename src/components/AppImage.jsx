@@ -4,7 +4,7 @@ function Image({
   src,
   alt = "Image Name",
   className = "",
-  ...props
+  .props
 }) {
 
   return (
@@ -15,7 +15,7 @@ function Image({
       onError={(e) => {
         e.target.src = "/assets/images/no_image.png"
       }}
-      {...props}
+      {.props}
     />
   );
 }

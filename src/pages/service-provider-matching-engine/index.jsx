@@ -196,11 +196,11 @@ const ServiceProviderMatchingEngine = () => {
   const filterOptions = {
     provider: [
       { value: 'all', label: 'All Providers' },
-      ...mockProviders?.map(p => ({ value: p?.id, label: p?.name }))
+      .mockProviders?.map(p => ({ value: p?.id, label: p?.name }))
     ],
     service: [
       { value: 'all', label: 'All Services' },
-      ...mockServices?.map(s => ({ value: s?.id, label: s?.name }))
+      .mockServices?.map(s => ({ value: s?.id, label: s?.name }))
     ],
     competencyLevel: [
       { value: 'all', label: 'All Levels' },
@@ -255,20 +255,20 @@ const ServiceProviderMatchingEngine = () => {
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({ ...prev, [filterType]: value }));
+    setFilters(prev => ({ .....prev, [filterType]: value }));
   };
 
   const handleRuleToggle = (ruleId) => {
     setMatchingRules(prev => prev?.map(rule => 
       rule?.id === ruleId 
-        ? { ...rule, isActive: !rule?.isActive }
+        ? { .rule, isActive: !rule?.isActive }
         : rule
     ));
   };
 
   const handleRuleUpdate = (ruleId, updatedRule) => {
     setMatchingRules(prev => prev?.map(rule => 
-      rule?.id === ruleId ? { ...rule, ...updatedRule } : rule
+      rule?.id === ruleId ? { .rule, .updatedRule } : rule
     ));
   };
 
@@ -279,7 +279,7 @@ const ServiceProviderMatchingEngine = () => {
         <div className="flex items-center justify-center h-96">
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="text-muted-foreground">Loading matching engine...</span>
+            <span className="text-muted-foreground">Loading matching engine.</span>
           </div>
         </div>
       </div>
@@ -458,7 +458,7 @@ const ServiceProviderMatchingEngine = () => {
               filters={filters}
               onProviderUpdate={(providerId, updates) => {
                 setProviders(prev => prev?.map(p => 
-                  p?.id === providerId ? { ...p, ...updates } : p
+                  p?.id === providerId ? { .p, .updates } : p
                 ));
               }}
             />
@@ -472,7 +472,7 @@ const ServiceProviderMatchingEngine = () => {
               onRuleToggle={handleRuleToggle}
               onRuleUpdate={handleRuleUpdate}
               onRuleCreate={(newRule) => {
-                setMatchingRules(prev => [...prev, { ...newRule, id: Date.now() }]);
+                setMatchingRules(prev => [...prev, { .newRule, id: Date.now() }]);
               }}
             />
           )}

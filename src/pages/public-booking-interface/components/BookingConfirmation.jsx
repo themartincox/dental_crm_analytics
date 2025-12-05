@@ -9,7 +9,7 @@ const BookingConfirmation = ({ bookingData, practiceInfo, onNewBooking }) => {
   
   const handleDownloadReceipt = () => {
     // Mock download functionality
-    console.log('Downloading receipt...');
+    console.log('Downloading receipt.');
   };
 
   const handleAddToCalendar = () => {

@@ -210,7 +210,7 @@ const Login = () => {
                   {isLoading && (
                     <Loader className="absolute left-3 h-5 w-5 animate-spin" />
                   )}
-                  {isLoading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
+                  {isLoading ? 'Please wait.' : (isSignUp ? 'Create Account' : 'Sign In')}
                 </button>
               </div>
 

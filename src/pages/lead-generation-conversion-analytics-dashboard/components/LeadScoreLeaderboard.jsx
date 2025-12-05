@@ -66,7 +66,7 @@ const LeadScoreLeaderboard = ({ leads, onLeadClick }) => {
     }
   };
 
-  const sortedLeads = [...leads]?.sort((a, b) => {
+  const sortedLeads = [.leads]?.sort((a, b) => {
     switch (sortBy) {
       case 'score':
         return b?.score - a?.score;

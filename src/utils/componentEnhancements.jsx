@@ -9,18 +9,18 @@ import EmptyState from '../components/EmptyState';
  */
 export const withLoading = (WrappedComponent, loadingProps = {}) => {
   return function WithLoadingComponent(props) {
-    const { isLoading, loadingMessage, ...restProps } = props;
+    const { isLoading, loadingMessage, .restProps } = props;
     
     if (isLoading) {
       return (
         <LoadingSpinner
-          text={loadingMessage || 'Loading...'}
-          {...loadingProps}
+          text={loadingMessage || 'Loading.'}
+          {.loadingProps}
         />
       );
     }
     
-    return <WrappedComponent {...restProps} />;
+    return <WrappedComponent {.restProps} />;
   };
 };
 
@@ -34,7 +34,7 @@ export const withEmptyState = (WrappedComponent, emptyStateProps = {}) => {
       emptyMessage = 'No data available',
       emptyDescription = 'There is no data to display at the moment.',
       emptyAction,
-      ...restProps 
+      .restProps 
     } = props;
     
     if (!data || (Array.isArray(data) && data.length === 0)) {
@@ -43,12 +43,12 @@ export const withEmptyState = (WrappedComponent, emptyStateProps = {}) => {
           title={emptyMessage}
           description={emptyDescription}
           action={emptyAction}
-          {...emptyStateProps}
+          {.emptyStateProps}
         />
       );
     }
     
-    return <WrappedComponent {...restProps} />;
+    return <WrappedComponent {.restProps} />;
   };
 };
 
@@ -57,7 +57,7 @@ export const withEmptyState = (WrappedComponent, emptyStateProps = {}) => {
  */
 export const withErrorHandling = (WrappedComponent, errorProps = {}) => {
   return function WithErrorHandlingComponent(props) {
-    const { error, onRetry, ...restProps } = props;
+    const { error, onRetry, .restProps } = props;
     
     if (error) {
       return (
@@ -90,7 +90,7 @@ export const withErrorHandling = (WrappedComponent, errorProps = {}) => {
       );
     }
     
-    return <WrappedComponent {...restProps} />;
+    return <WrappedComponent {.restProps} />;
   };
 };
 
@@ -102,10 +102,10 @@ export const useComponentState = (initialState = {}) => {
     isLoading: false,
     error: null,
     data: null,
-    ...initialState
+    .initialState
   });
 
-  const setLoading = (isLoading, message = 'Loading...') => {
+  const setLoading = (isLoading, message = 'Loading.') => {
     setState(prev => ({
       ...prev,
       isLoading,
@@ -140,7 +140,7 @@ export const useComponentState = (initialState = {}) => {
   };
 
   return {
-    ...state,
+    .state,
     setLoading,
     setError,
     setData,
@@ -152,9 +152,9 @@ export const useComponentState = (initialState = {}) => {
  * Utility to add loading states to async functions
  */
 export const withAsyncLoading = (asyncFunction) => {
-  return async (...args) => {
+  return async (.args) => {
     try {
-      const result = await asyncFunction(...args);
+      const result = await asyncFunction(.args);
       return { data: result, error: null };
     } catch (error) {
       return { data: null, error };
@@ -166,12 +166,12 @@ export const withAsyncLoading = (asyncFunction) => {
  * Utility to add retry logic to functions
  */
 export const withRetry = (fn, maxRetries = 3, delay = 1000) => {
-  return async (...args) => {
+  return async (.args) => {
     let lastError;
     
     for (let i = 0; i < maxRetries; i++) {
       try {
-        return await fn(...args);
+        return await fn(.args);
       } catch (error) {
         lastError = error;
         
@@ -189,12 +189,12 @@ export const withRetry = (fn, maxRetries = 3, delay = 1000) => {
  * Utility to add timeout to functions
  */
 export const withTimeout = (fn, timeout = 5000) => {
-  return async (...args) => {
+  return async (.args) => {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Operation timed out')), timeout);
     });
     
-    return Promise.race([fn(...args), timeoutPromise]);
+    return Promise.race([fn(.args), timeoutPromise]);
   };
 };
 
@@ -204,7 +204,7 @@ export const withTimeout = (fn, timeout = 5000) => {
 export const withCache = (fn, ttl = 300000) => { // 5 minutes default
   const cache = new Map();
   
-  return async (...args) => {
+  return async (.args) => {
     const key = JSON.stringify(args);
     const cached = cache.get(key);
     
@@ -212,7 +212,7 @@ export const withCache = (fn, ttl = 300000) => { // 5 minutes default
       return cached.data;
     }
     
-    const result = await fn(...args);
+    const result = await fn(.args);
     cache.set(key, {
       data: result,
       timestamp: Date.now()

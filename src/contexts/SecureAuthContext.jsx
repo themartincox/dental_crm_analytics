@@ -25,8 +25,8 @@ export const SecureAuthProvider = ({ children }) => {
             setLoading(true);
 
             // Check Supabase session
-            const { data: { session }, error } = await supabase.auth..getSession();
-            
+            const { data: { session }, error } = await supabase.auth.getSession();
+
             if (error || !session?.user) {
                 setUser(null);
                 setUserProfile(null);
@@ -37,7 +37,7 @@ export const SecureAuthProvider = ({ children }) => {
             // Validate with server and get enhanced profile
             try {
                 const profile = await secureApiService?.getProfile();
-                
+
                 setUser(session?.user);
                 setUserProfile(profile);
                 setIsAuthenticated(true);
@@ -62,7 +62,7 @@ export const SecureAuthProvider = ({ children }) => {
         try {
             setLoading(true);
 
-            const { data, error } = await supabase.auth..signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password
             });
@@ -94,7 +94,7 @@ export const SecureAuthProvider = ({ children }) => {
             setIsAuthenticated(false);
 
             // Sign out from Supabase
-            await supabase.auth..signOut();
+            await supabase.auth.signOut();
 
         } catch (error) {
             console.error('Sign out error:', error);
@@ -106,7 +106,7 @@ export const SecureAuthProvider = ({ children }) => {
     // Role-based permission checking
     const hasRole = (requiredRoles) => {
         if (!userProfile?.role) return false;
-        
+
         const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
         return roles?.includes(userProfile?.role);
     };
@@ -131,7 +131,7 @@ export const SecureAuthProvider = ({ children }) => {
         checkAuth();
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth..onAuthStateChange(async (event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_OUT' || !session) {
                 setUser(null);
                 setUserProfile(null);
@@ -148,7 +148,7 @@ export const SecureAuthProvider = ({ children }) => {
 
     // API connectivity monitoring
     const [apiHealthy, setApiHealthy] = useState(true);
-    
+
     useEffect(() => {
         const checkApiHealth = async () => {
             try {

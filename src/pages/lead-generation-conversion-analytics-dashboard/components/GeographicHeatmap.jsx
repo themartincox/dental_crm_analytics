@@ -41,13 +41,13 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
     }
   };
 
-  const maxValue = Math.max(...geoData?.map(region => 
+  const maxValue = Math.max(.geoData?.map(region => 
     selectedView === 'leads' ? region?.totalLeads :
     selectedView === 'conversion' ? region?.conversionRate :
     selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead
   ));
 
-  const sortedRegions = [...geoData]?.sort((a, b) => {
+  const sortedRegions = [.geoData]?.sort((a, b) => {
     const aValue = selectedView === 'leads' ? a?.totalLeads :
                   selectedView === 'conversion' ? a?.conversionRate :
                   selectedView === 'revenue' ? a?.totalRevenue : a?.costPerLead;

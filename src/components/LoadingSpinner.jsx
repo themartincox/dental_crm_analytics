@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 const LoadingSpinner = ({ 
   size = 'md', 
-  text = 'Loading...', 
+  text = 'Loading.', 
   className = '',
   showText = true,
   color = 'blue'

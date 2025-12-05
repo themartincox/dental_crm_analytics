@@ -197,7 +197,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
   };
 
   const handleStepComplete = (stepData) => {
-    setBookingData(prev => ({ ...prev, ...stepData }));
+    setBookingData(prev => ({ .....prev, .stepData }));
     
     if (currentStep < steps?.length) {
       setCurrentStep(prev => prev + 1);
@@ -272,7 +272,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center">
-                {[...Array(5)]?.map((_, i) => (
+                {[.Array(5)]?.map((_, i) => (
                   <Star
                     key={i}
                     size={16}

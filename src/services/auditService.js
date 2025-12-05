@@ -26,7 +26,7 @@ class AuditService {
         userAgent: navigator?.userAgent || 'Unknown',
         timestamp: new Date().toISOString(),
         url: window?.location?.href,
-        ...metadata
+        .metadata
       };
 
       // Use the existing log_security_event function
@@ -79,7 +79,7 @@ class AuditService {
         appointment_id: appointmentId,
         treatment_id: treatmentId,
         metadata: {
-          ...metadata,
+          .metadata,
           timestamp: new Date().toISOString(),
           userAgent: navigator?.userAgent
         }
@@ -110,7 +110,7 @@ class AuditService {
       resourceId: patientId,
       riskLevel: action === 'delete' ? 'high' : 'medium',
       metadata: {
-        ...metadata,
+        .metadata,
         gdprCompliance: true,
         accessType: 'clinical_data'
       }
@@ -136,7 +136,7 @@ class AuditService {
       resourceType: 'user_authentication',
       riskLevel: riskLevels?.[action] || 'medium',
       metadata: {
-        ...metadata,
+        .metadata,
         authEvent: true
       }
     });
@@ -155,7 +155,7 @@ class AuditService {
       resourceId: leadId,
       riskLevel: 'low',
       metadata: {
-        ...metadata,
+        .metadata,
         dataType: 'marketing_data'
       }
     });
@@ -174,7 +174,7 @@ class AuditService {
       resourceId: appointmentId,
       riskLevel: action === 'delete' ? 'medium' : 'low',
       metadata: {
-        ...metadata,
+        .metadata,
         dataType: 'scheduling_data'
       }
     });
