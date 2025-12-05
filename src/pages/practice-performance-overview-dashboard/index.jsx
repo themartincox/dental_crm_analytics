@@ -204,7 +204,7 @@ const PracticePerformanceOverviewDashboard = () => {
           <div className="animate-pulse space-y-6" aria-label="Loading dashboard content">
             <div className="h-20 bg-muted rounded-lg" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)]?.map((_, i) => (
+              {[.Array(4)]?.map((_, i) => (
                 <div key={i} className="h-32 bg-muted rounded-lg" />
               ))}
             </div>
@@ -251,7 +251,7 @@ const PracticePerformanceOverviewDashboard = () => {
         title="Practice Performance Overview - Dental CRM Analytics"
         description="Comprehensive business intelligence dashboard for dental practice performance monitoring and analytics. Track revenue, patient metrics, lead conversion, and operational efficiency in real-time."
         keywords="dental practice analytics, healthcare dashboard, patient management, revenue tracking, lead conversion, practice KPIs, dental CRM, business intelligence"
-        canonicalUrl={`${window?.location?.origin}/practice-performance-overview-dashboard`}
+        canonicalUrl={`${window.location.origin}/practice-performance-overview-dashboard`}
         structuredData={[practiceStructuredData]}
         noIndex={true} // Private dashboard should not be indexed
       />

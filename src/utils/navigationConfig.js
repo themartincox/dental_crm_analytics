@@ -132,7 +132,7 @@ export const defaultPermissions = {
 // Get effective permissions for a user role
 export const getEffectivePermissions = (userRole, customPermissions = []) => {
   const rolePermissions = defaultPermissions?.[userRole] || [];
-  return [...new Set([...rolePermissions, ...customPermissions])];
+  return [.new Set([.rolePermissions, .customPermissions])];
 };
 
 // Check if user has specific permission

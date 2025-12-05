@@ -62,20 +62,20 @@ const ThemeCustomizer = ({ widget, onUpdate }) => {
   ]);
 
   const handleThemeChange = (key, value) => {
-    const updatedTheme = { ...theme, [key]: value };
+    const updatedTheme = { .theme, [key]: value };
     setTheme(updatedTheme);
-    onUpdate({ ...widget, theme: updatedTheme });
+    onUpdate({ .widget, theme: updatedTheme });
   };
 
   const applyPresetTheme = (preset) => {
     setTheme(preset?.theme);
-    onUpdate({ ...widget, theme: preset?.theme });
+    onUpdate({ .widget, theme: preset?.theme });
   };
 
   const resetToDefault = () => {
     const defaultTheme = presetThemes?.[0]?.theme;
     setTheme(defaultTheme);
-    onUpdate({ ...widget, theme: defaultTheme });
+    onUpdate({ .widget, theme: defaultTheme });
   };
 
   const exportTheme = () => {

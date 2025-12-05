@@ -220,7 +220,7 @@ class ErrorTrackingService {
       return;
     }
 
-    const errorsToFlush = [...this.errorQueue];
+    const errorsToFlush = [.this.errorQueue];
     this.errorQueue = [];
 
     try {
@@ -236,7 +236,7 @@ class ErrorTrackingService {
     } catch (error) {
       logger.error('Failed to flush errors to server', error);
       // Re-add errors to queue for retry
-      this.errorQueue.unshift(...errorsToFlush);
+      this.errorQueue.unshift(.errorsToFlush);
     }
   }
 

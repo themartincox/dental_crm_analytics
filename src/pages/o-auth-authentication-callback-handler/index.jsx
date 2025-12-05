@@ -5,14 +5,14 @@ import { Loader, AlertCircle, CheckCircle } from 'lucide-react';
 
 const OAuthAuthenticationCallbackHandler = () => {
   const [status, setStatus] = useState('processing'); // processing, success, error
-  const [message, setMessage] = useState('Processing authentication...');
+  const [message, setMessage] = useState('Processing authentication.');
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
         setStatus('processing');
-        setMessage('Exchanging authorization code for session...');
+        setMessage('Exchanging authorization code for session.');
 
         // Exchange the code for a session
         const { data, error } = await supabase?.auth?.exchangeCodeForSession(window.location?.href);
@@ -31,7 +31,7 @@ const OAuthAuthenticationCallbackHandler = () => {
 
         if (data?.session) {
           setStatus('success');
-          setMessage('Authentication successful! Redirecting to dashboard...');
+          setMessage('Authentication successful! Redirecting to dashboard.');
           
           // Redirect to dashboard after successful auth
           setTimeout(() => {
@@ -65,7 +65,7 @@ const OAuthAuthenticationCallbackHandler = () => {
     } else {
       // No code present, redirect to login
       setStatus('error');
-      setMessage('No authorization code found. Redirecting to login...');
+      setMessage('No authorization code found. Redirecting to login.');
       setTimeout(() => {
         navigate('/login', { replace: true });
       }, 2000);

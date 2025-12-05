@@ -72,7 +72,7 @@ const DentalCrmDashboard = () => {
             return null;
           }
 
-          const dateFrom = new Date()?.toISOString()?.split('T')?.[0];
+          const dateFrom = new Date().toISOString()?.split('T')?.[0];
           const dateTo = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)?.toISOString()?.split('T')?.[0];
           const appointmentsResult = await withRetry(() => appointmentsService?.getAll({ date_from: dateFrom, date_to: dateTo }), 2, 500);
           if (appointmentsResult.error) {
@@ -91,7 +91,7 @@ const DentalCrmDashboard = () => {
       } catch (err) {
         throw err;
       }
-    }, 'Loading dashboard data...').catch(err => {
+    }, 'Loading dashboard data.').catch(err => {
       logger.error('Dashboard loading failed', { error: err?.message || 'Unknown error', stack: err?.stack, userId: user?.id });
       setError(`Dashboard loading failed: ${err?.message || ERROR_MESSAGES?.GENERIC_ERROR || 'Unknown error'}`);
       ScreenReader.announce('Failed to load dashboard data. Please try again.', 'assertive');
@@ -113,7 +113,7 @@ const DentalCrmDashboard = () => {
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner size="lg" text={loadingMessage || 'Loading dental CRM dashboard...'} />
+        <LoadingSpinner size="lg" text={loadingMessage || 'Loading dental CRM dashboard.'} />
       </div>
     );
   }

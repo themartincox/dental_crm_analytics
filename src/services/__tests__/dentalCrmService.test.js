@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 
-  patientsService, 
-  appointmentsService, 
-  leadsService, 
+import {
+  patientsService,
+  appointmentsService,
+  leadsService,
   paymentsService,
-  dashboardService 
+  dashboardService
 } from '../dentalCrmService';
 
 // Mock secureApiService methods used by dentalCrmService
-const mockSecureApi = {
+const mockSecureApi = vi.hoisted(() => ({
   getPatients: vi.fn(async () => [{ id: 1, first_name: 'John', last_name: 'Doe' }]),
   makeSecureRequest: vi.fn(async () => ({ data: { id: 1 } })),
-};
+}));
+
 vi.mock('../../services/secureApiService', () => ({
   default: mockSecureApi
 }));
@@ -26,10 +27,10 @@ describe('DentalCrmService', () => {
       const mockPatients = [
         { id: 1, first_name: 'John', last_name: 'Doe', email: 'john@example.com' }
       ];
-      
+
       mockSecureApi.getPatients.mockResolvedValueOnce(mockPatients);
       const result = await patientsService.getAll({ status: 'active' });
-      
+
       expect(result.data).toEqual(mockPatients);
       expect(result.error).toBeNull();
     });
@@ -40,22 +41,22 @@ describe('DentalCrmService', () => {
         last_name: 'Smith',
         email: 'jane@example.com'
       };
-      
-      const mockCreatedPatient = { id: 2, ...patientData };
-      
+
+      const mockCreatedPatient = { id: 2, .patientData };
+
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedPatient });
       const result = await patientsService.create(patientData);
-      
+
       expect(result.data).toEqual(mockCreatedPatient);
       expect(result.error).toBeNull();
     });
 
     it('should handle errors gracefully', async () => {
       const error = new Error('Database connection failed');
-      
+
       mockSecureApi.getPatients.mockRejectedValueOnce(error);
       const result = await patientsService.getAll();
-      
+
       expect(result.data).toEqual([]);
       expect(result.error).toBe(error);
     });
@@ -72,7 +73,7 @@ describe('DentalCrmService', () => {
           patients: { first_name: 'John', last_name: 'Doe' }
         }
       ];
-      
+
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockAppointments });
 
       const filters = {
@@ -81,7 +82,7 @@ describe('DentalCrmService', () => {
       };
 
       const result = await appointmentsService.getAll(filters);
-      
+
       expect(result.data).toEqual(mockAppointments);
     });
   });
@@ -94,12 +95,12 @@ describe('DentalCrmService', () => {
         email: 'bob@example.com',
         lead_source: 'google-ads'
       };
-      
-      const mockCreatedLead = { id: 3, ...leadData };
-      
+
+      const mockCreatedLead = { id: 3, .leadData };
+
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockCreatedLead });
       const result = await leadsService.create(leadData);
-      
+
       expect(result.data).toEqual(mockCreatedLead);
     });
   });
@@ -114,10 +115,10 @@ describe('DentalCrmService', () => {
           status: 'paid'
         }
       ];
-      
+
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockPayments });
       const result = await paymentsService.getAll({ status: 'paid' });
-      
+
       expect(result.data).toEqual(mockPayments);
     });
   });
@@ -134,17 +135,17 @@ describe('DentalCrmService', () => {
       // Mock multiple Supabase calls
       mockSecureApi.makeSecureRequest.mockResolvedValueOnce({ data: mockStats });
       const result = await dashboardService.getStats();
-      
+
       expect(result.data).toEqual(mockStats);
       expect(result.error).toBeNull();
     });
 
     it('should handle dashboard errors', async () => {
       const error = new Error('Database error');
-      
+
       mockSecureApi.makeSecureRequest.mockRejectedValueOnce(error);
       const result = await dashboardService.getStats();
-      
+
       expect(result.data).toEqual({
         totalPatients: 0,
         totalAppointments: 0,

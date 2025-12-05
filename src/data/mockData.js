@@ -126,8 +126,8 @@ export const createMockData = {
 };
 
 // Memoized data cache to prevent recreation on every render
-let dataCache = new Map();
-let cacheTimestamps = new Map();
+const dataCache = new Map();
+const cacheTimestamps = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const getMemoizedData = (dataType, params = {}) => {

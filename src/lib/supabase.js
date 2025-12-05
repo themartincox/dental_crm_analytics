@@ -17,7 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Auth helpers
 export const signUp = async (email, password, metadata = {}) => {
-  const { data, error } = await supabase?.auth?.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -28,7 +28,7 @@ export const signUp = async (email, password, metadata = {}) => {
 };
 
 export const signIn = async (email, password) => {
-  const { data, error } = await supabase?.auth?.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
@@ -36,16 +36,16 @@ export const signIn = async (email, password) => {
 };
 
 export const signOut = async () => {
-  const { error } = await supabase?.auth?.signOut();
+  const { error } = await supabase.auth.signOut();
   return { error };
 };
 
 export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase?.auth?.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
   return { user, error };
 };
 
 export const getCurrentSession = async () => {
-  const { data: { session }, error } = await supabase?.auth?.getSession();
+  const { data: { session }, error } = await supabase.auth.getSession();
   return { session, error };
 };

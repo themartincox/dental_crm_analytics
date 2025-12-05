@@ -83,38 +83,38 @@ export const devConsole = {
       console.log(`🔍 ${message}`, data || '');
     }
   },
-  
+
   warn: (message, data) => {
     if (process.env.NODE_ENV === 'development') {
       console.warn(`⚠️ ${message}`, data || '');
     }
   },
-  
+
   error: (message, data) => {
     if (process.env.NODE_ENV === 'development') {
       console.error(`❌ ${message}`, data || '');
     }
   },
-  
+
   success: (message, data) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`✅ ${message}`, data || '');
     }
   },
-  
+
   info: (message, data) => {
     if (process.env.NODE_ENV === 'development') {
       console.info(`ℹ️ ${message}`, data || '');
     }
   },
-  
+
   api: (method, url, status, duration) => {
     if (process.env.NODE_ENV === 'development') {
       const emoji = status >= 200 && status < 300 ? '✅' : '❌';
       console.log(`${emoji} API ${method} ${url} - ${status} (${duration}ms)`);
     }
   },
-  
+
   performance: (name, duration) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`⏱️ ${name}: ${duration}ms`);

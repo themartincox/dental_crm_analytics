@@ -24,7 +24,7 @@ const Select = React.forwardRef(({
     name,
     onChange,
     onOpenChange,
-    ...props
+    .props
 }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +71,7 @@ const Select = React.forwardRef(({
             const newValue = value || [];
             const updatedValue = newValue?.includes(option?.value)
                 ? newValue?.filter(v => v !== option?.value)
-                : [...newValue, option?.value];
+                : [.newValue, option?.value];
             onChange?.(updatedValue);
         } else {
             onChange?.(option?.value);
@@ -126,7 +126,7 @@ const Select = React.forwardRef(({
                     disabled={disabled}
                     aria-expanded={isOpen}
                     aria-haspopup="listbox"
-                    {...props}
+                    {.props}
                 >
                     <span className="truncate">{getSelectedDisplay()}</span>
 
@@ -163,7 +163,7 @@ const Select = React.forwardRef(({
                     multiple={multiple}
                     required={required}
                 >
-                    <option value="">Select...</option>
+                    <option value="">Select.</option>
                     {options?.map(option => (
                         <option key={option?.value} value={option?.value}>
                             {option?.label}
@@ -179,7 +179,7 @@ const Select = React.forwardRef(({
                                 <div className="relative">
                                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        placeholder="Search options..."
+                                        placeholder="Search options."
                                         value={searchTerm}
                                         onChange={handleSearchChange}
                                         className="pl-8"

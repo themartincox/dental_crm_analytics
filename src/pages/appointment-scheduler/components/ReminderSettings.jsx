@@ -39,14 +39,14 @@ const ReminderSettings = ({ onSave, onClose }) => {
   ];
 
   const handleSettingChange = (field, value) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    setSettings(prev => ({ .....prev, [field]: value }));
   };
 
   const handleTimingChange = (id, field, value) => {
     setSettings(prev => ({
       ...prev,
       reminderTiming: prev?.reminderTiming?.map(reminder =>
-        reminder?.id === id ? { ...reminder, [field]: value } : reminder
+        reminder?.id === id ? { .reminder, [field]: value } : reminder
       )
     }));
   };
@@ -61,7 +61,7 @@ const ReminderSettings = ({ onSave, onClose }) => {
     };
     setSettings(prev => ({
       ...prev,
-      reminderTiming: [...prev?.reminderTiming, newReminder]
+      reminderTiming: [.prev?.reminderTiming, newReminder]
     }));
   };
 
@@ -166,7 +166,7 @@ const ReminderSettings = ({ onSave, onClose }) => {
             <textarea
               value={settings?.smsTemplate}
               onChange={(e) => handleSettingChange('smsTemplate', e?.target?.value)}
-              placeholder="SMS reminder template..."
+              placeholder="SMS reminder template."
               rows={4}
               className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             />
@@ -196,7 +196,7 @@ const ReminderSettings = ({ onSave, onClose }) => {
             <textarea
               value={settings?.emailTemplate}
               onChange={(e) => handleSettingChange('emailTemplate', e?.target?.value)}
-              placeholder="Email reminder template..."
+              placeholder="Email reminder template."
               rows={8}
               className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             />

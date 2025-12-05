@@ -30,7 +30,7 @@ const SystemOwnerAdminDashboard = () => {
           if (path.startsWith('http')) { setUrl(path); return; }
           const { data, error } = await supabase.storage.from('branding').createSignedUrl(path, 60);
           if (!error && data?.signedUrl && active) setUrl(data.signedUrl);
-        } catch (_) {}
+        } catch (_) { }
       })();
       return () => { active = false; };
     }, [path]);
@@ -130,7 +130,7 @@ const SystemOwnerAdminDashboard = () => {
         });
         return;
       }
-    } catch (_) {}
+    } catch (_) { }
     // Fallback if KPIs not available
     const activeClients = clients?.filter(c => c?.status === 'active')?.length || 0;
     const totalUsers = clients?.reduce((sum, client) => sum + (client?.total_users || 0), 0) || 0;
@@ -164,28 +164,35 @@ const SystemOwnerAdminDashboard = () => {
   const handleClientAction = async (action, clientId, data = {}) => {
     try {
       switch (action) {
-        case 'edit_permissions':
+        case 'edit_permissions': {
           const client = clients?.find(c => c?.id === clientId);
           setSelectedClient(client);
           setShowPermissionModal(true);
           break;
+        }
 
-        case 'toggle_status':
+        case 'toggle_status': {
           const newStatus = data?.status === 'active' ? 'suspended' : 'active';
           await secureApiService.makeSecureRequest(`/admin/clients/${clientId}/status`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) }, 'super_admin');
-          
-          await logSystemAction('client_status_changed', clientId, { 
-            old_status: data?.status, 
-            new_status: newStatus 
+
+          await logSystemAction('client_status_changed', clientId, {
+            old_status: data?.status,
+            new_status: newStatus
           });
+          await loadClients();
+          break;
+        }
+        case 'approve':
+          await secureApiService.makeSecureRequest(`/admin/clients/${clientId}/approve`, { method: 'POST' }, 'super_admin');
+          await logSystemAction('client_approved', clientId, { organization_name: data?.organization_name });
           await loadClients();
           break;
 
         case 'delete':
           await secureApiService.makeSecureRequest(`/admin/clients/${clientId}`, { method: 'DELETE' }, 'super_admin');
-          
-          await logSystemAction('client_deleted', clientId, { 
-            organization_name: data?.organization_name 
+
+          await logSystemAction('client_deleted', clientId, {
+            organization_name: data?.organization_name
           });
           await loadClients();
           break;
@@ -216,10 +223,10 @@ const SystemOwnerAdminDashboard = () => {
           await secureApiService.makeSecureRequest('/admin/clients/bulk', { method: 'PATCH', body: JSON.stringify({ action, ids: clientIds }) }, 'super_admin');
           break;
       }
-      
-      await logSystemAction('bulk_action_performed', null, { 
-        action, 
-        client_count: clientIds?.length 
+
+      await logSystemAction('bulk_action_performed', null, {
+        action,
+        client_count: clientIds?.length
       });
       setSelectedClients([]);
       await loadClients();
@@ -231,10 +238,10 @@ const SystemOwnerAdminDashboard = () => {
 
   const filteredClients = clients?.filter(client => {
     const matchesSearch = client?.organization_name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                         client?.contact_email?.toLowerCase()?.includes(searchTerm?.toLowerCase());
+      client?.contact_email?.toLowerCase()?.includes(searchTerm?.toLowerCase());
     const matchesStatus = statusFilter === 'all' || client?.status === statusFilter;
     const matchesTier = tierFilter === 'all' || client?.subscription_tier === tierFilter;
-    
+
     return matchesSearch && matchesStatus && matchesTier;
   }) || [];
 
@@ -243,7 +250,7 @@ const SystemOwnerAdminDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading system dashboard...</p>
+          <p className="text-gray-600">Loading system dashboard.</p>
         </div>
       </div>
     );
@@ -266,7 +273,7 @@ const SystemOwnerAdminDashboard = () => {
                 <p className="text-sm text-gray-500">Multi-tenant client management & permissions</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 bg-green-400 rounded-full"></div>
@@ -318,7 +325,7 @@ const SystemOwnerAdminDashboard = () => {
                   <Search className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search clients..."
+                    placeholder="Search clients."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e?.target?.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -336,6 +343,7 @@ const SystemOwnerAdminDashboard = () => {
                     <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                     <option value="trial">Trial</option>
+                    <option value="pending_approval">Pending approval</option>
                   </select>
 
                   <select
@@ -367,7 +375,7 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Public Footer Variant</label>
-                  <select className="w-full border rounded px-3 py-2" value={uiSettingsEditing.publicFooterVariant} onChange={(e)=>setUiSettingsEditing(prev=>({...prev, publicFooterVariant: e.target.value}))}>
+                  <select className="w-full border rounded px-3 py-2" value={uiSettingsEditing.publicFooterVariant} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, publicFooterVariant: e.target.value }))}>
                     <option value="compact">Compact</option>
                     <option value="full">Full (GDC)</option>
                   </select>
@@ -375,11 +383,11 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <label className="inline-flex items-center text-sm">
-                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.publicFooterEnabled} onChange={(e)=>setUiSettingsEditing(prev=>({...prev, publicFooterEnabled: e.target.checked}))} />
+                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.publicFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, publicFooterEnabled: e.target.checked }))} />
                     Public Footer Enabled
                   </label>
                   <label className="inline-flex items-center text-sm">
-                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.internalFooterEnabled} onChange={(e)=>setUiSettingsEditing(prev=>({...prev, internalFooterEnabled: e.target.checked}))} />
+                    <input type="checkbox" className="mr-2" checked={uiSettingsEditing.internalFooterEnabled} onChange={(e) => setUiSettingsEditing(prev => ({ .....prev, internalFooterEnabled: e.target.checked }))} />
                     Internal Footer Enabled
                   </label>
                 </div>
@@ -413,8 +421,8 @@ const SystemOwnerAdminDashboard = () => {
                     if (id) {
                       try {
                         const { data } = await secureApiService.makeSecureRequest(`/admin/branding/${id}`, { method: 'GET' }, 'super_admin');
-                        if (data) setBrandingForm(prev => ({ ...prev, ...data }));
-                      } catch (_) {}
+                        if (data) setBrandingForm(prev => ({ .....prev, .data }));
+                      } catch (_) { }
                     }
                   }}>
                     <option value="">Select client</option>
@@ -425,20 +433,20 @@ const SystemOwnerAdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Practice Name</label>
-                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.practice_name} onChange={(e)=>setBrandingForm(prev=>({...prev, practice_name: e.target.value}))} />
+                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.practice_name} onChange={(e) => setBrandingForm(prev => ({ .....prev, practice_name: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.logo_url} onChange={(e)=>setBrandingForm(prev=>({...prev, logo_url: e.target.value}))} placeholder="https://..." />
+                  <input className="w-full border rounded px-3 py-2 text-sm" value={brandingForm.logo_url} onChange={(e) => setBrandingForm(prev => ({ .....prev, logo_url: e.target.value }))} placeholder="https://." />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                {['primary_color','secondary_color_1','secondary_color_2','secondary_color_3'].map((key) => (
+                {['primary_color', 'secondary_color_1', 'secondary_color_2', 'secondary_color_3'].map((key) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{key.replace(/_/g,' ')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{key.replace(/_/g, ' ')}</label>
                     <div className="flex items-center gap-2">
-                      <input type="color" value={brandingForm[key] || '#ffffff'} onChange={(e)=>setBrandingForm(prev=>({...prev,[key]: e.target.value}))} className="h-8 w-12 p-0 border rounded" />
-                      <input value={brandingForm[key] || ''} onChange={(e)=>setBrandingForm(prev=>({...prev,[key]: e.target.value}))} className="flex-1 border rounded px-3 py-2 text-sm" />
+                      <input type="color" value={brandingForm[key] || '#ffffff'} onChange={(e) => setBrandingForm(prev => ({ .....prev, [key]: e.target.value }))} className="h-8 w-12 p-0 border rounded" />
+                      <input value={brandingForm[key] || ''} onChange={(e) => setBrandingForm(prev => ({ .....prev, [key]: e.target.value }))} className="flex-1 border rounded px-3 py-2 text-sm" />
                     </div>
                   </div>
                 ))}
@@ -446,7 +454,7 @@ const SystemOwnerAdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Google Font</label>
-                  <input value={brandingForm.font_family} onChange={(e)=>setBrandingForm(prev=>({...prev, font_family: e.target.value}))} className="w-full border rounded px-3 py-2 text-sm" placeholder="Inter, Roboto, ..." />
+                  <input value={brandingForm.font_family} onChange={(e) => setBrandingForm(prev => ({ .....prev, font_family: e.target.value }))} className="w-full border rounded px-3 py-2 text-sm" placeholder="Inter, Roboto, ." />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Upload Logo</label>
@@ -458,7 +466,7 @@ const SystemOwnerAdminDashboard = () => {
                       const { error } = await supabase.storage.from('branding').upload(path, file, { upsert: true, cacheControl: '3600' });
                       if (error) throw error;
                       // store the path; display using signed URL
-                      setBrandingForm(prev => ({ ...prev, logo_url: path }));
+                      setBrandingForm(prev => ({ .....prev, logo_url: path }));
                     } catch (err) {
                       alert('Upload failed');
                     }
@@ -521,7 +529,7 @@ const SystemOwnerAdminDashboard = () => {
                 <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No clients found</h3>
                 <p className="text-gray-500">
-                  {searchTerm || statusFilter !== 'all' || tierFilter !== 'all' ?'Try adjusting your search criteria or filters' :'No clients have been added to the system yet'
+                  {searchTerm || statusFilter !== 'all' || tierFilter !== 'all' ? 'Try adjusting your search criteria or filters' : 'No clients have been added to the system yet'
                   }
                 </p>
               </div>

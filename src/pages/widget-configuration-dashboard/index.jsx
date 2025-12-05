@@ -124,11 +124,11 @@ const WidgetConfigurationDashboard = () => {
   const saveWidget = async (widgetData) => {
     try {
       if (isCreating) {
-        setWidgets(prev => [...prev, { ...widgetData, createdAt: new Date() }]);
+        setWidgets(prev => [...prev, { .widgetData, createdAt: new Date() }]);
       } else {
         setWidgets(prev => prev?.map(w => 
           w?.id === widgetData?.id 
-            ? { ...widgetData, lastModified: new Date() }
+            ? { .widgetData, lastModified: new Date() }
             : w
         ));
       }
@@ -432,7 +432,7 @@ const WidgetConfigurationDashboard = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
-    ...(selectedWidget ? [
+    .(selectedWidget ? [
       { id: 'builder', label: 'Builder', icon: Settings },
       { id: 'theme', label: 'Theme', icon: Edit3 },
       { id: 'analytics', label: 'Analytics', icon: BarChart3 }

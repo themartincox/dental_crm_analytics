@@ -5,7 +5,7 @@ export const validateRequest = (schema, options = {}) => {
   return (req, res, next) => {
     try {
       const { body, params, query } = req;
-      const dataToValidate = { ...body, ...params, ...query };
+      const dataToValidate = { .body, .params, .query };
       
       // Validate the data
       const validatedData = schema.validate(dataToValidate);

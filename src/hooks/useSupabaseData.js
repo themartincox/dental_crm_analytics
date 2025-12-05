@@ -19,7 +19,7 @@ export const useSupabaseData = (serviceMethod, dependencies = [], options = {}) 
       setLoading(true);
       setError(null);
       
-      const result = await serviceMethod(...dependencies);
+      const result = await serviceMethod(.dependencies);
       setData(result);
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -30,7 +30,7 @@ export const useSupabaseData = (serviceMethod, dependencies = [], options = {}) 
     } finally {
       setLoading(false);
     }
-  }, [serviceMethod, user, ...dependencies]);
+  }, [serviceMethod, user, .dependencies]);
 
   useEffect(() => {
     fetchData();
@@ -148,15 +148,15 @@ export const useSupabaseSubscription = (table, callback, filters = null) => {
   useEffect(() => {
     if (!user) return;
 
-    let subscription = supabaseService?.client?.channel(`${table}-changes`)?.on('postgres_changes', {
+    const subscription = supabaseService?.client?.channel(`${table}-changes`)?.on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: table,
-        ...(filters && { filter: filters })
+        .(filters && { filter: filters })
       }, callback)?.subscribe();
 
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [table, callback, filters, user]);
 };
@@ -178,7 +178,7 @@ export const useOptimisticUpdate = (initialData = []) => {
 
   const addOptimistic = useCallback((newItem) => {
     return optimisticUpdate(
-      (currentData) => [newItem, ...currentData],
+      (currentData) => [newItem, .currentData],
       (currentData) => currentData?.filter(item => item?.id !== newItem?.id)
     );
   }, [optimisticUpdate]);
@@ -191,7 +191,7 @@ export const useOptimisticUpdate = (initialData = []) => {
         return currentData?.map(item => {
           if (item?.id === id) {
             originalItem = item;
-            return { ...item, ...updates };
+            return { .item, .updates };
           }
           return item;
         });
@@ -218,7 +218,7 @@ export const useOptimisticUpdate = (initialData = []) => {
       },
       (currentData) => {
         if (removedItem) {
-          return [...currentData, removedItem];
+          return [.currentData, removedItem];
         }
         return currentData;
       }

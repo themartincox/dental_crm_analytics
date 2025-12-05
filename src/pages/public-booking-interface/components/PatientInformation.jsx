@@ -47,11 +47,11 @@ const PatientInformation = ({ initialData, onComplete, onBack, compact = false }
   ];
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ .....prev, [field]: value }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+      setErrors(prev => ({ .....prev, [field]: null }));
     }
   };
 
@@ -294,7 +294,7 @@ const PatientInformation = ({ initialData, onComplete, onBack, compact = false }
               disabled={isSubmitting}
               className="bg-primary hover:bg-primary/90"
             >
-              {isSubmitting ? 'Processing...' : 'Continue to Payment'}
+              {isSubmitting ? 'Processing.' : 'Continue to Payment'}
             </Button>
           </div>
         </form>
@@ -565,7 +565,7 @@ const PatientInformation = ({ initialData, onComplete, onBack, compact = false }
             disabled={isSubmitting}
             className="bg-primary hover:bg-primary/90"
           >
-            {isSubmitting ? 'Processing...' : 'Continue to Payment'}
+            {isSubmitting ? 'Processing.' : 'Continue to Payment'}
           </Button>
         </div>
       </form>

@@ -8,10 +8,10 @@ const ENCRYPTION_KEY = import.meta.env?.VITE_CLIENT_ENCRYPTION_KEY || 'dental-cr
 export const encryptData = (data) => {
     try {
         if (!data) return null;
-        
+
         const dataString = typeof data === 'string' ? data : JSON.stringify(data);
         const encrypted = CryptoJS?.AES?.encrypt(dataString, ENCRYPTION_KEY)?.toString();
-        
+
         return encrypted;
     } catch (error) {
         console.error('Encryption error:', error);
@@ -23,12 +23,12 @@ export const encryptData = (data) => {
 export const decryptData = (encryptedData) => {
     try {
         if (!encryptedData) return null;
-        
+
         const bytes = CryptoJS?.AES?.decrypt(encryptedData, ENCRYPTION_KEY);
         const decrypted = bytes?.toString(CryptoJS?.enc?.Utf8);
-        
+
         if (!decrypted) return '[Invalid Data]';
-        
+
         // Try to parse as JSON, fallback to string
         try {
             return JSON.parse(decrypted);
@@ -45,7 +45,7 @@ export const decryptData = (encryptedData) => {
 export const hashData = (data) => {
     try {
         if (!data) return null;
-        
+
         const dataString = typeof data === 'string' ? data : JSON.stringify(data);
         return CryptoJS?.SHA256(dataString)?.toString();
     } catch (error) {
@@ -84,7 +84,7 @@ export const secureStorage = {
             console.error('Secure storage set error:', error);
         }
     },
-    
+
     getItem: (key) => {
         try {
             const encrypted = sessionStorage.getItem(key);
@@ -94,7 +94,7 @@ export const secureStorage = {
             return null;
         }
     },
-    
+
     removeItem: (key) => {
         try {
             sessionStorage.removeItem(key);
@@ -102,7 +102,7 @@ export const secureStorage = {
             console.error('Secure storage remove error:', error);
         }
     },
-    
+
     clear: () => {
         try {
             sessionStorage.clear();
@@ -115,7 +115,7 @@ export const secureStorage = {
 // Data sanitization utilities
 export const sanitizeInput = (input) => {
     if (typeof input !== 'string') return input;
-    
+
     return (
         // Remove event handlers
         // Remove JavaScript protocols
@@ -127,36 +127,36 @@ export const sanitizeInput = (input) => {
 // Format sensitive data for display (partial masking)
 export const maskSensitiveData = (data, type = 'general') => {
     if (!data) return '';
-    
+
     const str = String(data);
-    
+
     switch (type) {
-        case 'email':
+        case 'email': {
             const atIndex = str?.indexOf('@');
             if (atIndex > 2) {
                 return str?.substring(0, 2) + '***' + str?.substring(atIndex);
             }
             return '***' + str?.substring(str?.length - 3);
-            
+        }
         case 'phone':
             if (str?.length > 6) {
                 return str?.substring(0, 3) + '***' + str?.substring(str?.length - 3);
             }
             return '***' + str?.substring(str?.length - 2);
-            
+
         case 'nhs_number':
             if (str?.length === 10) {
                 return str?.substring(0, 3) + ' *** ' + str?.substring(7);
             }
             return '*** ' + str?.substring(str?.length - 3);
-            
-        case 'postcode':
+
+        case 'postcode': {
             const parts = str?.split(' ');
             if (parts?.length === 2) {
                 return parts?.[0] + ' ***';
             }
             return str?.substring(0, 3) + '***';
-            
+        }
         default:
             return str?.substring(0, 2) + '*'?.repeat(Math.max(0, str?.length - 4)) + str?.substring(str?.length - 2);
     }

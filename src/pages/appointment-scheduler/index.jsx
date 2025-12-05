@@ -199,7 +199,7 @@ const AppointmentScheduler = () => {
   const handleDrop = (newDate, newTime) => {
     if (draggedAppointment) {
       const updatedAppointment = {
-        ...draggedAppointment,
+        .draggedAppointment,
         date: new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newTime?.hour || draggedAppointment?.date?.getHours(), newTime?.minute || draggedAppointment?.date?.getMinutes())
       };
       
@@ -213,7 +213,7 @@ const AppointmentScheduler = () => {
   const handlePaymentProcess = (appointmentId, amount) => {
     setAppointments(prev => prev?.map(apt => 
       apt?.id === appointmentId 
-        ? { ...apt, depositPaid: true }
+        ? { .apt, depositPaid: true }
         : apt
     ));
     setPaymentModalOpen(false);
@@ -222,7 +222,7 @@ const AppointmentScheduler = () => {
   const handleReminderSend = (appointmentId, reminderType) => {
     setAppointments(prev => prev?.map(apt => 
       apt?.id === appointmentId 
-        ? { ...apt, reminderSent: true }
+        ? { .apt, reminderSent: true }
         : apt
     ));
     setReminderModalOpen(false);
@@ -255,7 +255,7 @@ const AppointmentScheduler = () => {
         <div className="flex items-center justify-center h-96">
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="text-muted-foreground">Loading appointment schedule...</span>
+            <span className="text-muted-foreground">Loading appointment schedule.</span>
           </div>
         </div>
       </div>

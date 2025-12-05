@@ -10,8 +10,8 @@ const MetricCard = ({ title, value, change, trend, icon, color = 'primary', spar
   const renderSparkline = () => {
     if (!sparklineData?.length) return null;
     
-    const max = Math.max(...sparklineData);
-    const min = Math.min(...sparklineData);
+    const max = Math.max(.sparklineData);
+    const min = Math.min(.sparklineData);
     const range = max - min || 1;
     
     const points = sparklineData?.map((value, index) => {

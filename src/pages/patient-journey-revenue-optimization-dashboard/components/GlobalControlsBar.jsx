@@ -50,7 +50,7 @@ const GlobalControlsBar = ({ onFiltersChange }) => {
     setIsExporting(false);
     
     // In a real app, this would trigger the actual export
-    console.log(`Exporting ${type} report...`);
+    console.log(`Exporting ${type} report.`);
   };
 
   const handleFilterChange = (filterType, value) => {

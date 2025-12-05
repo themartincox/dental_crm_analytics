@@ -19,6 +19,16 @@ export class ValidationError extends AppError {
   }
 }
 
+// Schema-level validation error (multiple fields)
+export class SchemaValidationError extends ValidationError {
+  constructor(errors) {
+    super('Validation failed', null, null);
+    this.code = 'VALIDATION_ERROR';
+    this.statusCode = 400;
+    this.details = { errors };
+  }
+}
+
 export class AuthenticationError extends AppError {
   constructor(message = 'Authentication required') {
     super(message, 'AUTH_ERROR', 401);
@@ -110,7 +120,7 @@ export class ErrorBoundary extends React.Component {
 
     // Log error to monitoring service
     console.error('Error caught by boundary:', error, errorInfo);
-    
+
     // In production, send to error tracking service
     if (process.env.NODE_ENV === 'production') {
       // Example: Sentry.captureException(error, { extra: errorInfo });
@@ -177,35 +187,35 @@ export const logError = (error, context = {}) => {
 // Retry utility with exponential backoff
 export const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
   let lastError;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxRetries) {
         throw error;
       }
-      
+
       // Don't retry on client errors (4xx)
       if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
         throw error;
       }
-      
+
       const delay = baseDelay * Math.pow(2, attempt);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 };
 
 // Safe async wrapper for React components
 export const safeAsync = (fn) => {
-  return async (...args) => {
+  return async (.args) => {
     try {
-      return await fn(...args);
+      return await fn(.args);
     } catch (error) {
       logError(error, { function: fn.name, args });
       throw error;

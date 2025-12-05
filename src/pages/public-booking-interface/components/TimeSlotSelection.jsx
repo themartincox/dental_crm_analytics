@@ -104,7 +104,7 @@ const TimeSlotSelection = ({
       }
       // This would normally come from props, but for demo purposes
       if (typeof availableSlots?.push === 'function') {
-        availableSlots?.push(...mockSlots);
+        availableSlots?.push(.mockSlots);
       }
     }
   }, [selectedService?.priceFrom]);

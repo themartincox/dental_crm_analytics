@@ -187,7 +187,7 @@ const MembershipProgramManagement = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading membership data...</p>
+          <p className="text-gray-600">Loading membership data.</p>
         </div>
       </div>
     );
@@ -343,7 +343,7 @@ const MembershipProgramManagement = () => {
                   <Search className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search by name, email, or ID..."
+                    placeholder="Search by name, email, or ID."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e?.target?.value)}

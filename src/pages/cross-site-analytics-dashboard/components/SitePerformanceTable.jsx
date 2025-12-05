@@ -59,7 +59,7 @@ const SitePerformanceTable = ({ sites, selectedSites }) => {
     }
   };
 
-  const sortedSites = [...selectedSitesData]?.sort((a, b) => {
+  const sortedSites = [.selectedSitesData]?.sort((a, b) => {
     let aValue = a[sortBy];
     let bValue = b[sortBy];
     

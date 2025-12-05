@@ -52,9 +52,9 @@ const ServerValidatedProtectedRoute = ({
                 const validation = await secureApiService?.validateServerSideAccess(
                     primaryRole,
                     [
-                        ...(requireClinicalAccess ? ['clinical_data_access'] : []),
-                        ...(requireMarketingAccess ? ['marketing_data_access'] : []),
-                        ...(requireAdminAccess ? ['admin_access'] : [])
+                        .(requireClinicalAccess ? ['clinical_data_access'] : []),
+                        .(requireMarketingAccess ? ['marketing_data_access'] : []),
+                        .(requireAdminAccess ? ['admin_access'] : [])
                     ]
                 );
 
@@ -104,7 +104,7 @@ const ServerValidatedProtectedRoute = ({
                 <div className="flex flex-col items-center space-y-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     <span className="text-muted-foreground">
-                        {loading ? 'Checking authentication...' : 'Validating server access...'}
+                        {loading ? 'Checking authentication.' : 'Validating server access.'}
                     </span>
                 </div>
             </div>
@@ -238,7 +238,7 @@ const ServerValidatedProtectedRoute = ({
                     <div className="text-sm text-yellow-600 mb-6 space-y-2">
                         <p><strong>Required roles:</strong> {requiredRoles?.join(', ')}</p>
                         <p><strong>Your role:</strong> {userProfile?.role || 'No role assigned'}</p>
-                        <p><strong>User ID:</strong> {user?.id?.substring(0, 8)}...</p>
+                        <p><strong>User ID:</strong> {user?.id?.substring(0, 8)}.</p>
                     </div>
                     <div className="space-y-2">
                         <button 

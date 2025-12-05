@@ -15,7 +15,7 @@ const Checkbox = React.forwardRef(({
     size = "default",
     onCheckedChange,
     onChange,
-    ...props
+    .props
 }, ref) => {
     // Generate unique ID if not provided
     const checkboxId = id || `checkbox-${Math.random()?.toString(36)?.substr(2, 9)}`;
@@ -52,7 +52,7 @@ const Checkbox = React.forwardRef(({
                     required={required}
                     onChange={handleChange}
                     className="sr-only"
-                    {...props}
+                    {.props}
                 />
 
                 <label
@@ -118,14 +118,14 @@ const CheckboxGroup = React.forwardRef(({
     error,
     required = false,
     disabled = false,
-    ...props
+    .props
 }, ref) => {
     return (
         <fieldset
             ref={ref}
             disabled={disabled}
             className={cn("space-y-3", className)}
-            {...props}
+            {.props}
         >
             {label && (
                 <legend className={cn(

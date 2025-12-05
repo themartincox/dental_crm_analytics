@@ -153,8 +153,8 @@ class SecureApiService {
                         'X-Request-ID': `${Date.now()}-${++this.requestId}`,
                         'X-Required-Role': requiredRole || '',
                         'X-Client-Validation': 'true',
-                        ...(csrfHeader),
-                        ...(options?.headers || {})
+                        .(csrfHeader),
+                        .(options?.headers || {})
                     },
                     params: options?.params
                 });
@@ -202,7 +202,7 @@ class SecureApiService {
             await apiClient.post('/security/log', {
                 event: eventType,
                 metadata: {
-                    ...metadata,
+                    .metadata,
                     userAgent: navigator?.userAgent,
                     timestamp: new Date().toISOString(),
                     url: window.location?.href,
@@ -372,7 +372,7 @@ class SecureApiService {
                 dataType,
                 purpose,
                 approved,
-                timestamp: new Date()?.toISOString(),
+                timestamp: new Date().toISOString(),
                 gdprCompliance: true,
                 dataMinimization: approved
             });
@@ -427,7 +427,7 @@ class SecureApiService {
 
             const response = await apiClient?.post('/consent/cookie', {
                 preferences: consentData,
-                timestamp: new Date()?.toISOString(),
+                timestamp: new Date().toISOString(),
                 consentMethod: 'explicit',
                 gdprLawfulBasis: 'consent',
                 dataProcessingPurpose: {
@@ -450,7 +450,7 @@ class SecureApiService {
         try {
             const response = await apiClient?.post('/consent/withdraw', {
                 consentType,
-                withdrawalTimestamp: new Date()?.toISOString(),
+                withdrawalTimestamp: new Date().toISOString(),
                 reason: 'user_initiated'
             });
 
@@ -503,7 +503,7 @@ class SecureApiService {
 
             // Decrypt sensitive data for display
             return data?.map(patient => ({
-                ...patient,
+                .patient,
                 email: patient?.email ? decryptSensitiveData(patient?.email) : null,
                 phone: patient?.phone ? decryptSensitiveData(patient?.phone) : null,
                 dateOfBirth: patient?.date_of_birth ? decryptSensitiveData(patient?.date_of_birth) : null,
@@ -538,7 +538,7 @@ class SecureApiService {
 
     async deletePatient(patientId) {
         try {
-            const response = await apiClient?.delete(`/patients/${patientId}`);
+            const response = await apiClient.delete(`/patients/${patientId}`);
             return response?.data;
         } catch (error) {
             console.error('Delete patient error:', error);

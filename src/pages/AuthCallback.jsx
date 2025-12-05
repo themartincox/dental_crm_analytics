@@ -8,7 +8,7 @@ export default function AuthCallback() {
 
   useEffect(() => {
     // Must run in the browser: swaps ?code for a session and sets auth cookies/localStorage
-    supabase?.auth?.exchangeCodeForSession(window.location?.href)?.then(({ error }) => {
+    supabase?.auth?.exchangeCodeForSession(window.location?.href).then(({ error }) => {
         if (error) {
           console.error('Auth callback error:', error);
           navigate('/?auth=error', { replace: true });

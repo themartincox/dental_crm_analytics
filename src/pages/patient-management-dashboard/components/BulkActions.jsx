@@ -7,7 +7,7 @@ import React, { useState } from 'react';
           const [selectedAction, setSelectedAction] = useState('');
 
           const actionOptions = [
-            { value: '', label: 'Choose action...' },
+            { value: '', label: 'Choose action.' },
             { value: 'send_email', label: 'Send Email' },
             { value: 'send_sms', label: 'Send SMS' },
             { value: 'schedule_appointment', label: 'Schedule Appointment' },
@@ -23,19 +23,19 @@ import React, { useState } from 'react';
             
             // Here you would implement the actual bulk action logic
             switch (selectedAction) {
-              case 'send_email': console.log('Opening email composer...');
+              case 'send_email': console.log('Opening email composer.');
                 break;
-              case 'send_sms': console.log('Opening SMS composer...');
+              case 'send_sms': console.log('Opening SMS composer.');
                 break;
-              case 'schedule_appointment': console.log('Opening appointment scheduler...');
+              case 'schedule_appointment': console.log('Opening appointment scheduler.');
                 break;
-              case 'update_status': console.log('Opening status update modal...');
+              case 'update_status': console.log('Opening status update modal.');
                 break;
               case 'export_data':
-                console.log('Exporting selected patient data...');
+                console.log('Exporting selected patient data.');
                 break;
               case 'delete':
-                console.log('Confirming deletion...');
+                console.log('Confirming deletion.');
                 break;
               default:
                 break;

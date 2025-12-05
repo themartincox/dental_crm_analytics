@@ -15,7 +15,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     // Ensure formData is properly initialized
     if (widget) {
       setFormData({
-        ...widget,
+        .widget,
         settings: {
           allowedServices: [],
           autoResize: true,
@@ -25,7 +25,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
           allowedOrigins: ['*'],
           language: 'en',
           customCSS: '',
-          ...widget?.settings
+          .widget?.settings
         }
       });
     }
@@ -56,7 +56,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     setFormData(prev => ({
       ...prev,
       settings: {
-        ...prev?.settings,
+        .prev?.settings,
         [field]: value
       }
     }));
@@ -65,7 +65,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
   const handleServiceToggle = (serviceId, checked) => {
     const currentServices = formData?.settings?.allowedServices || [];
     const updatedServices = checked
-      ? [...currentServices, serviceId]
+      ? [.currentServices, serviceId]
       : currentServices?.filter(id => id !== serviceId);
     
     handleSettingsChange('allowedServices', updatedServices);
@@ -75,7 +75,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     const newOrigin = prompt('Enter domain (e.g., https://example.com):');
     if (newOrigin) {
       const currentOrigins = formData?.settings?.allowedOrigins || ['*'];
-      const updatedOrigins = [...currentOrigins?.filter(o => o !== '*'), newOrigin];
+      const updatedOrigins = [.currentOrigins?.filter(o => o !== '*'), newOrigin];
       handleSettingsChange('allowedOrigins', updatedOrigins);
     }
   };
@@ -310,7 +310,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                       <Input
                         value={origin}
                         onChange={(e) => {
-                          const updatedOrigins = [...formData?.settings?.allowedOrigins];
+                          const updatedOrigins = [.formData?.settings?.allowedOrigins];
                           updatedOrigins[index] = e?.target?.value;
                           handleSettingsChange('allowedOrigins', updatedOrigins);
                         }}

@@ -129,7 +129,7 @@ const PaymentForm = ({
             onValueChange={setSelectedSavedPayment}
             options={[
               { value: '', label: 'Use new payment method' },
-              ...savedPayments
+              .savedPayments
             ]}
             placeholder="Select saved payment method"
             label="Saved payment methods"
@@ -309,7 +309,7 @@ const PaymentForm = ({
         {isProcessingPayment ? (
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-            Processing Payment...
+            Processing Payment.
           </div>
         ) : (
           <div className="flex items-center justify-center">

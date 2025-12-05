@@ -9,7 +9,7 @@ export const useLoadingState = (initialLoading = false) => {
   const [isLoading, setIsLoading] = useState(initialLoading);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  const startLoading = useCallback((message = 'Loading...') => {
+  const startLoading = useCallback((message = 'Loading.') => {
     setIsLoading(true);
     setLoadingMessage(message);
   }, []);
@@ -19,7 +19,7 @@ export const useLoadingState = (initialLoading = false) => {
     setLoadingMessage('');
   }, []);
 
-  const withLoading = useCallback(async (asyncFunction, message = 'Loading...') => {
+  const withLoading = useCallback(async (asyncFunction, message = 'Loading.') => {
     try {
       startLoading(message);
       const result = await asyncFunction();

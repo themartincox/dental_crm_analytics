@@ -22,11 +22,11 @@ export class PerformanceTimer {
   end() {
     const endTime = performance.now();
     const duration = endTime - this.startTime;
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.group(`⏱️ Performance: ${this.name}`);
       console.log(`Total duration: ${duration.toFixed(2)}ms`);
-      
+
       if (this.marks.length > 0) {
         console.log('Marks:');
         this.marks.forEach(mark => {
@@ -35,7 +35,7 @@ export class PerformanceTimer {
       }
       console.groupEnd();
     }
-    
+
     return {
       name: this.name,
       duration,
@@ -54,7 +54,7 @@ export const createTimer = (name) => new PerformanceTimer(name);
  */
 export const measurePerformance = async (name, fn) => {
   const timer = createTimer(name);
-  
+
   try {
     const result = await fn();
     timer.end();
@@ -70,17 +70,17 @@ export const measurePerformance = async (name, fn) => {
  */
 export const debounce = (func, wait, immediate = false) => {
   let timeout;
-  
+
   return function executedFunction(...args) {
     const later = () => {
       timeout = null;
       if (!immediate) func(...args);
     };
-    
+
     const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
-    
+
     if (callNow) func(...args);
   };
 };
@@ -90,7 +90,7 @@ export const debounce = (func, wait, immediate = false) => {
  */
 export const throttle = (func, limit) => {
   let inThrottle;
-  
+
   return function executedFunction(...args) {
     if (!inThrottle) {
       func.apply(this, args);
@@ -119,10 +119,10 @@ export const getMemoryUsage = () => {
  */
 export const isLowEndDevice = () => {
   if (typeof navigator === 'undefined') return false;
-  
+
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const hardwareConcurrency = navigator.hardwareConcurrency || 4;
-  
+
   return (
     hardwareConcurrency <= 2 ||
     (connection && connection.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType))
@@ -141,7 +141,7 @@ export const lazyLoadImage = (img, src) => {
       }
     });
   });
-  
+
   observer.observe(img);
   return observer;
 };
@@ -169,7 +169,7 @@ export class PerformanceMetrics {
 
   record(metric) {
     if (!this.isEnabled) return;
-    
+
     this.metrics.push({
       ...metric,
       timestamp: Date.now()
@@ -188,9 +188,9 @@ export class PerformanceMetrics {
     const metricValues = this.metrics
       .filter(m => m.name === metricName)
       .map(m => m.value);
-    
+
     if (metricValues.length === 0) return 0;
-    
+
     return metricValues.reduce((sum, value) => sum + value, 0) / metricValues.length;
   }
 }
@@ -215,7 +215,7 @@ export const measureWebVitals = () => {
         unit: 'ms'
       });
     });
-    
+
     lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
   }
 
@@ -231,7 +231,7 @@ export const measureWebVitals = () => {
         });
       });
     });
-    
+
     fidObserver.observe({ entryTypes: ['first-input'] });
   }
 };

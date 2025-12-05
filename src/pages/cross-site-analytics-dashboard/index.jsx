@@ -187,7 +187,7 @@ const CrossSiteAnalyticsDashboard = () => {
           patientInitial: String.fromCharCode(65 + Math.floor(Math.random() * 26))
         };
         
-        setRealTimeNotifications(prev => [newNotification, ...prev?.slice(0, 9)]);
+        setRealTimeNotifications(prev => [newNotification, .prev?.slice(0, 9)]);
       }
     }, 10000); // Update every 10 seconds
 

@@ -47,7 +47,7 @@ const Button = React.forwardRef(({
     iconSize = null,
     fullWidth = false,
     disabled = false,
-    ...props
+    .props
 }, ref) => {
     const Comp = asChild ? Slot : "button";
 
@@ -97,7 +97,7 @@ const Button = React.forwardRef(({
             )}
             ref={ref}
             disabled={disabled || loading}
-            {...props}
+            {.props}
         >
             {loading && <LoadingSpinner />}
             {iconName && iconPosition === 'left' && renderIcon()}
@@ -137,7 +137,7 @@ const Button = React.forwardRef(({
                 children: content,
             });
 
-            return <Comp ref={ref} {...props}>{clonedChild}</Comp>;
+            return <Comp ref={ref} {.props}>{clonedChild}</Comp>;
         } catch {
             return renderFallbackButton();
         }
@@ -151,7 +151,7 @@ const Button = React.forwardRef(({
             )}
             ref={ref}
             disabled={disabled || loading}
-            {...props}
+            {.props}
         >
             {loading && <LoadingSpinner />}
             {iconName && iconPosition === 'left' && renderIcon()}

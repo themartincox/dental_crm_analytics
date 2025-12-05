@@ -159,7 +159,7 @@ const AnalyticsDashboard = ({ analytics }) => {
               {trendsData?.length > 0 ? (
                 <div className="grid grid-cols-7 gap-2 h-32">
                   {trendsData?.slice(-7)?.map((day, index) => {
-                    const maxCount = Math.max(...trendsData?.slice(-7)?.map(d => d?.count || 0));
+                    const maxCount = Math.max(.trendsData?.slice(-7)?.map(d => d?.count || 0));
                     const height = maxCount > 0 ? ((day?.count || 0) / maxCount) * 100 : 0;
                     
                     return (

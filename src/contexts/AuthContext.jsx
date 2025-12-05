@@ -24,10 +24,10 @@ export const AuthProvider = ({ children }) => {
       setProfileLoading(true)
       try {
         const { data, error } = await supabase
-          ?.from('user_profiles')
-          ?.select('*')
-          ?.eq('id', userId)
-          ?.single()
+          .from('user_profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
         if (!error && data) {
           setUserProfile(data)
         }
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
         setProfileLoading(false)
       }
     },
-    
+
     clear() {
       setUserProfile(null)
       setProfileLoading(false)
@@ -50,32 +50,32 @@ export const AuthProvider = ({ children }) => {
     onChange: (event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
-      
+
       if (session?.user) {
-        profileOperations?.load(session?.user?.id) // Fire-and-forget
+        profileOperations.load(session?.user?.id) // Fire-and-forget
       } else {
-        profileOperations?.clear()
+        profileOperations.clear()
       }
     }
   }
 
   useEffect(() => {
     // Get initial session
-    supabase?.auth?.getSession()?.then(({ data: { session } }) => {
-      authStateHandlers?.onChange(null, session)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      authStateHandlers.onChange(null, session)
     })
 
     // PROTECTED: Never modify this callback signature
-    const { data: { subscription } } = supabase?.auth?.onAuthStateChange(
-      authStateHandlers?.onChange
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      authStateHandlers.onChange
     )
 
-    return () => subscription?.unsubscribe()
+    return () => subscription.unsubscribe()
   }, [])
 
   const signUp = async (email, password, metadata = {}) => {
     try {
-      const { data, error } = await supabase?.auth?.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     try {
-      const { data, error } = await supabase?.auth?.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithOAuth = async (provider, options = {}) => {
     try {
-      const { data, error } = await supabase?.auth?.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location?.origin}/auth/callback`,
@@ -117,7 +117,7 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase?.auth?.signOut()
+      const { error } = await supabase.auth.signOut()
       return { error }
     } catch (error) {
       return { error }
@@ -126,14 +126,14 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (updates) => {
     if (!user?.id) return { error: new Error('No user logged in') }
-    
+
     try {
-      const { data, error } = await supabase?.from('user_profiles')?.update(updates)?.eq('id', user?.id)?.select()?.single()
-      
+      const { data, error } = await supabase.from('user_profiles').update(updates).eq('id', user?.id).select().single()
+
       if (!error && data) {
         setUserProfile(data)
       }
-      
+
       return { data, error }
     } catch (error) {
       return { data: null, error }

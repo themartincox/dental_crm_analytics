@@ -197,7 +197,7 @@ const ApplicationsTable = ({
                         className="text-green-600 hover:text-green-900 inline-flex items-center disabled:opacity-50"
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
-                        {processingId === application?.id ? 'Processing...' : 'Approve'}
+                        {processingId === application?.id ? 'Processing.' : 'Approve'}
                       </button>
                       
                       <button

@@ -77,7 +77,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
     setError('');
     
     try {
-      const { error } = await membershipPlansService?.update(editingPlan?.id, formData);
+      const { error } = await membershipPlansService.update(editingPlan?.id, formData);
       if (error) throw error;
       
       await onPlansUpdate();
@@ -94,7 +94,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
   const handleEditPlan = (plan) => {
     setEditingPlan(plan);
     setFormData({
-      ...plan,
+      .plan,
       benefits: plan?.benefits || [],
       service_inclusions: plan?.service_inclusions || {}
     });
@@ -113,7 +113,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
     if (newBenefit) {
       setFormData(prev => ({
         ...prev,
-        benefits: [...(prev?.benefits || []), newBenefit]
+        benefits: [.(prev?.benefits || []), newBenefit]
       }));
     }
   };
@@ -169,7 +169,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                 <input
                   type="text"
                   value={formData?.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e?.target?.value }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, name: e?.target?.value }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -178,7 +178,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                 <label className="block text-sm font-medium text-gray-700">Description</label>
                 <textarea
                   value={formData?.description || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e?.target?.value }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, description: e?.target?.value }))}
                   rows={3}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -188,7 +188,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                 <label className="block text-sm font-medium text-gray-700">Tier</label>
                 <select
                   value={formData?.tier}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tier: e?.target?.value }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, tier: e?.target?.value }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="basic">Basic</option>
@@ -204,7 +204,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                   type="number"
                   min="1"
                   value={formData?.max_family_members}
-                  onChange={(e) => setFormData(prev => ({ ...prev, max_family_members: parseInt(e?.target?.value) }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, max_family_members: parseInt(e?.target?.value) }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -218,7 +218,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                   type="number"
                   step="0.01"
                   value={formData?.monthly_price}
-                  onChange={(e) => setFormData(prev => ({ ...prev, monthly_price: parseFloat(e?.target?.value) }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, monthly_price: parseFloat(e?.target?.value) }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -229,7 +229,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                   type="number"
                   step="0.01"
                   value={formData?.quarterly_price || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, quarterly_price: parseFloat(e?.target?.value) || null }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, quarterly_price: parseFloat(e?.target?.value) || null }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -240,7 +240,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                   type="number"
                   step="0.01"
                   value={formData?.annual_price || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, annual_price: parseFloat(e?.target?.value) || null }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, annual_price: parseFloat(e?.target?.value) || null }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -249,7 +249,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
                 <input
                   type="checkbox"
                   checked={formData?.is_active}
-                  onChange={(e) => setFormData(prev => ({ ...prev, is_active: e?.target?.checked }))}
+                  onChange={(e) => setFormData(prev => ({ .....prev, is_active: e?.target?.checked }))}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label className="ml-2 block text-sm text-gray-900">
@@ -302,7 +302,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
               <Save className="h-4 w-4 mr-2" />
-              {loading ? 'Saving...' : (editingPlan ? 'Update Plan' : 'Create Plan')}
+              {loading ? 'Saving.' : (editingPlan ? 'Update Plan' : 'Create Plan')}
             </button>
           </div>
         </div>

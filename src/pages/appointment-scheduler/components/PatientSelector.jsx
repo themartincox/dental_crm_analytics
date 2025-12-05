@@ -117,7 +117,7 @@ const PatientSelector = ({ onSelect, onClose, selectedPatient }) => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e?.target?.value)}
-              placeholder="Search by name, email, phone, or ID..."
+              placeholder="Search by name, email, phone, or ID."
               className="pl-10"
             />
           </div>
@@ -129,7 +129,7 @@ const PatientSelector = ({ onSelect, onClose, selectedPatient }) => {
             <div className="flex items-center justify-center py-8">
               <div className="flex items-center space-x-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                <span className="text-muted-foreground">Loading patients...</span>
+                <span className="text-muted-foreground">Loading patients.</span>
               </div>
             </div>
           ) : filteredPatients?.length > 0 ? (

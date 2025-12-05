@@ -45,7 +45,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
     const errorPenalty = site?.errors * 5;
     const conversionBonus = site?.conversionRate > 12 ? 10 : 0;
     const sessionBonus = site?.avgSessionTime > 240 ? 5 : 0;
-    
+
     return Math?.max(0, Math?.min(100, baseScore - errorPenalty + conversionBonus + sessionBonus));
   };
 
@@ -63,11 +63,12 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
     { value: 'lastBooking', label: 'Last Booking' }
   ];
 
-  const sortedSites = [...selectedSitesData]?.sort((a, b) => {
+  const sortedSites = [.selectedSitesData]?.sort((a, b) => {
     switch (sortBy) {
-      case 'status':
+      case 'status': {
         const statusOrder = { error: 0, warning: 1, active: 2 };
         return statusOrder?.[a?.status] - statusOrder?.[b?.status];
+      }
       case 'score':
         return getPerformanceScore(b) - getPerformanceScore(a);
       case 'errors':
@@ -82,13 +83,13 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
     const diffInMinutes = Math?.floor((now - timestamp) / (1000 * 60));
-    
+
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math?.floor(diffInMinutes / 60)}h ago`;
     return `${Math?.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const overallHealthScore = selectedSitesData?.length > 0 
+  const overallHealthScore = selectedSitesData?.length > 0
     ? Math?.round(selectedSitesData?.reduce((sum, site) => sum + getPerformanceScore(site), 0) / selectedSitesData?.length)
     : 0;
 
@@ -176,7 +177,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusInfo?.color}`}>
                     <Icon name={statusInfo?.icon} size={14} />
                   </div>
-                  
+
                   {/* Site Info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center space-x-2">
@@ -201,7 +202,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
                       <span>{site?.errors} error{site?.errors !== 1 ? 's' : ''}</span>
                     </div>
                   )}
-                  
+
                   {/* Last Booking */}
                   <p className="text-xs text-muted-foreground">
                     {formatTimeAgo(site?.lastBooking)}
@@ -224,7 +225,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
             </div>
             <span className="text-success">Operational</span>
           </div>
-          
+
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2">
               <Icon name="CheckCircle" size={14} className="text-success" />
@@ -232,7 +233,7 @@ const SiteHealthMonitor = ({ sites, selectedSites }) => {
             </div>
             <span className="text-success">Operational</span>
           </div>
-          
+
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2">
               <Icon name="AlertTriangle" size={14} className="text-warning" />

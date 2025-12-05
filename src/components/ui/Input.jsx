@@ -9,7 +9,7 @@ const Input = React.forwardRef(({
     error,
     required = false,
     id,
-    ...props
+    .props
 }, ref) => {
     // Generate unique ID if not provided
     const inputId = id || `input-${Math.random()?.toString(36)?.substr(2, 9)}`;
@@ -28,7 +28,7 @@ const Input = React.forwardRef(({
                 )}
                 ref={ref}
                 id={inputId}
-                {...props}
+                {.props}
             />
         );
     }
@@ -44,7 +44,7 @@ const Input = React.forwardRef(({
                 )}
                 ref={ref}
                 id={inputId}
-                {...props}
+                {.props}
             />
         );
     }
@@ -74,7 +74,7 @@ const Input = React.forwardRef(({
                 )}
                 ref={ref}
                 id={inputId}
-                {...props}
+                {.props}
             />
 
             {description && !error && (
