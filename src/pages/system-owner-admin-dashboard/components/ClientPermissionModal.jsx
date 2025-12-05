@@ -59,7 +59,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
       const newPermissions = [];
       Object.entries(permissions)?.forEach(([moduleName, permission]) => {
         if (permission?.permission_level !== 'none') {
-          newPermissions?.push({
+          newPermissions.push({
             module_name: moduleName,
             permission_level: permission?.permission_level,
             is_enabled: permission?.is_enabled,

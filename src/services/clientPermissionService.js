@@ -4,7 +4,7 @@ class ClientPermissionService {
   // Client Organizations
   async getAllClients() {
     try {
-      const { data, error } = await supabase?.from('client_organizations')?.select(`
+      const { data, error } = await supabase.from('client_organizations').select(`
           *,
           client_practice_mappings (
             id,
@@ -28,7 +28,7 @@ class ClientPermissionService {
             expires_at,
             granted_at
           )
-        `)?.order('created_at', { ascending: false });
+        `).order('created_at', { ascending: false });
 
       if (error) throw error;
       return { data: data || [], error: null };
@@ -40,14 +40,14 @@ class ClientPermissionService {
 
   async getClientById(clientId) {
     try {
-      const { data, error } = await supabase?.from('client_organizations')?.select(`
+      const { data, error } = await supabase.from('client_organizations').select(`
           *,
           client_practice_mappings (
             *,
             practice_locations (*)
           ),
           client_module_permissions (*)
-        `)?.eq('id', clientId)?.single();
+        `).eq('id', clientId).single();
 
       if (error) throw error;
       return { data, error: null };
@@ -69,21 +69,21 @@ class ClientPermissionService {
         free_trial_months: 12
       };
 
-      const { data, error } = await supabase?.from('client_organizations')?.insert([{
-          organization_name: clientData?.organization_name,
-          organization_type: clientData?.organization_type || 'dental_practice',
-          status: clientData?.status || 'pending_approval',
-          subscription_tier: clientData?.subscription_tier || 'basic',
-          contact_email: clientData?.contact_email,
-          contact_phone: clientData?.contact_phone,
-          billing_address: clientData?.billing_address,
-          max_users: clientData?.max_users || 10,
-          total_users: userCount,
-          pricing_info: pricing,
-          installation_fee: pricing.installation_fee,
-          monthly_cost: pricing.monthly_cost,
-          free_trial_ends_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() // 12 months from now
-        }])?.select()?.single();
+      const { data, error } = await supabase.from('client_organizations').insert([{
+        organization_name: clientData?.organization_name,
+        organization_type: clientData?.organization_type || 'dental_practice',
+        status: clientData?.status || 'pending_approval',
+        subscription_tier: clientData?.subscription_tier || 'basic',
+        contact_email: clientData?.contact_email,
+        contact_phone: clientData?.contact_phone,
+        billing_address: clientData?.billing_address,
+        max_users: clientData?.max_users || 10,
+        total_users: userCount,
+        pricing_info: pricing,
+        installation_fee: pricing.installation_fee,
+        monthly_cost: pricing.monthly_cost,
+        free_trial_ends_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() // 12 months from now
+      }]).select().single();
 
       if (error) throw error;
 
@@ -105,10 +105,10 @@ class ClientPermissionService {
 
   async updateClient(clientId, updates) {
     try {
-      const { data, error } = await supabase?.from('client_organizations')?.update({
-          ...updates,
-          updated_at: new Date()?.toISOString()
-        })?.eq('id', clientId)?.select()?.single();
+      const { data, error } = await supabase.from('client_organizations').update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      }).eq('id', clientId).select().single();
 
       if (error) throw error;
 
@@ -128,9 +128,9 @@ class ClientPermissionService {
   async deleteClient(clientId) {
     try {
       // Get client name for logging before deletion
-      const { data: client } = await supabase?.from('client_organizations')?.select('organization_name')?.eq('id', clientId)?.single();
+      const { data: client } = await supabase.from('client_organizations').select('organization_name').eq('id', clientId).single();
 
-      const { error } = await supabase?.from('client_organizations')?.delete()?.eq('id', clientId);
+      const { error } = await supabase.from('client_organizations').delete().eq('id', clientId);
 
       if (error) throw error;
 
@@ -149,7 +149,7 @@ class ClientPermissionService {
   // System Modules
   async getSystemModules() {
     try {
-      const { data, error } = await supabase?.from('system_modules')?.select('*')?.order('display_name');
+      const { data, error } = await supabase.from('system_modules').select('*').order('display_name');
 
       if (error) throw error;
       return { data: data || [], error: null };
@@ -163,7 +163,7 @@ class ClientPermissionService {
   async updateClientPermissions(clientId, permissions) {
     try {
       // Start a transaction by first deleting existing permissions
-      const { error: deleteError } = await supabase?.from('client_module_permissions')?.delete()?.eq('client_organization_id', clientId);
+      const { error: deleteError } = await supabase.from('client_module_permissions').delete().eq('client_organization_id', clientId);
 
       if (deleteError) throw deleteError;
 
@@ -171,7 +171,7 @@ class ClientPermissionService {
       const newPermissions = [];
       Object.entries(permissions)?.forEach(([moduleName, permission]) => {
         if (permission?.permission_level !== 'none') {
-          newPermissions?.push({
+          newPermissions.push({
             client_organization_id: clientId,
             module_name: moduleName,
             permission_level: permission?.permission_level,
@@ -183,7 +183,7 @@ class ClientPermissionService {
       });
 
       if (newPermissions?.length > 0) {
-        const { error: insertError } = await supabase?.from('client_module_permissions')?.insert(newPermissions);
+        const { error: insertError } = await supabase.from('client_module_permissions').insert(newPermissions);
 
         if (insertError) throw insertError;
       }
@@ -203,10 +203,10 @@ class ClientPermissionService {
   // Bulk Operations
   async bulkUpdateClientStatus(clientIds, status) {
     try {
-      const { error } = await supabase?.from('client_organizations')?.update({ 
-          status,
-          updated_at: new Date()?.toISOString()
-        })?.in('id', clientIds);
+      const { error } = await supabase.from('client_organizations').update({
+        status,
+        updated_at: new Date().toISOString()
+      }).in('id', clientIds);
 
       if (error) throw error;
 
@@ -226,7 +226,7 @@ class ClientPermissionService {
 
   async bulkDeleteClients(clientIds) {
     try {
-      const { error } = await supabase?.from('client_organizations')?.delete()?.in('id', clientIds);
+      const { error } = await supabase.from('client_organizations').delete().in('id', clientIds);
 
       if (error) throw error;
 
@@ -246,7 +246,7 @@ class ClientPermissionService {
   // Activity Logging
   async logSystemAction(actionType, targetClientId = null, details = {}) {
     try {
-      await supabase?.rpc('log_system_owner_action', {
+      await supabase.rpc('log_system_owner_action', {
         action_type_param: actionType,
         target_client_param: targetClientId,
         target_user_param: null,
@@ -259,11 +259,11 @@ class ClientPermissionService {
 
   async getActivityLog(limit = 50) {
     try {
-      const { data, error } = await supabase?.from('system_owner_audit_log')?.select(`
+      const { data, error } = await supabase.from('system_owner_audit_log').select(`
           *,
           performed_by:user_profiles(full_name, email),
           target_client:client_organizations(organization_name)
-        `)?.order('created_at', { ascending: false })?.limit(limit);
+        `).order('created_at', { ascending: false }).limit(limit);
 
       if (error) throw error;
       return { data: data || [], error: null };
@@ -277,7 +277,7 @@ class ClientPermissionService {
   async getSystemMetrics() {
     try {
       // Get client stats
-      const { data: clients, error: clientsError } = await supabase?.from('client_organizations')?.select('id, status, subscription_tier, total_users, created_at');
+      const { data: clients, error: clientsError } = await supabase.from('client_organizations').select('id, status, subscription_tier, total_users, created_at');
 
       if (clientsError) throw clientsError;
 
@@ -293,7 +293,7 @@ class ClientPermissionService {
         const currentUsers = client?.total_users || 0;
         const additionalSeats = Math.max(0, currentUsers - includedSeats);
         const monthlyRevenue = additionalSeats * additionalSeatPrice;
-        
+
         return sum + installFee + monthlyRevenue;
       }, 0) || 0;
 
@@ -325,10 +325,10 @@ class ClientPermissionService {
 
   calculateGrowthRate(clients) {
     if (!clients?.length) return 0;
-    
+
     const thirtyDaysAgo = new Date();
-    thirtyDaysAgo?.setDate(thirtyDaysAgo?.getDate() - 30);
-    
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     const recentClients = clients?.filter(
       client => new Date(client?.created_at) >= thirtyDaysAgo
     )?.length || 0;

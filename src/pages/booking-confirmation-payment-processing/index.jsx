@@ -239,7 +239,7 @@ const BookingConfirmationPaymentProcessing = () => {
       const { error: appointmentError } = await secureApiService.makeSecureRequest(`/appointments/${appointment?.id}`, { method: 'PUT', body: JSON.stringify({
           status: 'confirmed',
           deposit_paid: appointment?.deposit_required || appointment?.estimated_cost,
-          updated_at: new Date()?.toISOString()
+          updated_at: new Date().toISOString()
         }) }, 'receptionist');
 
       if (appointmentError) throw appointmentError;
@@ -292,7 +292,7 @@ const BookingConfirmationPaymentProcessing = () => {
           appointment_date: newDate,
           start_time: newStartTime,
           end_time: newEndTime,
-          updated_at: new Date()?.toISOString()
+          updated_at: new Date().toISOString()
         }) }, 'receptionist');
 
       if (error) throw error;

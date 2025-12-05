@@ -72,7 +72,7 @@ const DentalCrmDashboard = () => {
             return null;
           }
 
-          const dateFrom = new Date()?.toISOString()?.split('T')?.[0];
+          const dateFrom = new Date().toISOString()?.split('T')?.[0];
           const dateTo = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)?.toISOString()?.split('T')?.[0];
           const appointmentsResult = await withRetry(() => appointmentsService?.getAll({ date_from: dateFrom, date_to: dateTo }), 2, 500);
           if (appointmentsResult.error) {

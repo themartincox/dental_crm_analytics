@@ -2,6 +2,7 @@
  * Image optimization utilities for AES CRM
  * Handles responsive images, WebP conversion, and lazy loading
  */
+import React from 'react';
 
 // Image optimization configuration
 export const imageConfig = {
@@ -13,7 +14,7 @@ export const imageConfig = {
     large: 1280,
     xlarge: 1536
   },
-  
+
   // Quality settings for different image types
   quality: {
     hero: 85,
@@ -21,10 +22,10 @@ export const imageConfig = {
     thumbnail: 75,
     icon: 90
   },
-  
+
   // Supported formats
   formats: ['webp', 'avif', 'jpeg', 'png'],
-  
+
   // Lazy loading settings
   lazy: {
     rootMargin: '50px',
@@ -49,27 +50,27 @@ export function generateResponsiveImage(basePath, alt, options = {}) {
 
   const imageName = basePath.split('/').pop().split('.')[0];
   const imageDir = basePath.substring(0, basePath.lastIndexOf('/'));
-  
+
   // Generate sources for different formats and sizes
   const sources = [];
-  
+
   // WebP sources (preferred)
   sources.push({
     type: 'image/webp',
     srcSet: generateSrcSet(imageDir, imageName, 'webp', quality),
     sizes
   });
-  
+
   // AVIF sources (best compression)
   sources.push({
     type: 'image/avif',
     srcSet: generateSrcSet(imageDir, imageName, 'avif', quality),
     sizes
   });
-  
+
   // Fallback JPEG/PNG
   const fallbackSrc = generateSrcSet(imageDir, imageName, 'jpg', quality);
-  
+
   return {
     alt,
     src: fallbackSrc.split(',')[0].split(' ')[0], // First size as default
@@ -95,7 +96,7 @@ function generateSrcSet(dir, name, format, quality) {
     const filename = `${name}-${width}w.${format}`;
     return `${dir}/${filename} ${width}w`;
   });
-  
+
   return srcSet.join(', ');
 }
 
@@ -110,36 +111,36 @@ export function lazyLoadImages(selector = 'img[data-src]', options = {}) {
     rootMargin: imageConfig.lazy.rootMargin,
     threshold: imageConfig.lazy.threshold
   };
-  
+
   const observerOptions = { ...defaultOptions, ...options };
-  
+
   const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const img = entry.target;
         const src = img.dataset.src;
         const srcset = img.dataset.srcset;
-        
+
         if (src) {
           img.src = src;
           img.removeAttribute('data-src');
         }
-        
+
         if (srcset) {
           img.srcset = srcset;
           img.removeAttribute('data-srcset');
         }
-        
+
         img.classList.add('loaded');
         observer.unobserve(img);
       }
     });
   }, observerOptions);
-  
+
   // Observe all images with data-src
   const images = document.querySelectorAll(selector);
   images.forEach(img => imageObserver.observe(img));
-  
+
   return imageObserver;
 }
 
@@ -175,7 +176,7 @@ export function getOptimizedImageProps(src, alt, options = {}) {
     lazy = true,
     sizes = '100vw'
   } = options;
-  
+
   // Generate responsive image data
   const responsiveImage = generateResponsiveImage(src, alt, {
     quality,
@@ -183,7 +184,7 @@ export function getOptimizedImageProps(src, alt, options = {}) {
     lazy,
     sizes
   });
-  
+
   return {
     ...responsiveImage,
     width,
@@ -207,15 +208,15 @@ export function convertToWebP(file, quality = 0.8) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    
+
     img.onload = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-      
+
       canvas.toBlob(resolve, 'image/webp', quality);
     };
-    
+
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
   });
@@ -231,13 +232,13 @@ export function convertToWebP(file, quality = 0.8) {
 export function generatePlaceholder(width, height, color = '#f3f4f6') {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
+
   canvas.width = width;
   canvas.height = height;
-  
+
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, width, height);
-  
+
   return canvas.toDataURL();
 }
 
@@ -251,13 +252,13 @@ export function useOptimizedImage(src, options = {}) {
   const [imageData, setImageData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
-  
+
   React.useEffect(() => {
     if (!src) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const optimized = getOptimizedImageProps(src, options.alt || '', options);
       setImageData(optimized);
@@ -267,7 +268,7 @@ export function useOptimizedImage(src, options = {}) {
       setLoading(false);
     }
   }, [src, options]);
-  
+
   return { imageData, loading, error };
 }
 

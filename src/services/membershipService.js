@@ -46,11 +46,11 @@ export const membershipApplicationsService = {
       const updateData = {
         status,
         processed_by_id,
-        updated_at: new Date()?.toISOString()
+        updated_at: new Date().toISOString()
       };
 
       if (status === 'approved') {
-        updateData.approved_date = new Date()?.toISOString();
+        updateData.approved_date = new Date().toISOString();
       } else if (status === 'rejected' && rejected_reason) {
         updateData.rejected_reason = rejected_reason;
       }

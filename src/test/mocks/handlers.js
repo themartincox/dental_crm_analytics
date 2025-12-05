@@ -36,7 +36,7 @@ export const handlers = [
         user_id: 'test-user-id',
         action: 'patient_view',
         resource_type: 'patient_record',
-        created_at: new Date()?.toISOString()
+        created_at: new Date().toISOString()
       }
     ]);
   }),
@@ -44,5 +44,16 @@ export const handlers = [
   // Mock RPC calls
   http?.post('*/rest/v1/rpc/log_security_event', () => {
     return HttpResponse?.json('audit-log-id');
+  }),
+
+  // Public waitlist endpoint (used in waitlistService.js)
+  http?.post('*/public/waitlist', () => {
+    return HttpResponse?.json({
+      data: {
+        id: 'test-lead-id',
+        lead_number: 'AES-1234567890-ABC123DEF',
+        status: 'new'
+      }
+    });
   })
 ];

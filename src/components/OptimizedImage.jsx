@@ -152,7 +152,7 @@ const OptimizedImage = ({
         sizes={imageProps.sizes}
         loading={imageProps.loading}
         decoding={imageProps.decoding}
-        fetchpriority={imageProps.fetchpriority}
+        fetchPriority={imageProps.fetchpriority}
         className={`optimized-image ${isLoaded ? 'loaded' : 'loading'}`}
         style={{
           width: '100%',

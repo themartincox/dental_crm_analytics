@@ -7,19 +7,19 @@ const publicRoutes = [
     url: '/',
     changefreq: 'daily',
     priority: 1.0,
-    lastmod: new Date()?.toISOString()
+    lastmod: new Date().toISOString()
   },
   {
     url: '/public-booking-interface',
     changefreq: 'weekly',
     priority: 0.8,
-    lastmod: new Date()?.toISOString()
+    lastmod: new Date().toISOString()
   },
   {
     url: '/login',
     changefreq: 'monthly',
     priority: 0.5,
-    lastmod: new Date()?.toISOString()
+    lastmod: new Date().toISOString()
   }
 ];
 

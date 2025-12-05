@@ -148,7 +148,7 @@ export const useSupabaseSubscription = (table, callback, filters = null) => {
   useEffect(() => {
     if (!user) return;
 
-    let subscription = supabaseService?.client?.channel(`${table}-changes`)?.on('postgres_changes', {
+    const subscription = supabaseService?.client?.channel(`${table}-changes`)?.on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: table,
@@ -156,7 +156,7 @@ export const useSupabaseSubscription = (table, callback, filters = null) => {
       }, callback)?.subscribe();
 
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [table, callback, filters, user]);
 };

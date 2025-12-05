@@ -190,7 +190,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
     const dentistMultiplier = bookingData?.dentist?.priceMultiplier || 1.0;
     
     // Peak time pricing (evening slots cost more)
-    let hour = slotTime?.getHours();
+    const hour = slotTime?.getHours();
     const peakMultiplier = hour >= 16 ? 1.15 : 1.0;
     
     return Math.round(basePrice * dentistMultiplier * peakMultiplier);

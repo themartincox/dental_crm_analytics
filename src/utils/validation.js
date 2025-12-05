@@ -1,5 +1,6 @@
 import React from 'react';
-import { ValidationError } from './errorHandler.js';
+import { ValidationError, AppError, SchemaValidationError } from './errorHandler.jsx';
+export { ValidationError }; // Re-export for tests
 
 // Comprehensive data validation utilities
 
@@ -7,7 +8,7 @@ import { ValidationError } from './errorHandler.js';
 export const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: {
-    uk: /^(\+44|0)[1-9]\d{8,9}$/,
+    uk: /^(\+44|0)(?:[\s-]*\d){9,10}$/,
     us: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
     international: /^\+[1-9]\d{1,14}$/
   },
@@ -91,11 +92,11 @@ export const rules = {
       const birth = new Date(birthDate);
       let age = today.getFullYear() - birth.getFullYear();
       const monthDiff = today.getMonth() - birth.getMonth();
-      
+
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
         age--;
       }
-      
+
       if (age < minAge) {
         throw new ValidationError(`Must be at least ${minAge} years old`, field, birthDate);
       }
@@ -151,29 +152,34 @@ export class Validator {
 
     for (const [field, validations] of Object.entries(this.schema)) {
       const value = data[field];
-      
+
       try {
         for (const validation of validations) {
           if (typeof validation === 'function') {
-            validation(value, field);
+            validation(value, field, data);
           } else if (Array.isArray(validation)) {
-            const [rule, ...args] = validation;
-            rules[rule](value, ...args, field);
+            const [ruleName, ...args] = validation;
+            // Call the rule function with proper arguments
+            if (typeof ruleName === 'string' && rules[ruleName]) {
+              rules[ruleName](value, ...args, field);
+            } else if (typeof ruleName === 'function') {
+              ruleName(value, ...args, field, data);
+            }
           }
         }
         validatedData[field] = value;
       } catch (error) {
-        if (error instanceof ValidationError) {
+        if (error instanceof ValidationError || error instanceof AppError) {
           errors.push({
             field,
             message: error.message,
-            code: error.code,
-            value: error.details?.value
+            code: error.code || 'VALIDATION_ERROR',
+            value: error.details?.value !== undefined ? error.details.value : value
           });
         } else {
           errors.push({
             field,
-            message: 'Validation error',
+            message: error.message || 'Validation error',
             code: 'VALIDATION_ERROR',
             value
           });
@@ -182,7 +188,7 @@ export class Validator {
     }
 
     if (errors.length > 0) {
-      throw new ValidationError('Validation failed', 'VALIDATION_ERROR', 400, { errors });
+      throw new SchemaValidationError(errors);
     }
 
     return validatedData;
@@ -208,17 +214,17 @@ export const schemas = {
     ],
     phone: [
       rules.required,
-      rules.phone
+      [rules.phone, 'uk']
     ],
     dateOfBirth: [
       rules.required,
       [rules.age, 16]
     ],
     address: [
-      [rules.maxLength, 200]
+      (value) => !value || rules.maxLength(value, 200, 'address')
     ],
     postcode: [
-      [rules.pattern, patterns.postcode.uk, 'postcode', 'Please enter a valid UK postcode']
+      (value) => !value || rules.pattern(value, patterns.postcode.uk, 'postcode', 'Please enter a valid UK postcode')
     ]
   }),
 
@@ -267,7 +273,7 @@ export const schemas = {
       rules.email
     ],
     phone: [
-      rules.phone
+      (value) => !value || rules.phone(value, 'uk', 'phone')
     ],
     leadSource: [
       rules.required,
@@ -313,7 +319,7 @@ export const schemas = {
           const currentDate = new Date();
           const currentYear = currentDate.getFullYear() % 100;
           const currentMonth = currentDate.getMonth() + 1;
-          
+
           if (!month || !year || month > 12 || month < 1) {
             throw new ValidationError('Please enter a valid expiry date', field, value);
           } else if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
@@ -385,7 +391,7 @@ export const useFormValidation = (schema, initialData = {}) => {
       setIsValid(true);
       return true;
     } catch (error) {
-      if (error instanceof ValidationError && error.details?.errors) {
+      if ((error instanceof ValidationError || error instanceof AppError) && error.details?.errors) {
         const fieldErrors = {};
         error.details.errors.forEach(err => {
           fieldErrors[err.field] = err.message;

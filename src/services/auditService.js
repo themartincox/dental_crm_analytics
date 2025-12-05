@@ -19,18 +19,18 @@ class AuditService {
   }) {
     try {
       // Get current user context
-      const { data: { user } } = await supabase?.auth?.getUser();
-      
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Get client information
       const clientInfo = {
         userAgent: navigator?.userAgent || 'Unknown',
-        timestamp: new Date()?.toISOString(),
+        timestamp: new Date().toISOString(),
         url: window?.location?.href,
         ...metadata
       };
 
       // Use the existing log_security_event function
-      const { data, error } = await supabase?.rpc('log_security_event', {
+      const { data, error } = await supabase.rpc('log_security_event', {
         action_type: action,
         resource_type: resourceType,
         resource_id: resourceId,
@@ -69,21 +69,21 @@ class AuditService {
     metadata = {}
   }) {
     try {
-      const { data: { user } } = await supabase?.auth?.getUser();
-      
-      const { data, error } = await supabase?.from('system_activities')?.insert({
-          user_id: user?.id,
-          activity_type: type,
-          description,
-          patient_id: patientId,
-          appointment_id: appointmentId,
-          treatment_id: treatmentId,
-          metadata: {
-            ...metadata,
-            timestamp: new Date()?.toISOString(),
-            userAgent: navigator?.userAgent
-          }
-        })?.select('id')?.single();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data, error } = await supabase.from('system_activities').insert({
+        user_id: user?.id,
+        activity_type: type,
+        description,
+        patient_id: patientId,
+        appointment_id: appointmentId,
+        treatment_id: treatmentId,
+        metadata: {
+          ...metadata,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator?.userAgent
+        }
+      }).select('id').single();
 
       if (error) {
         console.error('Failed to log system activity:', error);
@@ -188,14 +188,14 @@ class AuditService {
    */
   static async getAuditTrail(resourceType, resourceId, limit = 50) {
     try {
-      const { data, error } = await supabase?.from('security_audit_logs')?.select(`
+      const { data, error } = await supabase.from('security_audit_logs').select(`
           *,
           user_profiles!user_id (
             full_name,
             email,
             role
           )
-        `)?.eq('resource_type', resourceType)?.eq('resource_id', resourceId)?.order('created_at', { ascending: false })?.limit(limit);
+        `).eq('resource_type', resourceType).eq('resource_id', resourceId).order('created_at', { ascending: false }).limit(limit);
 
       if (error) {
         console.error('Failed to get audit trail:', error);
@@ -217,15 +217,15 @@ class AuditService {
   static async getSecurityEvents(riskLevel = 'high', hours = 24) {
     try {
       const timeThreshold = new Date(Date.now() - hours * 60 * 60 * 1000);
-      
-      const { data, error } = await supabase?.from('security_audit_logs')?.select(`
+
+      const { data, error } = await supabase.from('security_audit_logs').select(`
           *,
           user_profiles!user_id (
             full_name,
             email,
             role
           )
-        `)?.eq('risk_level', riskLevel)?.gte('created_at', timeThreshold?.toISOString())?.order('created_at', { ascending: false });
+        `).eq('risk_level', riskLevel).gte('created_at', timeThreshold.toISOString()).order('created_at', { ascending: false });
 
       if (error) {
         console.error('Failed to get security events:', error);
@@ -246,13 +246,13 @@ class AuditService {
     try {
       // Check for multiple failed logins
       const failedLogins = await this.getSecurityEvents('high', 1);
-      const authFailures = failedLogins?.filter(event => 
+      const authFailures = failedLogins?.filter(event =>
         event?.action?.includes('failed_login')
       );
 
       // Check for unusual data access patterns
       const dataAccess = await this.getSecurityEvents('medium', 2);
-      const patientAccess = dataAccess?.filter(event => 
+      const patientAccess = dataAccess?.filter(event =>
         event?.resource_type === 'patient_record'
       );
 
@@ -280,7 +280,7 @@ class AuditService {
     const recommendations = [];
 
     if (failedLogins?.length > 5) {
-      recommendations?.push({
+      recommendations.push({
         type: 'auth_security',
         priority: 'high',
         message: 'Multiple failed login attempts detected. Consider implementing account lockouts.',
@@ -289,7 +289,7 @@ class AuditService {
     }
 
     if (dataAccess?.length > 100) {
-      recommendations?.push({
+      recommendations.push({
         type: 'data_access',
         priority: 'medium',
         message: 'High volume of patient data access detected. Review access patterns.',

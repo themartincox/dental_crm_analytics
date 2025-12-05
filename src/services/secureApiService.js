@@ -372,7 +372,7 @@ class SecureApiService {
                 dataType,
                 purpose,
                 approved,
-                timestamp: new Date()?.toISOString(),
+                timestamp: new Date().toISOString(),
                 gdprCompliance: true,
                 dataMinimization: approved
             });
@@ -427,7 +427,7 @@ class SecureApiService {
 
             const response = await apiClient?.post('/consent/cookie', {
                 preferences: consentData,
-                timestamp: new Date()?.toISOString(),
+                timestamp: new Date().toISOString(),
                 consentMethod: 'explicit',
                 gdprLawfulBasis: 'consent',
                 dataProcessingPurpose: {
@@ -450,7 +450,7 @@ class SecureApiService {
         try {
             const response = await apiClient?.post('/consent/withdraw', {
                 consentType,
-                withdrawalTimestamp: new Date()?.toISOString(),
+                withdrawalTimestamp: new Date().toISOString(),
                 reason: 'user_initiated'
             });
 
@@ -538,7 +538,7 @@ class SecureApiService {
 
     async deletePatient(patientId) {
         try {
-            const response = await apiClient?.delete(`/patients/${patientId}`);
+            const response = await apiClient.delete(`/patients/${patientId}`);
             return response?.data;
         } catch (error) {
             console.error('Delete patient error:', error);

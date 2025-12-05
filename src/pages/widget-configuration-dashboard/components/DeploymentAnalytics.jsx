@@ -76,7 +76,7 @@ const DeploymentAnalytics = ({ widget }) => {
     const reportData = {
       widget: widget?.name,
       timeRange,
-      generatedAt: new Date()?.toISOString(),
+      generatedAt: new Date().toISOString(),
       data: analyticsData
     };
     

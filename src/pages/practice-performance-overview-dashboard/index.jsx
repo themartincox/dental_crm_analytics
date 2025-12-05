@@ -251,7 +251,7 @@ const PracticePerformanceOverviewDashboard = () => {
         title="Practice Performance Overview - Dental CRM Analytics"
         description="Comprehensive business intelligence dashboard for dental practice performance monitoring and analytics. Track revenue, patient metrics, lead conversion, and operational efficiency in real-time."
         keywords="dental practice analytics, healthcare dashboard, patient management, revenue tracking, lead conversion, practice KPIs, dental CRM, business intelligence"
-        canonicalUrl={`${window?.location?.origin}/practice-performance-overview-dashboard`}
+        canonicalUrl={`${window.location.origin}/practice-performance-overview-dashboard`}
         structuredData={[practiceStructuredData]}
         noIndex={true} // Private dashboard should not be indexed
       />

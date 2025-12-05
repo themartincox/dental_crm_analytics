@@ -13,7 +13,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  
+
   const { signIn, signUp, signInWithOAuth, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -44,7 +44,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
+
     if (!formData?.email || !formData?.password) {
       setError('Please fill in all fields');
       return;
@@ -54,7 +54,7 @@ const Login = () => {
     setError('');
 
     try {
-      const result = isSignUp 
+      const result = isSignUp
         ? await signUp(formData?.email, formData?.password, { full_name: formData?.email?.split('@')?.[0] })
         : await signIn(formData?.email, formData?.password);
 
@@ -77,12 +77,12 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError('');
-    
+
     try {
       const { error } = await signInWithOAuth('google', {
         redirectTo: `${window.location?.origin}/auth/callback`
       });
-      
+
       if (error) {
         setError(`OAuth sign-in failed: ${error?.message}`);
         setIsLoading(false);
@@ -102,7 +102,7 @@ const Login = () => {
 
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title={`${isSignUp ? 'Sign Up' : 'Login'} - AES CRM`}
         description={`${isSignUp ? 'Create your account for' : 'Access'} the comprehensive aesthetic practice management system`}
       />
@@ -115,9 +115,9 @@ const Login = () => {
                   AES CRM — The Aesthetic CRM
                 </h1>
                 <p className="text-sm text-gray-500">
-                  <a 
-                    href="https://postino.cc" 
-                    target="_blank" 
+                  <a
+                    href="https://postino.cc"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-blue-600 transition-colors"
                   >
@@ -181,6 +181,7 @@ const Login = () => {
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -264,8 +265,8 @@ const Login = () => {
                   onClick={toggleMode}
                   className="text-blue-600 hover:text-blue-500 text-sm font-medium"
                 >
-                  {isSignUp 
-                    ? 'Already have an account? Sign in' :'Need an account? Sign up'
+                  {isSignUp
+                    ? 'Already have an account? Sign in' : 'Need an account? Sign up'
                   }
                 </button>
               </div>
@@ -279,8 +280,8 @@ const Login = () => {
                   All routes are accessible for preview. In production, authentication will be required for protected routes.
                 </p>
                 <div className="mt-2">
-                  <Link 
-                    to="/dashboard" 
+                  <Link
+                    to="/dashboard"
                     className="text-blue-600 hover:text-blue-500 text-sm font-medium underline"
                   >
                     Explore Dashboard Without Login →

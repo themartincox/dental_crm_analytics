@@ -302,7 +302,7 @@ const CookieConsent = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const { data: { session } } = await supabase?.auth?.getSession();
+        const { data: { session } } = await supabase.auth..getSession();
         setIsLoggedIn(!!session?.user);
       } catch (error) {
         console.error('Auth check error:', error);
@@ -316,13 +316,13 @@ const CookieConsent = () => {
     if (!isLoggedIn) return;
 
     try {
-      const { data: { user } } = await supabase?.auth?.getUser();
+      const { data: { user } } = await supabase.auth..getUser();
       if (!user) return;
 
       // Record in compliance_records table
-      const { error } = await supabase?.from('compliance_records')?.insert({
+      const { error } = await supabase.from('compliance_records').insert({
           record_type: 'cookie_consent',
-          compliance_date: new Date()?.toISOString()?.split('T')?.[0],
+          compliance_date: new Date().toISOString()?.split('T')?.[0],
           details: {
             preferences,
             timestamp: consentTimestamp,
@@ -347,7 +347,7 @@ const CookieConsent = () => {
       }
 
       // Also log to security audit logs
-      await supabase?.from('security_audit_logs')?.insert({
+      await supabase.from('security_audit_logs').insert({
           action: 'cookie_consent_updated',
           resource_type: 'user_consent',
           resource_id: user?.id,
@@ -365,7 +365,7 @@ const CookieConsent = () => {
   };
 
   const handleAcceptAll = async () => {
-    const consentTimestamp = new Date()?.toISOString();
+    const consentTimestamp = new Date().toISOString();
     const preferences = {
       essential: true,
       analytics: true,
@@ -389,7 +389,7 @@ const CookieConsent = () => {
   };
 
   const handleDeclineAll = async () => {
-    const consentTimestamp = new Date()?.toISOString();
+    const consentTimestamp = new Date().toISOString();
     const preferences = {
       essential: true,
       analytics: false,
@@ -412,7 +412,7 @@ const CookieConsent = () => {
   };
 
   const handleSavePreferences = async (preferences) => {
-    const consentTimestamp = new Date()?.toISOString();
+    const consentTimestamp = new Date().toISOString();
     const preferencesWithTimestamp = {
       ...preferences,
       timestamp: consentTimestamp,

@@ -9,11 +9,11 @@ const AIUsagePolicy = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const { data: { session } } = await supabase?.auth?.getSession();
+        const { data: { session } } = await supabase.auth..getSession();
         if (session?.user) {
           setIsLoggedIn(true);
           // Get user role from user_profiles
-          const { data: profile } = await supabase?.from('user_profiles')?.select('role')?.eq('id', session?.user?.id)?.single();
+          const { data: profile } = await supabase.from('user_profiles').select('role').eq('id', session?.user?.id).single();
           
           setUserRole(profile?.role);
         }
@@ -41,17 +41,17 @@ const AIUsagePolicy = () => {
     if (!isLoggedIn) return;
 
     try {
-      const { data: { user } } = await supabase?.auth?.getUser();
+      const { data: { user } } = await supabase.auth..getUser();
       if (!user) return;
 
       // Log to security audit logs
-      await supabase?.from('security_audit_logs')?.insert({
+      await supabase.from('security_audit_logs').insert({
           action: eventType,
           resource_type: 'ai_usage',
           resource_id: user?.id,
           metadata: {
             ...details,
-            timestamp: new Date()?.toISOString(),
+            timestamp: new Date().toISOString(),
             policyVersion: '1.0',
             gdprCompliance: true,
             dataMinimization: true

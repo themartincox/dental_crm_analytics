@@ -132,7 +132,7 @@ export const appointmentsService = {
 export const practiceLocationsService = {
   async getAll() {
     try {
-      const { data, error } = await supabase?.from('practice_locations')?.select('*')?.order('name', { ascending: true })
+      const { data, error } = await supabase.from('practice_locations').select('*').order('name', { ascending: true })
       return { data: data || [], error }
     } catch (error) {
       return { data: [], error }
@@ -141,7 +141,7 @@ export const practiceLocationsService = {
 
   async getById(id) {
     try {
-      const { data, error } = await supabase?.from('practice_locations')?.select('*')?.eq('id', id)?.single()
+      const { data, error } = await supabase.from('practice_locations').select('*').eq('id', id).single()
       return { data, error }
     } catch (error) {
       return { data: null, error }
@@ -150,7 +150,7 @@ export const practiceLocationsService = {
 
   async create(locationData) {
     try {
-      const { data, error } = await supabase?.from('practice_locations')?.insert(locationData)?.select()?.single()
+      const { data, error } = await supabase.from('practice_locations').insert(locationData).select().single()
       return { data, error }
     } catch (error) {
       return { data: null, error }
@@ -159,7 +159,7 @@ export const practiceLocationsService = {
 
   async update(id, updates) {
     try {
-      const { data, error } = await supabase?.from('practice_locations')?.update(updates)?.eq('id', id)?.select()?.single()
+      const { data, error } = await supabase.from('practice_locations').update(updates).eq('id', id).select().single()
       return { data, error }
     } catch (error) {
       return { data: null, error }

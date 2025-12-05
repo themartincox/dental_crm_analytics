@@ -11,7 +11,7 @@ const IntegrationGuide = ({ onClose, widgets }) => {
   const widget = widgets?.find(w => w?.id === selectedWidget);
 
   const copyToClipboard = (text, type) => {
-    navigator.clipboard?.writeText(text)?.then(() => {
+    navigator.clipboard?.writeText(text).then(() => {
       setCopySuccess(type);
       setTimeout(() => setCopySuccess(''), 2000);
     });

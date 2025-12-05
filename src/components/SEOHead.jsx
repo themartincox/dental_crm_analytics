@@ -8,7 +8,7 @@ const SEOHead = ({
   image = null,
   url = null 
 }) => {
-  const siteUrl = window?.location?.origin || 'https://dentalcrm.com';
+  const siteUrl = window.location.origin || 'https://dentalcrm.com';
   const fullUrl = url || window?.location?.href || siteUrl;
   const imageUrl = image || `${siteUrl}/assets/images/dental-crm-og.jpg`;
 

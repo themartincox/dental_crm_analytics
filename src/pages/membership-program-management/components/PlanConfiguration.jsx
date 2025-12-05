@@ -77,7 +77,7 @@ const PlanConfiguration = ({ plans = [], onPlansUpdate }) => {
     setError('');
     
     try {
-      const { error } = await membershipPlansService?.update(editingPlan?.id, formData);
+      const { error } = await membershipPlansService.update(editingPlan?.id, formData);
       if (error) throw error;
       
       await onPlansUpdate();
