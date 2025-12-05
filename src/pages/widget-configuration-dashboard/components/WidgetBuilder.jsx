@@ -75,7 +75,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     const newOrigin = prompt('Enter domain (e.g., https://example.com):');
     if (newOrigin) {
       const currentOrigins = formData?.settings?.allowedOrigins || ['*'];
-      const updatedOrigins = [...currentOrigins?.filter(o => o !== '*'), newOrigin];
+      const updatedOrigins = [...(currentOrigins?.filter(o => o !== '*') || []), newOrigin];
       handleSettingsChange('allowedOrigins', updatedOrigins);
     }
   };
@@ -310,7 +310,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                       <Input
                         value={origin}
                         onChange={(e) => {
-                          const updatedOrigins = [...formData?.settings?.allowedOrigins];
+                          const updatedOrigins = [...(formData?.settings?.allowedOrigins || [])];
                           updatedOrigins[index] = e?.target?.value;
                           handleSettingsChange('allowedOrigins', updatedOrigins);
                         }}

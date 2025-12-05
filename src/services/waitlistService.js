@@ -4,7 +4,7 @@ import { emailService } from './emailService';
 
 // Waitlist Service - Extends leads service for marketing page functionality
 export const waitlistService = {
-  
+
   /**
    * Add a new waitlist signup to the leads table and send notifications
    * @param {Object} waitlistData - Waitlist form data
@@ -13,8 +13,8 @@ export const waitlistService = {
   async addToWaitlist(waitlistData) {
     try {
       // Generate unique lead number for waitlist
-      const leadNumber = `AES-${Date.now()}-${Math.random()?.toString(36)?.substr(2, 9)?.toUpperCase()}`;
-      
+      const leadNumber = `AES-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
       const leadData = {
         first_name: waitlistData?.firstName,
         last_name: waitlistData?.lastName,
@@ -24,9 +24,9 @@ export const waitlistService = {
         status: 'new', // Default status for new waitlist members
         notes: `Waitlist signup from AES CRM marketing page. ${waitlistData?.practiceName ? `Practice: ${waitlistData?.practiceName}. ` : ''}${waitlistData?.interest ? `Interest: ${waitlistData?.interest}` : ''}`,
         lead_number: leadNumber,
-        treatment_interest: waitlistData?.interest === 'cosmetic' ? 'cosmetic' : 
-                           waitlistData?.interest === 'general' ? 'general' : 
-                           waitlistData?.interest === 'orthodontics' ? 'orthodontics' : null,
+        treatment_interest: waitlistData?.interest === 'cosmetic' ? 'cosmetic' :
+          waitlistData?.interest === 'general' ? 'general' :
+            waitlistData?.interest === 'orthodontics' ? 'orthodontics' : null,
         utm_source: waitlistData?.utm_source || 'aescrm_landing',
         utm_medium: waitlistData?.utm_medium || 'waitlist_form',
         utm_campaign: waitlistData?.utm_campaign || 'pre_launch_waitlist'
@@ -67,7 +67,7 @@ export const waitlistService = {
         console.error('Failed to send welcome email:', welcomeResult.error);
         // Don't fail the entire process if email fails
       }
-      
+
       return {
         success: true,
         data: result?.data,
@@ -99,18 +99,18 @@ export const waitlistService = {
    */
   async getWaitlistStats() {
     try {
-      const { data, error } = await leadsService?.getAll({ 
+      const { data, error } = await leadsService?.getAll({
         source: 'website',
         status: 'new'
-      });
+      }) || {};
 
       if (error) {
         return { totalWaitlist: 0, error };
       }
 
       // Filter for waitlist signups from marketing page
-      const waitlistMembers = data?.filter(lead => 
-        lead?.utm_source === 'aescrm_landing' && 
+      const waitlistMembers = data?.filter(lead =>
+        lead?.utm_source === 'aescrm_landing' &&
         lead?.utm_campaign === 'pre_launch_waitlist'
       ) || [];
 
@@ -147,16 +147,16 @@ export const waitlistService = {
         return { exists: false, error: 'Invalid email format' };
       }
 
-      const { data, error } = await leadsService?.getAll({ 
+      const { data, error } = await leadsService?.getAll({
         source: 'website'
-      });
+      }) || {};
 
       if (error) {
         return { exists: false, error };
       }
 
       // Check if email exists in waitlist signups
-      const existingLead = data?.find(lead => 
+      const existingLead = data?.find(lead =>
         lead?.email?.toLowerCase() === email?.toLowerCase() &&
         lead?.utm_source === 'aescrm_landing'
       );

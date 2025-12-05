@@ -3,6 +3,7 @@
  * Comprehensive user behavior tracking and analytics
  */
 
+import { supabase } from '../lib/supabase';
 import { logger } from '../utils/logger';
 // Supabase direct writes removed for secure API routing
 import secureApiService from './secureApiService';

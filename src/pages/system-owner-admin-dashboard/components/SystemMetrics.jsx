@@ -62,9 +62,9 @@ const SystemMetrics = ({ metrics }) => {
     <div className="mb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {metricCards?.map((metric) => {
-          const [iconBg, textColor, cardBg] = getColorClasses(metric?.color)?.split(' ');
+          const [iconBg, textColor, cardBg] = (getColorClasses(metric?.color)?.split(' ') || []);
           const Icon = metric?.icon;
-          
+
           return (
             <div key={metric?.title} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ const SystemMetrics = ({ metrics }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="text-right">
             <div className="flex items-center space-x-2 mb-1">
               <span className="text-2xl font-semibold text-green-600">
@@ -121,7 +121,7 @@ const SystemMetrics = ({ metrics }) => {
             <p className="text-sm text-gray-500">Uptime (30 days)</p>
           </div>
         </div>
-        
+
         {/* Health Progress Bar */}
         <div className="mt-4">
           <div className="w-full bg-gray-200 rounded-full h-2">

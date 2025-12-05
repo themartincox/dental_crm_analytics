@@ -9,7 +9,7 @@ export const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: {
     uk: /^(\+44|0)(?:[\s-]*\d){9,10}$/,
-    us: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+    us: /^(\+?\d{1,3}[-.]?)?\(?\d{3}\)?[-.]?\d{3}[-.]?\d{4}$/,
     international: /^\+[1-9]\d{1,14}$/
   },
   postcode: {
@@ -359,7 +359,7 @@ export const sanitize = {
 
   phone: (value) => {
     if (typeof value !== 'string') return value;
-    return value.replace(/[^\d+\-\(\)\s]/g, '').trim();
+    return value.replace(/[^\d+\-()\s]/g, '').trim();
   },
 
   number: (value) => {

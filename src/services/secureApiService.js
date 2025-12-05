@@ -299,8 +299,12 @@ class SecureApiService {
     async sendAnalyticsEvents(events = []) {
         if (!Array.isArray(events) || events.length === 0) return { ok: true, count: 0 };
         try {
-            const response = await apiClient?.post('/analytics/events', events);
-            return response?.data || { ok: true };
+            const response = await supabase.functions?.invoke('analytics-events', {
+                body: events
+            });
+            const { data, error } = response || {};
+            if (error) throw error;
+            return data || { ok: true };
         } catch (error) {
             console.error('sendAnalyticsEvents error:', error);
             throw error;

@@ -10,7 +10,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
     systemStatus: 'optimal',
     lastUpdate: new Date()
   });
-  
+
   const [recentActivity, setRecentActivity] = useState([]);
   const [systemAlerts, setSystemAlerts] = useState([]);
   const [matchingQueue, setMatchingQueue] = useState([]);
@@ -45,8 +45,8 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
         timestamp: new Date(),
         severity: Math.random() > 0.8 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low'
       };
-      
-      return [newActivity,...prev?.slice(0, 19)]; // Keep last 20 activities
+
+      return [newActivity, ...(prev?.slice(0, 19) || [])]; // Keep last 20 activities
     });
 
     // Update system alerts
@@ -60,8 +60,8 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
           severity: Math.random() > 0.6 ? 'high' : 'medium',
           resolved: false
         };
-        
-        return [newAlert,...prev?.slice(0, 9)]; // Keep last 10 alerts
+
+        return [newAlert, ...(prev?.slice(0, 9) || [])]; // Keep last 10 alerts
       });
     }
 
@@ -80,7 +80,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
       'Complex treatment matched to specialist',
       'Emergency override activated for urgent case'
     ];
-    
+
     return messages?.[Math.floor(Math.random() * messages?.length)];
   };
 
@@ -93,7 +93,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
       'Provider availability sync delayed',
       'High-priority rule conflicts detected'
     ];
-    
+
     return alerts?.[Math.floor(Math.random() * alerts?.length)];
   };
 
@@ -147,7 +147,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
   };
 
   const resolveAlert = (alertId) => {
-    setSystemAlerts(prev => prev?.map(alert => 
+    setSystemAlerts(prev => prev?.map(alert =>
       alert?.id === alertId ? { ...alert, resolved: true } : alert
     ));
   };
@@ -248,7 +248,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
               Last updated: {format(realTimeData?.lastUpdate, 'HH:mm:ss')}
             </div>
           </div>
-          
+
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {recentActivity?.map((activity) => (
               <div
@@ -269,7 +269,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
                 </div>
               </div>
             ))}
-            
+
             {recentActivity?.length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <Activity size={32} className="mx-auto mb-2 text-gray-400" />
@@ -290,7 +290,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
               </span>
             </div>
           </div>
-          
+
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {systemAlerts?.filter(alert => !alert?.resolved)?.map((alert) => (
               <div
@@ -315,7 +315,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
                 </div>
               </div>
             ))}
-            
+
             {systemAlerts?.filter(a => !a?.resolved)?.length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <CheckCircle size={32} className="mx-auto mb-2 text-green-400" />
@@ -334,7 +334,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
             {matchingQueue?.length} items in queue
           </div>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -377,7 +377,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
               ))}
             </tbody>
           </table>
-          
+
           {matchingQueue?.length === 0 && (
             <div className="text-center py-12">
               <Users size={32} className="mx-auto mb-2 text-gray-400" />
@@ -390,7 +390,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
       {/* Provider Status Overview */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h4 className="text-lg font-semibold text-gray-900 mb-4">Provider Status Overview</h4>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {providers?.map((provider) => (
             <div key={provider?.id} className="border border-gray-200 rounded-lg p-4">
@@ -399,23 +399,21 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
                   <div className="font-medium text-gray-900">{provider?.name}</div>
                   <div className="text-sm text-gray-600">{provider?.role}</div>
                 </div>
-                <div className={`w-3 h-3 rounded-full ${
-                  provider?.workload >= 90 ? 'bg-red-500' :
-                  provider?.workload >= 75 ? 'bg-yellow-500': 'bg-green-500'
-                }`}></div>
+                <div className={`w-3 h-3 rounded-full ${provider?.workload >= 90 ? 'bg-red-500' :
+                    provider?.workload >= 75 ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}></div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Workload</span>
                   <span className="font-medium">{provider?.workload}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      provider?.workload >= 90 ? 'bg-red-500' :
-                      provider?.workload >= 75 ? 'bg-yellow-500': 'bg-green-500'
-                    }`}
+                  <div
+                    className={`h-2 rounded-full transition-all duration-300 ${provider?.workload >= 90 ? 'bg-red-500' :
+                        provider?.workload >= 75 ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
                     style={{ width: `${provider?.workload}%` }}
                   />
                 </div>

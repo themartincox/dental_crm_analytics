@@ -203,11 +203,11 @@ const ServiceProviderMatchingEngine = () => {
   const filterOptions = {
     provider: [
       { value: 'all', label: 'All Providers' },
-      ...(mockProviders?.map(p => ({ value: p?.id, label: p?.name })))
+      ...(mockProviders?.map(p => ({ value: p?.id, label: p?.name })) || [])
     ],
     service: [
       { value: 'all', label: 'All Services' },
-      ...(mockServices?.map(s => ({ value: s?.id, label: s?.name })))
+      ...(mockServices?.map(s => ({ value: s?.id, label: s?.name })) || [])
     ],
     competencyLevel: [
       { value: 'all', label: 'All Levels' },
@@ -389,7 +389,7 @@ const ServiceProviderMatchingEngine = () => {
                   key={tab?.id}
                   onClick={() => setActiveTab(tab?.id)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab?.id
-                      ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                    ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
                     }`}
                 >
                   <Icon name={tab?.icon} size={16} />

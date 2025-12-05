@@ -1,4 +1,5 @@
 import secureApiService, { API_BASE_URL } from './secureApiService';
+import { supabase } from '../lib/supabase';
 
 // User Profiles Service
 export const userProfilesService = {
@@ -248,7 +249,7 @@ export const appointmentsRealtimeService = {
       try {
         const data = JSON.parse(e.data);
         if (data?.table === 'appointments') callback(data);
-      } catch {}
+      } catch { }
     };
     es.addEventListener('appointment_update', handler);
     return () => es.close();
