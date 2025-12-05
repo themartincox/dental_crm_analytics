@@ -101,34 +101,48 @@ const CrossSiteAnalyticsDashboard = () => {
   // Mock performance chart data
   const performanceData = {
     bookingsByDay: [
-      { day: 'Mon', totalBookings: 145, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 82 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 63 }
-      ]},
-      { day: 'Tue', totalBookings: 187, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 98 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 89 }
-      ]},
-      { day: 'Wed', totalBookings: 234, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 142 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 92 }
-      ]},
-      { day: 'Thu', totalBookings: 198, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 115 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 83 }
-      ]},
-      { day: 'Fri', totalBookings: 267, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 156 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 111 }
-      ]},
-      { day: 'Sat', totalBookings: 312, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 187 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 125 }
-      ]},
-      { day: 'Sun', totalBookings: 289, siteData: [
-        { siteId: 'site-1', siteName: 'Smile Dental', bookings: 167 },
-        { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 122 }
-      ]}
+      {
+        day: 'Mon', totalBookings: 145, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 82 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 63 }
+        ]
+      },
+      {
+        day: 'Tue', totalBookings: 187, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 98 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 89 }
+        ]
+      },
+      {
+        day: 'Wed', totalBookings: 234, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 142 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 92 }
+        ]
+      },
+      {
+        day: 'Thu', totalBookings: 198, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 115 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 83 }
+        ]
+      },
+      {
+        day: 'Fri', totalBookings: 267, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 156 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 111 }
+        ]
+      },
+      {
+        day: 'Sat', totalBookings: 312, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 187 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 125 }
+        ]
+      },
+      {
+        day: 'Sun', totalBookings: 289, siteData: [
+          { siteId: 'site-1', siteName: 'Smile Dental', bookings: 167 },
+          { siteId: 'site-2', siteName: 'Perfect Teeth', bookings: 122 }
+        ]
+      }
     ],
     heatmapData: [
       { hour: 9, day: 'Monday', interactions: 245 },
@@ -171,12 +185,12 @@ const CrossSiteAnalyticsDashboard = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setLastUpdate(new Date());
-      
+
       // Simulate new booking notifications
       if (Math.random() > 0.8) {
         const sites = ['Smile Dental Clinic', 'Perfect Teeth Practice', 'Family Dentistry'];
         const services = ['Dental Implants', 'Teeth Whitening', 'General Checkup', 'Orthodontics'];
-        
+
         const newNotification = {
           id: Date.now(),
           type: 'booking',
@@ -186,8 +200,8 @@ const CrossSiteAnalyticsDashboard = () => {
           timestamp: new Date(),
           patientInitial: String.fromCharCode(65 + Math.floor(Math.random() * 26))
         };
-        
-        setRealTimeNotifications(prev => [newNotification, .prev?.slice(0, 9)]);
+
+        setRealTimeNotifications(prev => [newNotification, ...prev?.slice(0, 9)]);
       }
     }, 10000); // Update every 10 seconds
 
@@ -207,16 +221,16 @@ const CrossSiteAnalyticsDashboard = () => {
   };
 
   const formatTime = (timestamp) => {
-    return timestamp?.toLocaleTimeString('en-GB', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return timestamp?.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-6 py-8">
         {/* Page Header */}
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between mb-8">
@@ -228,14 +242,14 @@ const CrossSiteAnalyticsDashboard = () => {
               Monitor booking widget performance and optimization across multiple client websites
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-4 mt-4 xl:mt-0">
             {/* Real-time Status */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
               <span>Live data • Updated {formatTime(lastUpdate)}</span>
             </div>
-            
+
             {/* Quick Actions */}
             <Button
               variant="outline"
@@ -244,7 +258,7 @@ const CrossSiteAnalyticsDashboard = () => {
             >
               Widget Settings
             </Button>
-            
+
             <Button
               iconName="Download"
               iconPosition="left"
@@ -255,7 +269,7 @@ const CrossSiteAnalyticsDashboard = () => {
         </div>
 
         {/* Site Selector & Filters */}
-        <SiteSelector 
+        <SiteSelector
           sites={sitesData}
           selectedSites={selectedSites}
           onSiteSelection={handleSiteSelection}
@@ -266,7 +280,7 @@ const CrossSiteAnalyticsDashboard = () => {
         />
 
         {/* Metrics Summary */}
-        <MetricsSummary 
+        <MetricsSummary
           metrics={metricsData}
           selectedSites={selectedSites}
           sitesData={sitesData}
@@ -276,13 +290,13 @@ const CrossSiteAnalyticsDashboard = () => {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mb-8">
           {/* Performance Charts - Main Content */}
           <div className="xl:col-span-8 space-y-8">
-            <PerformanceCharts 
+            <PerformanceCharts
               data={performanceData}
               selectedSites={selectedSites}
               sitesData={sitesData}
             />
-            
-            <ConversionFunnel 
+
+            <ConversionFunnel
               funnelData={funnelData}
               selectedSites={selectedSites}
             />
@@ -290,11 +304,11 @@ const CrossSiteAnalyticsDashboard = () => {
 
           {/* Side Panel */}
           <div className="xl:col-span-4 space-y-6">
-            <BookingNotifications 
+            <BookingNotifications
               notifications={realTimeNotifications}
             />
-            
-            <SiteHealthMonitor 
+
+            <SiteHealthMonitor
               sites={sitesData}
               selectedSites={selectedSites}
             />
@@ -302,13 +316,13 @@ const CrossSiteAnalyticsDashboard = () => {
         </div>
 
         {/* Site Performance Table */}
-        <SitePerformanceTable 
+        <SitePerformanceTable
           sites={sitesData}
           selectedSites={selectedSites}
         />
 
         {/* A/B Testing Results */}
-        <ABTestingResults 
+        <ABTestingResults
           testData={abTestData}
         />
 

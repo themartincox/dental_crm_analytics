@@ -123,12 +123,12 @@ const AppointmentScheduler = () => {
   // Filter appointments based on selected date and filters
   useEffect(() => {
     if (appointments?.length > 0) {
-      const dayAppointments = appointments?.filter(apt => 
+      const dayAppointments = appointments?.filter(apt =>
         isSameDay(apt?.date, selectedDate) &&
         (selectedProvider === 'all' || apt?.provider === selectedProvider) &&
         (appointmentType === 'all' || apt?.type === appointmentType)
       )?.sort((a, b) => a?.date?.getTime() - b?.date?.getTime());
-      
+
       setDailySchedule(dayAppointments);
     }
   }, [selectedDate, selectedProvider, appointmentType, appointments]);
@@ -160,7 +160,7 @@ const AppointmentScheduler = () => {
       await secureApiService.makeSecureRequest(`/appointments/${appointmentId}`, { method: 'DELETE' }, 'practice_admin');
       setAppointments(prev => prev?.filter(apt => apt?.id !== appointmentId));
       setSelectedAppointment(null);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleBookingSave = async (bookingData) => {
@@ -199,11 +199,11 @@ const AppointmentScheduler = () => {
   const handleDrop = (newDate, newTime) => {
     if (draggedAppointment) {
       const updatedAppointment = {
-        .draggedAppointment,
+        ...draggedAppointment,
         date: new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newTime?.hour || draggedAppointment?.date?.getHours(), newTime?.minute || draggedAppointment?.date?.getMinutes())
       };
-      
-      setAppointments(prev => prev?.map(apt => 
+
+      setAppointments(prev => prev?.map(apt =>
         apt?.id === draggedAppointment?.id ? updatedAppointment : apt
       ));
       setDraggedAppointment(null);
@@ -211,18 +211,18 @@ const AppointmentScheduler = () => {
   };
 
   const handlePaymentProcess = (appointmentId, amount) => {
-    setAppointments(prev => prev?.map(apt => 
-      apt?.id === appointmentId 
-        ? { .apt, depositPaid: true }
+    setAppointments(prev => prev?.map(apt =>
+      apt?.id === appointmentId
+        ? { ...apt, depositPaid: true }
         : apt
     ));
     setPaymentModalOpen(false);
   };
 
   const handleReminderSend = (appointmentId, reminderType) => {
-    setAppointments(prev => prev?.map(apt => 
-      apt?.id === appointmentId 
-        ? { .apt, reminderSent: true }
+    setAppointments(prev => prev?.map(apt =>
+      apt?.id === appointmentId
+        ? { ...apt, reminderSent: true }
         : apt
     ));
     setReminderModalOpen(false);
@@ -368,7 +368,7 @@ const AppointmentScheduler = () => {
                   {format(selectedDate, 'MMM dd, yyyy')}
                 </span>
               </div>
-              
+
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {dailySchedule?.length > 0 ? (
                   dailySchedule?.map((appointment) => (
@@ -412,8 +412,8 @@ const AppointmentScheduler = () => {
                       {appointment?.depositPaid ? (
                         <Icon name="CreditCard" size={14} className="text-success" />
                       ) : (
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => setPaymentModalOpen(true)}
                         >
@@ -433,10 +433,9 @@ const AppointmentScheduler = () => {
               <div className="space-y-3 max-h-48 overflow-y-auto">
                 {upcomingAlerts?.map((alert) => (
                   <div key={alert?.id} className="flex items-start space-x-3">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      alert?.priority === 'high' ? 'bg-error' : 
-                      alert?.priority === 'medium' ? 'bg-warning' : 'bg-success'
-                    }`}></div>
+                    <div className={`w-2 h-2 rounded-full mt-2 ${alert?.priority === 'high' ? 'bg-error' :
+                        alert?.priority === 'medium' ? 'bg-warning' : 'bg-success'
+                      }`}></div>
                     <div className="flex-1">
                       <p className="text-sm text-foreground">{alert?.message}</p>
                       <p className="text-xs text-muted-foreground">

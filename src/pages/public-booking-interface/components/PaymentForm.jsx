@@ -72,11 +72,11 @@ const PaymentForm = ({ bookingData, onPaymentComplete, onBack, compact = false }
       formattedValue = value?.replace(/\D/g, '')?.substring(0, 4); // Limit to 4 digits
     }
 
-    setCardData(prev => ({ .....prev, [field]: formattedValue }));
+    setCardData(prev => ({ ...prev, [field]: formattedValue }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ .....prev, [field]: null }));
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 

@@ -47,11 +47,11 @@ const PatientInformation = ({ initialData, onComplete, onBack, compact = false }
   ];
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ .....prev, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ .....prev, [field]: null }));
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 

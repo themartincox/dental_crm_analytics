@@ -158,12 +158,12 @@ export class Validator {
           if (typeof validation === 'function') {
             validation(value, field, data);
           } else if (Array.isArray(validation)) {
-            const [ruleName, .args] = validation;
+            const [ruleName, ...args] = validation;
             // Call the rule function with proper arguments
             if (typeof ruleName === 'string' && rules[ruleName]) {
-              rules[ruleName](value, .args, field);
+              rules[ruleName](value, ...args, field);
             } else if (typeof ruleName === 'function') {
-              ruleName(value, .args, field, data);
+              ruleName(value, ...args, field, data);
             }
           }
         }
@@ -406,9 +406,9 @@ export const useFormValidation = (schema, initialData = {}) => {
   }, [data, schema]);
 
   const updateField = React.useCallback((field, value) => {
-    setData(prev => ({ .....prev, [field]: value }));
+    setData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ .....prev, [field]: null }));
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   }, [errors]);
 

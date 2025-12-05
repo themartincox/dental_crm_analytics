@@ -213,9 +213,9 @@ export const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => 
 
 // Safe async wrapper for React components
 export const safeAsync = (fn) => {
-  return async (.args) => {
+  return async (...args) => {
     try {
-      return await fn(.args);
+      return await fn(...args);
     } catch (error) {
       logError(error, { function: fn.name, args });
       throw error;

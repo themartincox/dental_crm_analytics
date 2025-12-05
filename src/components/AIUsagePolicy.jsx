@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, Database, Lock, Eye, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const AIUsagePolicy = () => {
+const AIUsagePolicy = ({ className, open, onClose, ...props }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const { data: { session } } = await supabase.auth..getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setIsLoggedIn(true);
           // Get user role from user_profiles
           const { data: profile } = await supabase.from('user_profiles').select('role').eq('id', session?.user?.id).single();
-          
+
           setUserRole(profile?.role);
         }
       } catch (error) {
@@ -41,24 +41,24 @@ const AIUsagePolicy = () => {
     if (!isLoggedIn) return;
 
     try {
-      const { data: { user } } = await supabase.auth..getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Log to security audit logs
       await supabase.from('security_audit_logs').insert({
-          action: eventType,
-          resource_type: 'ai_usage',
-          resource_id: user?.id,
-          metadata: {
-            .details,
-            timestamp: new Date().toISOString(),
-            policyVersion: '1.0',
-            gdprCompliance: true,
-            dataMinimization: true
-          },
-          success: true,
-          risk_level: details?.containsHealthData ? 'high' : 'low'
-        });
+        action: eventType,
+        resource_type: 'ai_usage',
+        resource_id: user?.id,
+        metadata: {
+          ...details,
+          timestamp: new Date().toISOString(),
+          policyVersion: '1.0',
+          gdprCompliance: true,
+          dataMinimization: true
+        },
+        success: true,
+        risk_level: details?.containsHealthData ? 'high' : 'low'
+      });
 
     } catch (error) {
       console.error('Error logging AI usage:', error);
@@ -80,8 +80,8 @@ const AIUsagePolicy = () => {
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Policy Overview</h2>
         <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
           <p className="text-blue-800">
-            This policy governs the use of Artificial Intelligence (AI) systems within our dental practice 
-            to ensure compliance with GDPR, Data Protection Act 2018, and GDC guidelines regarding patient 
+            This policy governs the use of Artificial Intelligence (AI) systems within our dental practice
+            to ensure compliance with GDPR, Data Protection Act 2018, and GDC guidelines regarding patient
             data processing and special category health data.
           </p>
         </div>
@@ -93,7 +93,7 @@ const AIUsagePolicy = () => {
           <AlertTriangle className="h-6 w-6 text-red-600" />
           <h2 className="text-xl font-semibold text-gray-900">Critical Data Protection Rules</h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="border border-red-200 rounded-lg p-4 bg-red-50">
             <h3 className="font-semibold text-red-800 mb-2">PROHIBITED ACTIONS</h3>
@@ -106,7 +106,7 @@ const AIUsagePolicy = () => {
               <li>• Allowing AI model training on patient data</li>
             </ul>
           </div>
-          
+
           <div className="border border-green-200 rounded-lg p-4 bg-green-50">
             <h3 className="font-semibold text-green-800 mb-2">PERMITTED ACTIONS</h3>
             <ul className="text-green-700 text-sm space-y-2">
@@ -273,7 +273,7 @@ const AIUsagePolicy = () => {
       {/* Incident Response */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">AI Data Incident Response</h2>
-        
+
         <div className="border border-red-200 rounded-lg p-4 bg-red-50">
           <h3 className="font-semibold text-red-800 mb-2">If Patient Data Is Accidentally Sent to AI:</h3>
           <ol className="text-red-700 text-sm space-y-2 list-decimal list-inside">
@@ -292,7 +292,7 @@ const AIUsagePolicy = () => {
       {isLoggedIn && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Responsibilities</h2>
-          
+
           <div className="border rounded-lg p-4 bg-blue-50">
             <h3 className="font-semibold text-blue-800 mb-2">
               As a {userRole || 'staff member'}, you must:
@@ -305,7 +305,7 @@ const AIUsagePolicy = () => {
               <li>Maintain patient confidentiality in all AI interactions</li>
               <li>Follow the data minimization protocols before AI processing</li>
             </ul>
-            
+
             {(userRole === 'super_admin' || userRole === 'practice_admin') && (
               <div className="mt-4 p-3 bg-yellow-100 rounded">
                 <p className="text-yellow-800 text-sm font-medium">
@@ -327,12 +327,12 @@ const AIUsagePolicy = () => {
       <div className="border-t pt-6">
         <div className="text-center text-sm text-gray-600">
           <p className="mb-2">
-            <strong>Policy Version:</strong> 1.0 | 
-            <strong> Effective Date:</strong> 3rd September 2025 | 
+            <strong>Policy Version:</strong> 1.0 |
+            <strong> Effective Date:</strong> 3rd September 2025 |
             <strong> Next Review:</strong> March 2026
           </p>
           <p>
-            This policy is binding for all staff members and contractors. 
+            This policy is binding for all staff members and contractors.
             Violations may result in disciplinary action and regulatory reporting.
           </p>
           <p className="mt-2">

@@ -74,7 +74,7 @@ const ProviderServiceMatrix = ({ providers = [], services = [], filters, onProvi
     setEditValues(prev => ({
       ...prev,
       [cellKey]: {
-        .prev?.[cellKey],
+...prev?.[cellKey],
         [field]: value
       }
     }));
@@ -93,7 +93,7 @@ const ProviderServiceMatrix = ({ providers = [], services = [], filters, onProvi
 
     setEditingCell(null);
     setEditValues(prev => {
-      const newValues = { .....prev };
+      const newValues = { ...prev };
       delete newValues?.[cellKey];
       return newValues;
     });

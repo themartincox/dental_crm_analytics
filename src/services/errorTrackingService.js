@@ -32,7 +32,7 @@ class ErrorTrackingService {
     this.maxQueueSize = 100;
     this.flushInterval = 30000; // 30 seconds
     this.isOnline = navigator.onLine;
-    
+
     this.setupEventListeners();
     this.setupGlobalErrorHandlers();
     this.startFlushTimer();
@@ -220,7 +220,7 @@ class ErrorTrackingService {
       return;
     }
 
-    const errorsToFlush = [.this.errorQueue];
+    const errorsToFlush = [...this.errorQueue];
     this.errorQueue = [];
 
     try {
@@ -236,7 +236,7 @@ class ErrorTrackingService {
     } catch (error) {
       logger.error('Failed to flush errors to server', error);
       // Re-add errors to queue for retry
-      this.errorQueue.unshift(.errorsToFlush);
+      this.errorQueue.unshift(...errorsToFlush);
     }
   }
 
@@ -304,7 +304,7 @@ class ErrorTrackingService {
   getPerformanceContext() {
     const navigation = performance.getEntriesByType('navigation')[0];
     const paint = performance.getEntriesByType('paint');
-    
+
     return {
       loadTime: navigation ? navigation.loadEventEnd - navigation.loadEventStart : 0,
       domContentLoaded: navigation ? navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart : 0,

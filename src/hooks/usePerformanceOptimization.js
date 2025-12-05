@@ -21,9 +21,9 @@ export const useDebounce = (value, delay) => {
 export const useThrottle = (callback, delay) => {
   const lastRun = useRef(Date.now());
 
-  return useCallback((.args) => {
+  return useCallback((...args) => {
     if (Date.now() - lastRun.current >= delay) {
-      callback(.args);
+      callback(...args);
       lastRun.current = Date.now();
     }
   }, [callback, delay]);
@@ -37,8 +37,8 @@ export const useOptimizedCallback = (callback, deps) => {
     callbackRef.current = callback;
   });
 
-  return useCallback((.args) => {
-    return callbackRef.current(.args);
+  return useCallback((...args) => {
+    return callbackRef.current(...args);
   }, deps);
 };
 
@@ -162,7 +162,7 @@ export const useIntersectionObserver = (options = {}) => {
       {
         threshold: 0.1,
         rootMargin: '50px',
-        .options
+...options
       }
     );
 

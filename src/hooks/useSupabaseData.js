@@ -18,8 +18,8 @@ export const useSupabaseData = (serviceMethod, dependencies = [], options = {}) 
     try {
       setLoading(true);
       setError(null);
-      
-      const result = await serviceMethod(.dependencies);
+
+      const result = await serviceMethod(...dependencies);
       setData(result);
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -30,7 +30,7 @@ export const useSupabaseData = (serviceMethod, dependencies = [], options = {}) 
     } finally {
       setLoading(false);
     }
-  }, [serviceMethod, user, .dependencies]);
+  }, [serviceMethod, user, ...dependencies]);
 
   useEffect(() => {
     fetchData();
@@ -125,7 +125,7 @@ export const usePracticeLocations = () => {
   return useSupabaseData(
     supabaseService?.common?.getPracticeLocations,
     [],
-    { 
+    {
       initialData: [],
       requireAuth: false  // Public data
     }
@@ -144,16 +144,16 @@ export const useStaffMembers = () => {
 // Hook for real-time subscriptions
 export const useSupabaseSubscription = (table, callback, filters = null) => {
   const { user } = useAuth();
-  
+
   useEffect(() => {
     if (!user) return;
 
     const subscription = supabaseService?.client?.channel(`${table}-changes`)?.on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: table,
-        .(filters && { filter: filters })
-      }, callback)?.subscribe();
+      event: '*',
+      schema: 'public',
+      table: table,
+      ...(filters && { filter: filters })
+    }, callback)?.subscribe();
 
     return () => {
       subscription.unsubscribe();
@@ -178,26 +178,26 @@ export const useOptimisticUpdate = (initialData = []) => {
 
   const addOptimistic = useCallback((newItem) => {
     return optimisticUpdate(
-      (currentData) => [newItem, .currentData],
+      (currentData) => [newItem, ...currentData],
       (currentData) => currentData?.filter(item => item?.id !== newItem?.id)
     );
   }, [optimisticUpdate]);
 
   const updateOptimistic = useCallback((id, updates) => {
     let originalItem = null;
-    
+
     return optimisticUpdate(
       (currentData) => {
         return currentData?.map(item => {
           if (item?.id === id) {
             originalItem = item;
-            return { .item, .updates };
+            return { ...item, ...updates };
           }
           return item;
         });
       },
       (currentData) => {
-        return currentData?.map(item => 
+        return currentData?.map(item =>
           item?.id === id ? originalItem : item
         );
       }
@@ -206,7 +206,7 @@ export const useOptimisticUpdate = (initialData = []) => {
 
   const removeOptimistic = useCallback((id) => {
     let removedItem = null;
-    
+
     return optimisticUpdate(
       (currentData) => {
         const index = currentData?.findIndex(item => item?.id === id);
@@ -218,7 +218,7 @@ export const useOptimisticUpdate = (initialData = []) => {
       },
       (currentData) => {
         if (removedItem) {
-          return [.currentData, removedItem];
+          return [...currentData, removedItem];
         }
         return currentData;
       }

@@ -15,7 +15,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     // Ensure formData is properly initialized
     if (widget) {
       setFormData({
-        .widget,
+        ...widget,
         settings: {
           allowedServices: [],
           autoResize: true,
@@ -25,7 +25,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
           allowedOrigins: ['*'],
           language: 'en',
           customCSS: '',
-          .widget?.settings
+          ...widget?.settings
         }
       });
     }
@@ -56,7 +56,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     setFormData(prev => ({
       ...prev,
       settings: {
-        .prev?.settings,
+        ...prev?.settings,
         [field]: value
       }
     }));
@@ -65,9 +65,9 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
   const handleServiceToggle = (serviceId, checked) => {
     const currentServices = formData?.settings?.allowedServices || [];
     const updatedServices = checked
-      ? [.currentServices, serviceId]
+      ? [...currentServices, serviceId]
       : currentServices?.filter(id => id !== serviceId);
-    
+
     handleSettingsChange('allowedServices', updatedServices);
   };
 
@@ -75,7 +75,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
     const newOrigin = prompt('Enter domain (e.g., https://example.com):');
     if (newOrigin) {
       const currentOrigins = formData?.settings?.allowedOrigins || ['*'];
-      const updatedOrigins = [.currentOrigins?.filter(o => o !== '*'), newOrigin];
+      const updatedOrigins = [...currentOrigins?.filter(o => o !== '*'), newOrigin];
       handleSettingsChange('allowedOrigins', updatedOrigins);
     }
   };
@@ -88,15 +88,15 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
 
   const validateForm = () => {
     const errors = [];
-    
+
     if (!formData?.name?.trim()) {
       errors?.push('Widget name is required');
     }
-    
+
     if (!formData?.practiceId) {
       errors?.push('Practice ID is required');
     }
-    
+
     return errors;
   };
 
@@ -106,7 +106,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
       alert('Please fix the following errors:\n' + errors?.join('\n'));
       return;
     }
-    
+
     onSave(formData);
   };
 
@@ -129,7 +129,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
         {/* Basic Information */}
         <div className="space-y-4">
           <h4 className="text-md font-medium text-gray-900">Basic Information</h4>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -141,7 +141,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                 placeholder="e.g., Main Website Widget"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
@@ -157,7 +157,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
               </Select>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Deployment URL
@@ -179,11 +179,11 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
           <p className="text-sm text-gray-600">
             Select which services should be available in this widget. Leave empty to show all services.
           </p>
-          
+
           <div className="grid grid-cols-2 gap-3">
             {availableServices?.map((service) => {
               const isChecked = formData?.settings?.allowedServices?.includes(service?.id) || false;
-              
+
               return (
                 <div key={service?.id} className="flex items-center space-x-3">
                   <Checkbox
@@ -191,7 +191,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                     checked={isChecked}
                     onCheckedChange={(checked) => handleServiceToggle(service?.id, checked)}
                   />
-                  <label 
+                  <label
                     htmlFor={`service-${service?.id}`}
                     className="text-sm text-gray-700 cursor-pointer select-none"
                   >
@@ -201,10 +201,10 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
               );
             })}
           </div>
-          
+
           {/* Service selection feedback */}
           <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-            {formData?.settings?.allowedServices?.length > 0 
+            {formData?.settings?.allowedServices?.length > 0
               ? `${formData?.settings?.allowedServices?.length} service(s) selected`
               : 'All services will be available when no specific services are selected'
             }
@@ -214,7 +214,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
         {/* Display Settings */}
         <div className="space-y-4">
           <h4 className="text-md font-medium text-gray-900">Display Settings</h4>
-          
+
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <Checkbox
@@ -231,7 +231,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <Checkbox
                 id="show-header"
@@ -247,7 +247,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <Checkbox
                 id="enable-analytics"
@@ -287,8 +287,8 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-md font-medium text-gray-900">Advanced Settings</h4>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setShowAdvanced(!showAdvanced)}
             >
@@ -296,7 +296,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
               {showAdvanced ? 'Hide' : 'Show'} Advanced
             </Button>
           </div>
-          
+
           {showAdvanced && (
             <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
               {/* Allowed Origins */}
@@ -310,7 +310,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                       <Input
                         value={origin}
                         onChange={(e) => {
-                          const updatedOrigins = [.formData?.settings?.allowedOrigins];
+                          const updatedOrigins = [...formData?.settings?.allowedOrigins];
                           updatedOrigins[index] = e?.target?.value;
                           handleSettingsChange('allowedOrigins', updatedOrigins);
                         }}
@@ -340,7 +340,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                   Control which domains can embed this widget. Use "*" for any domain (less secure).
                 </p>
               </div>
-              
+
               {/* Default Language */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -356,7 +356,7 @@ const WidgetBuilder = ({ widget, onSave, onCancel }) => {
                   <option value="de">German</option>
                 </Select>
               </div>
-              
+
               {/* Custom CSS */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

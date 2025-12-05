@@ -125,7 +125,7 @@ const PracticePerformanceOverviewDashboard = () => {
 
   useEffect(() => {
     let interval;
-    
+
     // Auto-refresh functionality
     if (autoRefresh && user) {
       const refreshData = () => {
@@ -147,8 +147,8 @@ const PracticePerformanceOverviewDashboard = () => {
 
   const handleDateRangeChange = (range) => {
     setSelectedDateRange(range);
-    logger.info('Date range changed', { 
-      newRange: range, 
+    logger.info('Date range changed', {
+      newRange: range,
       userId: user?.id,
       timestamp: new Date().toISOString()
     });
@@ -156,8 +156,8 @@ const PracticePerformanceOverviewDashboard = () => {
 
   const handleLocationChange = (location) => {
     setSelectedLocation(location);
-    logger.info('Location changed', { 
-      newLocation: location, 
+    logger.info('Location changed', {
+      newLocation: location,
       userId: user?.id,
       timestamp: new Date().toISOString()
     });
@@ -165,16 +165,16 @@ const PracticePerformanceOverviewDashboard = () => {
 
   const handleRefreshToggle = (enabled) => {
     setAutoRefresh(enabled);
-    logger.info('Auto-refresh toggled', { 
-      enabled, 
+    logger.info('Auto-refresh toggled', {
+      enabled,
       userId: user?.id,
       timestamp: new Date().toISOString()
     });
   };
 
   const handleChartDataClick = (data) => {
-    logger.info('Chart data clicked', { 
-      data, 
+    logger.info('Chart data clicked', {
+      data,
       userId: user?.id,
       timestamp: new Date().toISOString()
     });
@@ -191,7 +191,7 @@ const PracticePerformanceOverviewDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <SEOHead 
+        <SEOHead
           title="Loading Practice Dashboard - Dental CRM Analytics"
           description="Loading comprehensive business intelligence dashboard for dental practice performance monitoring"
           image=""
@@ -204,7 +204,7 @@ const PracticePerformanceOverviewDashboard = () => {
           <div className="animate-pulse space-y-6" aria-label="Loading dashboard content">
             <div className="h-20 bg-muted rounded-lg" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[.Array(4)]?.map((_, i) => (
+              {[...Array(4)]?.map((_, i) => (
                 <div key={i} className="h-32 bg-muted rounded-lg" />
               ))}
             </div>
@@ -222,7 +222,7 @@ const PracticePerformanceOverviewDashboard = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <SEOHead 
+        <SEOHead
           title="Authentication Required - Practice Dashboard"
           description="Sign in to access comprehensive dental practice performance analytics and management tools"
           image=""
@@ -247,9 +247,13 @@ const PracticePerformanceOverviewDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
+      <SEOHead
         title="Practice Performance Overview - Dental CRM Analytics"
-        description="Comprehensive business intelligence dashboard for dental practice performance monitoring and analytics. Track revenue, patient metrics, lead conversion, and operational efficiency in real-time."
+        description="Comprehensive business intelligence dashboard for  // Mock practice performance data
+  const [metrics, setMetrics] = React.useState({
+    ...defaultMetrics,
+    isLoading: true
+  });and operational efficiency in real-time."
         keywords="dental practice analytics, healthcare dashboard, patient management, revenue tracking, lead conversion, practice KPIs, dental CRM, business intelligence"
         canonicalUrl={`${window.location.origin}/practice-performance-overview-dashboard`}
         structuredData={[practiceStructuredData]}

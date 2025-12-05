@@ -24,7 +24,7 @@ const Select = React.forwardRef(({
     name,
     onChange,
     onOpenChange,
-    .props
+    ...props
 }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +71,7 @@ const Select = React.forwardRef(({
             const newValue = value || [];
             const updatedValue = newValue?.includes(option?.value)
                 ? newValue?.filter(v => v !== option?.value)
-                : [.newValue, option?.value];
+                : [...newValue, option?.value];
             onChange?.(updatedValue);
         } else {
             onChange?.(option?.value);
@@ -126,7 +126,7 @@ const Select = React.forwardRef(({
                     disabled={disabled}
                     aria-expanded={isOpen}
                     aria-haspopup="listbox"
-                    {.props}
+                    {...props}
                 >
                     <span className="truncate">{getSelectedDisplay()}</span>
 

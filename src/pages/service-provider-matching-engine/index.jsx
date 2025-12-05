@@ -24,6 +24,13 @@ const ServiceProviderMatchingEngine = () => {
     competencyLevel: 'all',
     status: 'active'
   });
+  const [advancedSettings, setAdvancedSettings] = useState({
+    // Assuming defaultSettings is defined elsewhere or meant to be an empty object
+    // and fixing the syntax error in caching property
+    caching: true,
+    competencyLevel: 'all',
+    status: 'active'
+  });
 
   // Mock data
   const mockProviders = [
@@ -196,11 +203,11 @@ const ServiceProviderMatchingEngine = () => {
   const filterOptions = {
     provider: [
       { value: 'all', label: 'All Providers' },
-      .mockProviders?.map(p => ({ value: p?.id, label: p?.name }))
+      ...(mockProviders?.map(p => ({ value: p?.id, label: p?.name })))
     ],
     service: [
       { value: 'all', label: 'All Services' },
-      .mockServices?.map(s => ({ value: s?.id, label: s?.name }))
+      ...(mockServices?.map(s => ({ value: s?.id, label: s?.name })))
     ],
     competencyLevel: [
       { value: 'all', label: 'All Levels' },
@@ -249,26 +256,26 @@ const ServiceProviderMatchingEngine = () => {
       2: { label: 'Basic', color: 'bg-yellow-100 text-yellow-800' },
       1: { label: 'Trainee', color: 'bg-gray-100 text-gray-800' }
     };
-    
+
     const badge = badges?.[level] || badges?.[1];
     return badge;
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({ .....prev, [filterType]: value }));
+    setFilters(prev => ({ ...prev, [filterType]: value }));
   };
 
   const handleRuleToggle = (ruleId) => {
-    setMatchingRules(prev => prev?.map(rule => 
-      rule?.id === ruleId 
-        ? { .rule, isActive: !rule?.isActive }
+    setMatchingRules(prev => prev?.map(rule =>
+      rule?.id === ruleId
+        ? { ...rule, isActive: !rule?.isActive }
         : rule
     ));
   };
 
   const handleRuleUpdate = (ruleId, updatedRule) => {
-    setMatchingRules(prev => prev?.map(rule => 
-      rule?.id === ruleId ? { .rule, .updatedRule } : rule
+    setMatchingRules(prev => prev?.map(rule =>
+      rule?.id === ruleId ? { ...rule, ...updatedRule } : rule
     ));
   };
 
@@ -381,10 +388,9 @@ const ServiceProviderMatchingEngine = () => {
                 <button
                   key={tab?.id}
                   onClick={() => setActiveTab(tab?.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab?.id
-                      ? 'border-primary text-primary' :'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab?.id
+                      ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   <Icon name={tab?.icon} size={16} />
                   {tab?.label}
@@ -400,7 +406,7 @@ const ServiceProviderMatchingEngine = () => {
                 <Filter size={16} className="text-muted-foreground" />
                 <span className="text-sm font-medium">Filters:</span>
               </div>
-              
+
               <Select
                 value={filters?.provider}
                 onValueChange={(value) => handleFilterChange('provider', value)}
@@ -408,7 +414,7 @@ const ServiceProviderMatchingEngine = () => {
                 placeholder="Provider"
                 className="w-48"
               />
-              
+
               <Select
                 value={filters?.service}
                 onValueChange={(value) => handleFilterChange('service', value)}
@@ -416,7 +422,7 @@ const ServiceProviderMatchingEngine = () => {
                 placeholder="Service"
                 className="w-48"
               />
-              
+
               <Select
                 value={filters?.competencyLevel}
                 onValueChange={(value) => handleFilterChange('competencyLevel', value)}
@@ -424,7 +430,7 @@ const ServiceProviderMatchingEngine = () => {
                 placeholder="Competency"
                 className="w-48"
               />
-              
+
               <Select
                 value={filters?.status}
                 onValueChange={(value) => handleFilterChange('status', value)}
@@ -457,8 +463,8 @@ const ServiceProviderMatchingEngine = () => {
               services={services}
               filters={filters}
               onProviderUpdate={(providerId, updates) => {
-                setProviders(prev => prev?.map(p => 
-                  p?.id === providerId ? { .p, .updates } : p
+                setProviders(prev => prev?.map(p =>
+                  p?.id === providerId ? { ...p, ...updates } : p
                 ));
               }}
             />
@@ -472,7 +478,7 @@ const ServiceProviderMatchingEngine = () => {
               onRuleToggle={handleRuleToggle}
               onRuleUpdate={handleRuleUpdate}
               onRuleCreate={(newRule) => {
-                setMatchingRules(prev => [...prev, { .newRule, id: Date.now() }]);
+                setMatchingRules(prev => [...prev, { ...newRule, id: Date.now() }]);
               }}
             />
           )}

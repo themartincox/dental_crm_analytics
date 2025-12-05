@@ -168,7 +168,7 @@ import React, { useState, useEffect } from 'react';
               // Update lead status
               setLeads(prev => prev?.map(lead => 
                 lead?.id === draggedLead?.id 
-                  ? { .lead, status: newStatus }
+                  ? { ...lead, status: newStatus }
                   : lead
               ));
               setDraggedLead(null);

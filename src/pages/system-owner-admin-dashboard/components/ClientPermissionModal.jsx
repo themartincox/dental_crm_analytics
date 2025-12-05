@@ -16,10 +16,10 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
       description: 'Control access to revenue, payments, and P&L features',
       is_core_module: true,
       base_price: 0,
-      tier_availability: ['basic','pro','enterprise']
+      tier_availability: ['basic', 'pro', 'enterprise']
     };
     const names = new Set((systemModules || []).map(m => m?.module_name));
-    return names.has('finance') ? systemModules : [.(systemModules || []), financeModule];
+    return names.has('finance') ? systemModules : [...(systemModules || []), financeModule];
   }, [systemModules]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
     setPermissions(prev => ({
       ...prev,
       [moduleName]: {
-        .prev?.[moduleName],
+...prev?.[moduleName],
         [field]: value
       }
     }));
@@ -53,7 +53,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
   const handleSave = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       // Build new permissions and upsert through secure API
       const newPermissions = [];
@@ -105,7 +105,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
                 Client Permissions - {client?.organization_name}
               </h3>
               <p className="text-sm text-gray-500">
-                Subscription Tier: {client?.subscription_tier?.toUpperCase()} • 
+                Subscription Tier: {client?.subscription_tier?.toUpperCase()} •
                 Status: {client?.status?.toUpperCase()}
               </p>
             </div>
@@ -132,13 +132,12 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
             {modulesWithFinance?.map((module) => {
               const isAvailable = isModuleAvailableForTier(module, client?.subscription_tier);
               const permission = permissions?.[module?.module_name] || {};
-              
+
               return (
                 <div
                   key={module?.id}
-                  className={`border rounded-lg p-4 ${
-                    isAvailable ? 'border-gray-200' : 'border-gray-100 bg-gray-50'
-                  }`}
+                  className={`border rounded-lg p-4 ${isAvailable ? 'border-gray-200' : 'border-gray-100 bg-gray-50'
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -154,7 +153,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
                         </p>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-gray-500">
                         ${module?.base_price}/month
@@ -176,8 +175,8 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
                         <select
                           value={permission?.permission_level || 'none'}
                           onChange={(e) => handlePermissionChange(
-                            module?.module_name, 
-                            'permission_level', 
+                            module?.module_name,
+                            'permission_level',
                             e?.target?.value
                           )}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -199,8 +198,8 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
                             type="checkbox"
                             checked={permission?.is_enabled || false}
                             onChange={(e) => handlePermissionChange(
-                              module?.module_name, 
-                              'is_enabled', 
+                              module?.module_name,
+                              'is_enabled',
                               e?.target?.checked
                             )}
                             disabled={permission?.permission_level === 'none'}
@@ -222,8 +221,8 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
                           placeholder="Unlimited"
                           value={permission?.usage_quota || ''}
                           onChange={(e) => handlePermissionChange(
-                            module?.module_name, 
-                            'usage_quota', 
+                            module?.module_name,
+                            'usage_quota',
                             e?.target?.value ? parseInt(e?.target?.value) : null
                           )}
                           disabled={permission?.permission_level === 'none'}
@@ -242,7 +241,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
           <div className="text-sm text-gray-500">
             {hasChanges && 'You have unsaved changes'}
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
@@ -251,7 +250,7 @@ const ClientPermissionModal = ({ client, systemModules, onClose, onSave }) => {
             >
               Cancel
             </button>
-            
+
             <button
               onClick={handleSave}
               disabled={loading || !hasChanges}

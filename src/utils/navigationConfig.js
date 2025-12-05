@@ -78,15 +78,15 @@ export const getNavigationItems = (userRole, permissions = []) => {
   // Filter navigation items based on user role and permissions
   return baseNavigationItems?.filter(item => {
     // Check role access
-    const hasRoleAccess = !item?.requiredRoles || 
-                         item?.requiredRoles?.length === 0 || 
-                         item?.requiredRoles?.includes(userRole);
+    const hasRoleAccess = !item?.requiredRoles ||
+      item?.requiredRoles?.length === 0 ||
+      item?.requiredRoles?.includes(userRole);
 
     // Check permission access
-    const hasPermissionAccess = !item?.requiredPermissions || 
-                               item?.requiredPermissions?.length === 0 ||
-                               item?.requiredPermissions?.every(permission => 
-                                 permissions?.includes(permission));
+    const hasPermissionAccess = !item?.requiredPermissions ||
+      item?.requiredPermissions?.length === 0 ||
+      item?.requiredPermissions?.every(permission =>
+        permissions?.includes(permission));
 
     return hasRoleAccess && hasPermissionAccess;
   });
@@ -105,17 +105,17 @@ export const roleHierarchy = {
 // Default permissions by role
 export const defaultPermissions = {
   super_admin: [
-    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads', 
-    'manage_leads', 'view_analytics', 'view_marketing_analytics', 'view_compliance', 
+    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads',
+    'manage_leads', 'view_analytics', 'view_marketing_analytics', 'view_compliance',
     'manage_compliance', 'manage_widgets', 'view_cross_site_analytics', 'manage_system'
   ],
   practice_admin: [
-    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads', 
-    'manage_leads', 'view_analytics', 'view_marketing_analytics', 'view_compliance', 
+    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads',
+    'manage_leads', 'view_analytics', 'view_marketing_analytics', 'view_compliance',
     'manage_compliance', 'manage_widgets'
   ],
   manager: [
-    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads', 
+    'view_patients', 'manage_patients', 'manage_appointments', 'view_leads',
     'view_analytics', 'view_marketing_analytics', 'view_compliance'
   ],
   dentist: [
@@ -132,7 +132,7 @@ export const defaultPermissions = {
 // Get effective permissions for a user role
 export const getEffectivePermissions = (userRole, customPermissions = []) => {
   const rolePermissions = defaultPermissions?.[userRole] || [];
-  return [.new Set([.rolePermissions, .customPermissions])];
+  return [...new Set([...rolePermissions, ...customPermissions])];
 };
 
 // Check if user has specific permission

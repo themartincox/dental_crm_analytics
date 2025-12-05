@@ -160,18 +160,18 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
     const startHour = 9;
     const endHour = 17;
     const slotDuration = bookingData?.service?.duration || 60;
-    
+
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         if (hour === 12 && minute === 0) continue; // Lunch break
         if (hour === 12 && minute === 30) continue; // Lunch break
-        
+
         const slotTime = new Date(selectedDate);
         slotTime?.setHours(hour, minute, 0, 0);
-        
+
         // Randomly mark some slots as unavailable (simulating bookings)
         const isAvailable = Math.random() > 0.3;
-        
+
         slots?.push({
           time: slotTime,
           available: isAvailable,
@@ -179,26 +179,26 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
         });
       }
     }
-    
+
     setAvailableSlots(slots);
   };
 
   const calculateSlotPrice = (slotTime) => {
     if (!bookingData?.service || !bookingData?.dentist) return 0;
-    
+
     const basePrice = bookingData?.service?.priceFrom;
     const dentistMultiplier = bookingData?.dentist?.priceMultiplier || 1.0;
-    
+
     // Peak time pricing (evening slots cost more)
     const hour = slotTime?.getHours();
     const peakMultiplier = hour >= 16 ? 1.15 : 1.0;
-    
+
     return Math.round(basePrice * dentistMultiplier * peakMultiplier);
   };
 
   const handleStepComplete = (stepData) => {
-    setBookingData(prev => ({ .....prev, .stepData }));
-    
+    setBookingData(prev => ({ ...prev, ...stepData }));
+
     if (currentStep < steps?.length) {
       setCurrentStep(prev => prev + 1);
     }
@@ -219,10 +219,9 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
       <div className="flex items-center justify-between">
         {steps?.map((step, index) => (
           <div key={step?.id} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium ${
-              step?.id <= currentStep
-                ? 'bg-primary text-white' :'bg-gray-100 text-gray-400'
-            }`}>
+            <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium ${step?.id <= currentStep
+                ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'
+              }`}>
               {step?.id < currentStep ? (
                 <Check size={16} />
               ) : (
@@ -230,16 +229,14 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
               )}
             </div>
             <div className="ml-3 hidden sm:block">
-              <div className={`text-sm font-medium ${
-                step?.id <= currentStep ? 'text-gray-900' : 'text-gray-400'
-              }`}>
+              <div className={`text-sm font-medium ${step?.id <= currentStep ? 'text-gray-900' : 'text-gray-400'
+                }`}>
                 {step?.title}
               </div>
             </div>
             {index < steps?.length - 1 && (
-              <div className={`w-full h-px mx-4 ${
-                step?.id < currentStep ? 'bg-primary' : 'bg-gray-200'
-              }`} />
+              <div className={`w-full h-px mx-4 ${step?.id < currentStep ? 'bg-primary' : 'bg-gray-200'
+                }`} />
             )}
           </div>
         ))}
@@ -272,14 +269,13 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center">
-                {[.Array(5)]?.map((_, i) => (
+                {[...Array(5)]?.map((_, i) => (
                   <Star
                     key={i}
                     size={16}
-                    className={`${
-                      i < Math.floor(practiceInfo?.rating)
-                        ? 'text-yellow-400 fill-current' :'text-white/40'
-                    }`}
+                    className={`${i < Math.floor(practiceInfo?.rating)
+                        ? 'text-yellow-400 fill-current' : 'text-white/40'
+                      }`}
                   />
                 ))}
               </div>
@@ -288,7 +284,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
               </span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 bg-white/10 rounded-lg p-4">
               <Shield className="w-6 h-6" />
@@ -323,9 +319,9 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
       case 2:
         return (
           <DentistSelection
-            dentists={dentists?.filter(d => 
+            dentists={dentists?.filter(d =>
               !bookingData?.service?.specializations ||
-              d?.specializations?.some(spec => 
+              d?.specializations?.some(spec =>
                 bookingData?.service?.specializations?.includes(spec)
               )
             )}
@@ -428,7 +424,7 @@ const PublicBookingInterface = ({ showGDCInfo = false }) => {
           </div>
         )}
       </div>
-      
+
       {/* Conditionally render GDC Footer */}
       {showGDCInfo && <GDCFooter />}
     </div>

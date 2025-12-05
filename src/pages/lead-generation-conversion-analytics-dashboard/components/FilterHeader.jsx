@@ -38,9 +38,9 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
     const currentSources = filters?.sources || [];
     const newSources = currentSources?.includes(sourceValue)
       ? currentSources?.filter(s => s !== sourceValue)
-      : [.currentSources, sourceValue];
+      : [...currentSources, sourceValue];
     
-    onFiltersChange({ .filters, sources: newSources });
+    onFiltersChange({ ...filters, sources: newSources });
   };
 
   return (
@@ -53,7 +53,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
             <Icon name="Calendar" size={16} className="text-muted-foreground" />
             <select
               value={filters?.dateRange}
-              onChange={(e) => onFiltersChange({ .filters, dateRange: e?.target?.value })}
+              onChange={(e) => onFiltersChange({ ...filters, dateRange: e?.target?.value })}
               className="bg-background border border-border rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               {dateRanges?.map(range => (
@@ -67,7 +67,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
             <Icon name="GitCompare" size={16} className="text-muted-foreground" />
             <select
               value={filters?.comparison}
-              onChange={(e) => onFiltersChange({ .filters, comparison: e?.target?.value })}
+              onChange={(e) => onFiltersChange({ ...filters, comparison: e?.target?.value })}
               className="bg-background border border-border rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               {comparisonTypes?.map(type => (
@@ -81,7 +81,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
             <Icon name="Megaphone" size={16} className="text-muted-foreground" />
             <select
               value={filters?.campaign}
-              onChange={(e) => onFiltersChange({ .filters, campaign: e?.target?.value })}
+              onChange={(e) => onFiltersChange({ ...filters, campaign: e?.target?.value })}
               className="bg-background border border-border rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">All campaigns</option>
@@ -153,7 +153,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
                     type="text"
                     placeholder="e.g., google, facebook"
                     value={filters?.utmSource || ''}
-                    onChange={(e) => onFiltersChange({ .filters, utmSource: e?.target?.value })}
+                    onChange={(e) => onFiltersChange({ ...filters, utmSource: e?.target?.value })}
                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -163,7 +163,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
                     type="text"
                     placeholder="e.g., cpc, social"
                     value={filters?.utmMedium || ''}
-                    onChange={(e) => onFiltersChange({ .filters, utmMedium: e?.target?.value })}
+                    onChange={(e) => onFiltersChange({ ...filters, utmMedium: e?.target?.value })}
                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -173,7 +173,7 @@ const FilterHeader = ({ filters, onFiltersChange }) => {
                     type="text"
                     placeholder="e.g., winter-promo"
                     value={filters?.utmCampaign || ''}
-                    onChange={(e) => onFiltersChange({ .filters, utmCampaign: e?.target?.value })}
+                    onChange={(e) => onFiltersChange({ ...filters, utmCampaign: e?.target?.value })}
                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>

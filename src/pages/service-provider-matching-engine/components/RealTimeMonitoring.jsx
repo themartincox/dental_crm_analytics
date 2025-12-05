@@ -46,7 +46,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
         severity: Math.random() > 0.8 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low'
       };
       
-      return [newActivity, .prev?.slice(0, 19)]; // Keep last 20 activities
+      return [newActivity,...prev?.slice(0, 19)]; // Keep last 20 activities
     });
 
     // Update system alerts
@@ -61,7 +61,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
           resolved: false
         };
         
-        return [newAlert, .prev?.slice(0, 9)]; // Keep last 10 alerts
+        return [newAlert,...prev?.slice(0, 9)]; // Keep last 10 alerts
       });
     }
 
@@ -148,7 +148,7 @@ const RealTimeMonitoring = ({ providers = [], services = [], matchingRules = [] 
 
   const resolveAlert = (alertId) => {
     setSystemAlerts(prev => prev?.map(alert => 
-      alert?.id === alertId ? { .alert, resolved: true } : alert
+      alert?.id === alertId ? { ...alert, resolved: true } : alert
     ));
   };
 

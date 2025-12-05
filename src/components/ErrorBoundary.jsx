@@ -12,7 +12,7 @@ export default class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     const id = (Date.now().toString(36) + Math.random().toString(36).slice(2)).toUpperCase();
     this.setState({ errorId: id });
-    window.__COMPONENT_ERROR__?.(error, { .errorInfo, errorId: id });
+    window.__COMPONENT_ERROR__?.(error, { ...errorInfo, errorId: id });
   }
   render() {
     if (!this.state.hasError) return this.props?.children;

@@ -29,15 +29,15 @@ const AnalyticsDashboard = ({ analytics }) => {
 
   const getGrowthPercentage = () => {
     if (!trendsData?.length || trendsData?.length < 2) return 0;
-    
+
     const recent = trendsData?.slice(-7); // Last 7 days
     const previous = trendsData?.slice(-14, -7); // Previous 7 days
-    
+
     const recentTotal = recent?.reduce((sum, day) => sum + (day?.count || 0), 0);
     const previousTotal = previous?.reduce((sum, day) => sum + (day?.count || 0), 0);
-    
+
     if (previousTotal === 0) return recentTotal > 0 ? 100 : 0;
-    
+
     return ((recentTotal - previousTotal) / previousTotal * 100)?.toFixed(1);
   };
 
@@ -49,7 +49,7 @@ const AnalyticsDashboard = ({ analytics }) => {
       {/* Analytics Overview */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-6">Membership Program Analytics</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Applications */}
           <div className="bg-blue-50 rounded-lg p-6">
@@ -155,16 +155,16 @@ const AnalyticsDashboard = ({ analytics }) => {
             {/* Simple Trend Chart */}
             <div className="space-y-4">
               <h4 className="text-sm font-medium text-gray-700">Daily New Memberships</h4>
-              
+
               {trendsData?.length > 0 ? (
                 <div className="grid grid-cols-7 gap-2 h-32">
                   {trendsData?.slice(-7)?.map((day, index) => {
-                    const maxCount = Math.max(.trendsData?.slice(-7)?.map(d => d?.count || 0));
+                    const maxCount = Math.max(...trendsData?.slice(-7)?.map(d => d?.count || 0));
                     const height = maxCount > 0 ? ((day?.count || 0) / maxCount) * 100 : 0;
-                    
+
                     return (
                       <div key={index} className="flex flex-col items-center justify-end">
-                        <div 
+                        <div
                           className="bg-blue-500 rounded-t w-full"
                           style={{ height: `${height}%` }}
                           title={`${day?.count || 0} new members on ${new Date(day.date)?.toLocaleDateString()}`}
@@ -196,25 +196,25 @@ const AnalyticsDashboard = ({ analytics }) => {
         {/* Performance Summary */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Summary</h3>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Application Approval Rate</span>
               <span className="text-sm font-medium text-gray-900">
-                {analytics?.totalApplications > 0 ? 
+                {analytics?.totalApplications > 0 ?
                   (((analytics?.activeMemberships || 0) / analytics?.totalApplications) * 100)?.toFixed(1) : 0}%
               </span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Average Revenue per Member</span>
               <span className="text-sm font-medium text-gray-900">
-                £{analytics?.activeMemberships > 0 ? 
-                  ((parseFloat(analytics?.monthlyRevenue || 0)) / analytics?.activeMemberships)?.toFixed(2) : 
+                £{analytics?.activeMemberships > 0 ?
+                  ((parseFloat(analytics?.monthlyRevenue || 0)) / analytics?.activeMemberships)?.toFixed(2) :
                   '0.00'}
               </span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Growth Rate (Last 7 days)</span>
               <span className={`text-sm font-medium ${isGrowthPositive ? 'text-green-600' : 'text-red-600'}`}>
@@ -227,7 +227,7 @@ const AnalyticsDashboard = ({ analytics }) => {
         {/* Quick Actions */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Insights</h3>
-          
+
           <div className="space-y-3">
             <div className="flex items-start">
               <div className="flex-shrink-0">
@@ -239,7 +239,7 @@ const AnalyticsDashboard = ({ analytics }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
@@ -250,7 +250,7 @@ const AnalyticsDashboard = ({ analytics }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2"></div>
@@ -261,7 +261,7 @@ const AnalyticsDashboard = ({ analytics }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>

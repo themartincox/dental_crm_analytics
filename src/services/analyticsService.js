@@ -39,7 +39,7 @@ class AnalyticsService {
     this.sessionId = this.getSessionId();
     this.userId = this.getCurrentUserId();
     this.isOnline = navigator.onLine;
-    
+
     this.setupEventListeners();
     this.startFlushTimer();
     this.trackPageView();
@@ -122,7 +122,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.PAGE_VIEW, {
       page: pageName,
       title: document.title,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -134,7 +134,7 @@ class AnalyticsService {
   trackUserAction(action, additionalData = {}) {
     this.trackEvent(EVENT_TYPES.USER_ACTION, {
       action,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -146,7 +146,7 @@ class AnalyticsService {
   trackButtonClick(buttonName, additionalData = {}) {
     this.trackEvent(EVENT_TYPES.BUTTON_CLICK, {
       buttonName,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -160,7 +160,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.LINK_CLICK, {
       linkText,
       linkUrl,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -174,7 +174,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.FORM_SUBMIT, {
       formName,
       formData: this.sanitizeFormData(formData),
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -188,7 +188,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.SEARCH, {
       searchTerm,
       searchType,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -202,7 +202,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.CONVERSION, {
       conversionType,
       conversionData,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -216,7 +216,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.FEATURE_USAGE, {
       featureName,
       usageData,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -230,7 +230,7 @@ class AnalyticsService {
     this.trackEvent(EVENT_TYPES.PERFORMANCE, {
       metricName,
       value,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -245,7 +245,7 @@ class AnalyticsService {
       action: 'user_journey',
       journeyStep: step,
       stepData,
-      .additionalData
+      ...additionalData
     });
   }
 
@@ -257,7 +257,7 @@ class AnalyticsService {
       return;
     }
 
-    const eventsToFlush = [.this.eventQueue];
+    const eventsToFlush = [...this.eventQueue];
     this.eventQueue = [];
 
     try {
@@ -268,7 +268,7 @@ class AnalyticsService {
     } catch (error) {
       logger.error('Failed to flush events to server', error);
       // Re-add events to queue for retry
-      this.eventQueue.unshift(.eventsToFlush);
+      this.eventQueue.unshift(...eventsToFlush);
     }
   }
 
@@ -352,8 +352,8 @@ class AnalyticsService {
    * @returns {Object} Sanitized form data
    */
   sanitizeFormData(formData) {
-    const sanitized = { .formData };
-    
+    const sanitized = { ...formData };
+
     // Remove sensitive fields
     const sensitiveFields = ['password', 'ssn', 'creditCard', 'cvv', 'ssn'];
     sensitiveFields.forEach(field => {
@@ -403,14 +403,14 @@ class AnalyticsService {
   getTopPages(events) {
     const pageViews = events.filter(e => e.eventType === EVENT_TYPES.PAGE_VIEW);
     const pageCounts = {};
-    
+
     pageViews.forEach(event => {
       const page = event.data.page || 'unknown';
       pageCounts[page] = (pageCounts[page] || 0) + 1;
     });
 
     return Object.entries(pageCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([page, count]) => ({ page, count }));
   }
@@ -423,14 +423,14 @@ class AnalyticsService {
   getTopActions(events) {
     const userActions = events.filter(e => e.eventType === EVENT_TYPES.USER_ACTION);
     const actionCounts = {};
-    
+
     userActions.forEach(event => {
       const action = event.data.action || 'unknown';
       actionCounts[action] = (actionCounts[action] || 0) + 1;
     });
 
     return Object.entries(actionCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([action, count]) => ({ action, count }));
   }
@@ -443,7 +443,7 @@ class AnalyticsService {
   getConversionRate(events) {
     const pageViews = events.filter(e => e.eventType === EVENT_TYPES.PAGE_VIEW).length;
     const conversions = events.filter(e => e.eventType === EVENT_TYPES.CONVERSION).length;
-    
+
     return pageViews > 0 ? (conversions / pageViews) * 100 : 0;
   }
 

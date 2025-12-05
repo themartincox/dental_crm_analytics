@@ -3,7 +3,7 @@ import { format, addDays, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval }
 import { ChevronLeft, ChevronRight, Clock, Calendar, Zap } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 
-const TimeSlotSelection = ({ 
+const TimeSlotSelection = ({
   selectedDate,
   availableSlots = [],
   selectedService,
@@ -27,13 +27,13 @@ const TimeSlotSelection = ({
   const weekDays = getCurrentWeek();
 
   // Filter slots for selected date
-  const dailySlots = availableSlots?.filter(slot => 
+  const dailySlots = availableSlots?.filter(slot =>
     isSameDay(slot?.time, selectedDate)
   )?.sort((a, b) => a?.time?.getTime() - b?.time?.getTime());
 
   const handleSlotSelect = (slot) => {
     if (!slot?.available) return;
-    
+
     setSelectedSlot(slot);
     onTimeSelect?.({
       dateTime: slot?.time,
@@ -52,7 +52,7 @@ const TimeSlotSelection = ({
   };
 
   const getAvailableSlotsCount = (date) => {
-    return availableSlots?.filter(slot => 
+    return availableSlots?.filter(slot =>
       isSameDay(slot?.time, date) && slot?.available
     )?.length || 0;
   };
@@ -104,7 +104,7 @@ const TimeSlotSelection = ({
       }
       // This would normally come from props, but for demo purposes
       if (typeof availableSlots?.push === 'function') {
-        availableSlots?.push(.mockSlots);
+        availableSlots?.push(...mockSlots);
       }
     }
   }, [selectedService?.priceFrom]);
@@ -148,11 +148,11 @@ const TimeSlotSelection = ({
                 >
                   Previous
                 </Button>
-                
+
                 <div className="font-medium text-gray-700">
                   {format(weekDays?.[0], 'MMM dd')} - {format(weekDays?.[6], 'MMM dd')}
                 </div>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -174,14 +174,13 @@ const TimeSlotSelection = ({
                   return (
                     <div
                       key={day?.toISOString()}
-                      className={`aspect-square p-3 border-b border-r border-gray-200 cursor-pointer transition-all duration-200 ${
-                        isSelected
+                      className={`aspect-square p-3 border-b border-r border-gray-200 cursor-pointer transition-all duration-200 ${isSelected
                           ? 'bg-primary text-white'
                           : isPast || isWeekend
-                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : availableCount > 0
-                          ? 'hover:bg-gray-50 hover:shadow-sm' :'bg-gray-100 text-gray-400'
-                      }`}
+                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                            : availableCount > 0
+                              ? 'hover:bg-gray-50 hover:shadow-sm' : 'bg-gray-100 text-gray-400'
+                        }`}
                       onClick={() => {
                         if (!isPast && !isWeekend && availableCount > 0) {
                           onDateSelect?.(day);
@@ -232,18 +231,17 @@ const TimeSlotSelection = ({
                     {dailySlots?.slice(0, 8)?.map((slot, index) => {
                       const peakLabel = getPeakTimeLabel(slot?.time);
                       const isSelected = selectedSlot?.time?.getTime() === slot?.time?.getTime();
-                      
+
                       return (
                         <button
                           key={index}
                           onClick={() => handleSlotSelect(slot)}
                           disabled={!slot?.available}
-                          className={`w-full p-3 rounded-lg border text-left transition-all duration-200 ${
-                            isSelected
+                          className={`w-full p-3 rounded-lg border text-left transition-all duration-200 ${isSelected
                               ? 'border-primary bg-primary text-white'
                               : slot?.available
-                              ? 'border-gray-200 hover:border-primary hover:bg-primary/5' :'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                          }`}
+                                ? 'border-gray-200 hover:border-primary hover:bg-primary/5' : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -284,7 +282,7 @@ const TimeSlotSelection = ({
                 {(() => {
                   const servicePrice = selectedSlot?.price;
                   const pricingOptions = calculatePricingOptions(servicePrice);
-                  
+
                   return (
                     <div className="space-y-2">
                       <div className="text-sm text-blue-800">
@@ -365,11 +363,11 @@ const TimeSlotSelection = ({
               >
                 Previous Week
               </Button>
-              
+
               <div className="text-sm font-medium text-gray-700">
                 {format(weekDays?.[0], 'MMM dd')} - {format(weekDays?.[6], 'MMM dd, yyyy')}
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -391,14 +389,13 @@ const TimeSlotSelection = ({
                 return (
                   <div
                     key={day?.toISOString()}
-                    className={`p-4 border-b border-r border-gray-200 cursor-pointer transition-all duration-200 ${
-                      isSelected
+                    className={`p-4 border-b border-r border-gray-200 cursor-pointer transition-all duration-200 ${isSelected
                         ? 'bg-primary text-white'
                         : isPast || isWeekend
-                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                        : availableCount > 0
-                        ? 'hover:bg-gray-50' :'bg-gray-100 text-gray-400'
-                    }`}
+                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                          : availableCount > 0
+                            ? 'hover:bg-gray-50' : 'bg-gray-100 text-gray-400'
+                      }`}
                     onClick={() => {
                       if (!isPast && !isWeekend && availableCount > 0) {
                         onDateSelect?.(day);
@@ -465,23 +462,22 @@ const TimeSlotSelection = ({
                   <div className="text-sm text-gray-600 mb-3">
                     Available time slots:
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
                     {dailySlots?.map((slot, index) => {
                       const peakLabel = getPeakTimeLabel(slot?.time);
                       const isSelected = selectedSlot?.time?.getTime() === slot?.time?.getTime();
-                      
+
                       return (
                         <button
                           key={index}
                           onClick={() => handleSlotSelect(slot)}
                           disabled={!slot?.available}
-                          className={`p-3 rounded-lg border text-left transition-all duration-200 ${
-                            isSelected
+                          className={`p-3 rounded-lg border text-left transition-all duration-200 ${isSelected
                               ? 'border-primary bg-primary text-white'
                               : slot?.available
-                              ? 'border-gray-200 hover:border-primary hover:bg-primary/5' :'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                          }`}
+                                ? 'border-gray-200 hover:border-primary hover:bg-primary/5' : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                            }`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">

@@ -79,7 +79,7 @@ const PatientJourneyRevenueDashboard = () => {
   // Simulate real-time updates
   useEffect(() => {
     setIsLoading(false);
-    
+
     const interval = setInterval(() => {
       const updates = [
         'New booking confirmed: Sarah Mitchell - Implant consultation',
@@ -88,11 +88,11 @@ const PatientJourneyRevenueDashboard = () => {
         'Follow-up scheduled: Michael Brown - Crown check-up',
         'Review received: 5-star rating from Lisa Davis'
       ];
-      
+
       const randomUpdate = updates?.[Math.floor(Math.random() * updates?.length)];
       setRealTimeUpdates(prev => [
         { id: Date.now(), message: randomUpdate, timestamp: new Date() },
-        .prev?.slice(0, 4)
+        ...prev?.slice(0, 4)
       ]);
     }, 15000);
 
@@ -141,7 +141,7 @@ const PatientJourneyRevenueDashboard = () => {
                 Comprehensive lifecycle analytics for retention and revenue maximization
               </p>
             </div>
-            
+
             {/* Real-time Updates */}
             <div className="hidden lg:block">
               <div className="bg-card border border-border rounded-lg p-4 w-80">
@@ -196,7 +196,7 @@ const PatientJourneyRevenueDashboard = () => {
           <div className="xl:col-span-2">
             <PatientJourneyMap />
           </div>
-          
+
           {/* Treatment Trending Panel - Takes 1 column */}
           <div className="xl:col-span-1">
             <TreatmentTrendingPanel />
@@ -250,7 +250,7 @@ const PatientJourneyRevenueDashboard = () => {
               </div>
               <p className="text-2xl font-bold text-foreground">2,847</p>
             </div>
-            
+
             <div className="text-center">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Icon name="DollarSign" size={20} className="text-success" />
@@ -258,7 +258,7 @@ const PatientJourneyRevenueDashboard = () => {
               </div>
               <p className="text-2xl font-bold text-foreground">£486,200</p>
             </div>
-            
+
             <div className="text-center">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Icon name="TrendingUp" size={20} className="text-accent" />
@@ -266,7 +266,7 @@ const PatientJourneyRevenueDashboard = () => {
               </div>
               <p className="text-2xl font-bold text-foreground">+12.4%</p>
             </div>
-            
+
             <div className="text-center">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Icon name="Target" size={20} className="text-warning" />

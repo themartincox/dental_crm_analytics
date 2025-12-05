@@ -39,14 +39,14 @@ const ReminderSettings = ({ onSave, onClose }) => {
   ];
 
   const handleSettingChange = (field, value) => {
-    setSettings(prev => ({ .....prev, [field]: value }));
+    setSettings(prev => ({ ...prev, [field]: value }));
   };
 
   const handleTimingChange = (id, field, value) => {
     setSettings(prev => ({
       ...prev,
       reminderTiming: prev?.reminderTiming?.map(reminder =>
-        reminder?.id === id ? { .reminder, [field]: value } : reminder
+        reminder?.id === id ? { ...reminder, [field]: value } : reminder
       )
     }));
   };
@@ -61,7 +61,7 @@ const ReminderSettings = ({ onSave, onClose }) => {
     };
     setSettings(prev => ({
       ...prev,
-      reminderTiming: [.prev?.reminderTiming, newReminder]
+      reminderTiming: [...prev?.reminderTiming, newReminder]
     }));
   };
 

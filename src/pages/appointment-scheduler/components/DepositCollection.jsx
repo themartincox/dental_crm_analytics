@@ -48,12 +48,12 @@ const DepositCollection = ({ appointment, onProcess, onClose }) => {
         [parent]: { ...prev?.[parent], [child]: value }
       }));
     } else {
-      setPaymentData(prev => ({ .....prev, [field]: value }));
+      setPaymentData(prev => ({ ...prev, [field]: value }));
     }
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ .....prev, [field]: '' }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 

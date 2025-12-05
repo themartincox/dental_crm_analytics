@@ -38,7 +38,7 @@ const SiteSelector = ({
   const handleSiteToggle = (siteId) => {
     const newSelection = selectedSites?.includes(siteId)
       ? selectedSites?.filter(id => id !== siteId)
-      : [.selectedSites, siteId];
+      : [...selectedSites, siteId];
     onSiteSelection(newSelection);
   };
 

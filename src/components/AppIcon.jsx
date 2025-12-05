@@ -8,12 +8,12 @@ function Icon({
     color = "currentColor",
     className = "",
     strokeWidth = 2,
-    .props
+    ...props
 }) {
     const IconComponent = LucideIcons?.[name];
 
     if (!IconComponent) {
-        return <HelpCircle size={size} color="gray" strokeWidth={strokeWidth} className={className} {.props} />;
+        return <HelpCircle size={size} color="gray" strokeWidth={strokeWidth} className={className} {...props} />;
     }
 
     return <IconComponent
@@ -21,7 +21,7 @@ function Icon({
         color={color}
         strokeWidth={strokeWidth}
         className={className}
-        {.props}
+        {...props}
     />;
 }
 export default Icon;

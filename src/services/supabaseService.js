@@ -9,7 +9,7 @@ const handleError = (error, operation) => {
 // Helper function to check if user is authenticated
 const checkAuth = async () => {
   // CHANGED: Use getUser() instead of deprecated auth.user
-  if (!supabase.auth. {
+  if (!supabase.auth) {
     throw new Error('Supabase client not initialized');
   }
   const result = await supabase.auth.getUser();
@@ -75,7 +75,7 @@ export const userProfileService = {
         .from('user_profiles')
         .upsert({
           id: userId,
-          .updates,
+          ...updates,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id',
@@ -619,7 +619,7 @@ export const commonService = {
   // Log system activity
   async logActivity(activityData) {
     try {
-      const user = supabase.auth..user;
+      const { data: { user } } = await supabase.auth.getUser();
 
       const { error } = await supabase.from('system_activities').insert({
         activity_type: activityData?.activity_type,

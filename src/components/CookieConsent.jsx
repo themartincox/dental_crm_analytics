@@ -117,7 +117,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.analytics}
-                    onChange={(e) => setPreferences({.preferences, analytics: e?.target?.checked })}
+                    onChange={(e) => setPreferences({ ...preferences, analytics: e?.target?.checked })}
                     className="sr-only"
                   />
                   <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.analytics ? 'bg-blue-600' : 'bg-gray-300'
@@ -141,7 +141,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.marketing}
-                    onChange={(e) => setPreferences({.preferences, marketing: e?.target?.checked })}
+                    onChange={(e) => setPreferences({ ...preferences, marketing: e?.target?.checked })}
                     className="sr-only"
                   />
                   <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.marketing ? 'bg-blue-600' : 'bg-gray-300'
@@ -165,7 +165,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                   <input
                     type="checkbox"
                     checked={preferences?.functional}
-                    onChange={(e) => setPreferences({.preferences, functional: e?.target?.checked })}
+                    onChange={(e) => setPreferences({ ...preferences, functional: e?.target?.checked })}
                     className="sr-only"
                   />
                   <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.functional ? 'bg-blue-600' : 'bg-gray-300'
@@ -196,7 +196,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.emailMarketing}
-                      onChange={(e) => setPreferences({.preferences, emailMarketing: e?.target?.checked })}
+                      onChange={(e) => setPreferences({ ...preferences, emailMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
                     <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.emailMarketing ? 'bg-blue-600' : 'bg-gray-300'
@@ -219,7 +219,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.smsMarketing}
-                      onChange={(e) => setPreferences({.preferences, smsMarketing: e?.target?.checked })}
+                      onChange={(e) => setPreferences({ ...preferences, smsMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
                     <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.smsMarketing ? 'bg-blue-600' : 'bg-gray-300'
@@ -242,7 +242,7 @@ const CookiePreferencesModal = ({ isOpen, onClose, onSave }) => {
                     <input
                       type="checkbox"
                       checked={preferences?.postalMarketing}
-                      onChange={(e) => setPreferences({.preferences, postalMarketing: e?.target?.checked })}
+                      onChange={(e) => setPreferences({ ...preferences, postalMarketing: e?.target?.checked })}
                       className="sr-only"
                     />
                     <div className={`w-11 h-6 rounded-full shadow-inner transition-colors ${preferences?.postalMarketing ? 'bg-blue-600' : 'bg-gray-300'
@@ -402,7 +402,7 @@ const CookieConsent = () => {
   const handleSavePreferences = async (preferences) => {
     const consentTimestamp = new Date().toISOString();
     const preferencesWithTimestamp = {
-      .preferences,
+      ...preferences,
       timestamp: consentTimestamp,
       userIdentifier: isLoggedIn ? 'authenticated_user' : `anonymous_${Date.now()}`
     };

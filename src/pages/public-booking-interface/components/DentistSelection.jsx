@@ -101,7 +101,7 @@ const DentistSelection = ({
                   {/* Rating */}
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center">
-                      {[.Array(5)]?.map((_, i) => (
+                      {[...Array(5)]?.map((_, i) => (
                         <Star
                           key={i}
                           size={12}
@@ -232,7 +232,7 @@ const DentistSelection = ({
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-3">
                   <div className="flex items-center">
-                    {[.Array(5)]?.map((_, i) => (
+                    {[...Array(5)]?.map((_, i) => (
                       <Star
                         key={i}
                         size={14}

@@ -78,11 +78,11 @@ const BookingModal = ({
   ];
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ .....prev, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
     if (errors?.[field]) {
-      setErrors(prev => ({ .....prev, [field]: '' }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
 
     // Auto-calculate deposit based on treatment type
@@ -146,7 +146,7 @@ const BookingModal = ({
     const appointmentDateTime = new Date(`${formData?.date}T${formData?.time}`);
     
     const bookingData = {
-      .formData,
+      ...formData,
       date: appointmentDateTime,
       patientId: formData?.patientId || `P${Date.now()}`,
       status: 'pending',

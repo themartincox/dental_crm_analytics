@@ -79,7 +79,7 @@ const MatchingRulesBuilder = ({
   const handleCreateRule = (template = null) => {
     if (template) {
       setNewRule({
-        .template,
+        ...template,
         id: undefined // Remove template ID
       });
     } else {
@@ -115,7 +115,7 @@ const MatchingRulesBuilder = ({
   };
 
   const handleEditRule = (rule) => {
-    setNewRule({ .rule });
+    setNewRule({ ...rule });
     setEditingRule(rule);
     setShowCreateModal(true);
   };
@@ -124,7 +124,7 @@ const MatchingRulesBuilder = ({
     setNewRule(prev => ({
       ...prev,
       conditions: {
-        .prev?.conditions,
+...prev?.conditions,
         [conditionType]: value
       }
     }));
@@ -134,7 +134,7 @@ const MatchingRulesBuilder = ({
     setNewRule(prev => ({
       ...prev,
       actions: {
-        .prev?.actions,
+...prev?.actions,
         [actionType]: value
       }
     }));
@@ -144,7 +144,7 @@ const MatchingRulesBuilder = ({
     setNewRule(prev => {
       const newConditions = { ...prev?.conditions };
       delete newConditions?.[conditionType];
-      return { .....prev, conditions: newConditions };
+      return { ...prev, conditions: newConditions };
     });
   };
 
@@ -152,7 +152,7 @@ const MatchingRulesBuilder = ({
     setNewRule(prev => {
       const newActions = { ...prev?.actions };
       delete newActions?.[actionType];
-      return { .....prev, actions: newActions };
+      return { ...prev, actions: newActions };
     });
   };
 
@@ -345,7 +345,7 @@ const MatchingRulesBuilder = ({
                   <Input
                     label="Rule Name"
                     value={newRule?.name}
-                    onChange={(e) => setNewRule(prev => ({ .....prev, name: e?.target?.value }))}
+                    onChange={(e) => setNewRule(prev => ({ ...prev, name: e?.target?.value }))}
                     placeholder="Enter rule name"
                     required
                   />
@@ -357,7 +357,7 @@ const MatchingRulesBuilder = ({
                       min="0"
                       max="100"
                       value={newRule?.weight}
-                      onChange={(e) => setNewRule(prev => ({ .....prev, weight: parseInt(e?.target?.value) }))}
+                      onChange={(e) => setNewRule(prev => ({ ...prev, weight: parseInt(e?.target?.value) }))}
                       className="w-full"
                     />
                     <div className="text-sm text-gray-600 mt-1">
@@ -370,7 +370,7 @@ const MatchingRulesBuilder = ({
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea
                     value={newRule?.description}
-                    onChange={(e) => setNewRule(prev => ({ .....prev, description: e?.target?.value }))}
+                    onChange={(e) => setNewRule(prev => ({ ...prev, description: e?.target?.value }))}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                     placeholder="Describe when and how this rule should be applied"
@@ -401,10 +401,10 @@ const MatchingRulesBuilder = ({
                         <Select
                           value={conditionType}
                           onValueChange={(newType) => {
-                            const newConditions = { .newRule?.conditions };
+                            const newConditions = { ...newRule?.conditions };
                             delete newConditions?.[conditionType];
                             newConditions[newType] = value;
-                            setNewRule(prev => ({ .....prev, conditions: newConditions }));
+                            setNewRule(prev => ({ ...prev, conditions: newConditions }));
                           }}
                           options={conditionTypes?.map(ct => ({ value: ct?.value, label: ct?.label }))}
                           className="w-48"
@@ -459,10 +459,10 @@ const MatchingRulesBuilder = ({
                         <Select
                           value={actionType}
                           onValueChange={(newType) => {
-                            const newActions = { .newRule?.actions };
+                            const newActions = { ...newRule?.actions };
                             delete newActions?.[actionType];
                             newActions[newType] = value;
-                            setNewRule(prev => ({ .....prev, actions: newActions }));
+                            setNewRule(prev => ({ ...prev, actions: newActions }));
                           }}
                           options={actionTypes?.map(at => ({ value: at?.value, label: at?.label }))}
                           className="w-48"

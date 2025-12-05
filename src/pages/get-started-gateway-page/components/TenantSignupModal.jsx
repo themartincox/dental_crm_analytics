@@ -12,7 +12,7 @@ const TenantSignupModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ .....prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const submit = async (e) => {

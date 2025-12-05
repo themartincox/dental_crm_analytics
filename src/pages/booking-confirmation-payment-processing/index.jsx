@@ -438,23 +438,23 @@ const BookingConfirmationPaymentProcessing = () => {
                   <div className="space-y-3">
                     <Checkbox
                       checked={reminderPreferences?.email}
-                      onChange={(checked) => setReminderPreferences(prev => ({ .....prev, email: checked }))}
+                      onChange={(checked) => setReminderPreferences(prev => ({ ...prev, email: checked }))}
                       label="Email reminders"
                     />
                     <Checkbox
                       checked={reminderPreferences?.sms}
-                      onChange={(checked) => setReminderPreferences(prev => ({ .....prev, sms: checked }))}
+                      onChange={(checked) => setReminderPreferences(prev => ({ ...prev, sms: checked }))}
                       label="SMS reminders"
                     />
                     <Checkbox
                       checked={reminderPreferences?.call}
-                      onChange={(checked) => setReminderPreferences(prev => ({ .....prev, call: checked }))}
+                      onChange={(checked) => setReminderPreferences(prev => ({ ...prev, call: checked }))}
                       label="Phone call reminders"
                     />
                   </div>
                   <Select
                     value={reminderPreferences?.timeBeforeAppointment}
-                    onValueChange={(value) => setReminderPreferences(prev => ({ .....prev, timeBeforeAppointment: value }))}
+                    onValueChange={(value) => setReminderPreferences(prev => ({ ...prev, timeBeforeAppointment: value }))}
                     options={reminderTimes}
                     placeholder="When to remind"
                     label="Reminder timing"
@@ -471,17 +471,17 @@ const BookingConfirmationPaymentProcessing = () => {
                 <div className="space-y-3">
                   <Checkbox
                     checked={calendarIntegration?.google}
-                    onChange={(checked) => setCalendarIntegration(prev => ({ .....prev, google: checked }))}
+                    onChange={(checked) => setCalendarIntegration(prev => ({ ...prev, google: checked }))}
                     label="Add to Google Calendar"
                   />
                   <Checkbox
                     checked={calendarIntegration?.outlook}
-                    onChange={(checked) => setCalendarIntegration(prev => ({ .....prev, outlook: checked }))}
+                    onChange={(checked) => setCalendarIntegration(prev => ({ ...prev, outlook: checked }))}
                     label="Add to Outlook Calendar"
                   />
                   <Checkbox
                     checked={calendarIntegration?.apple}
-                    onChange={(checked) => setCalendarIntegration(prev => ({ .....prev, apple: checked }))}
+                    onChange={(checked) => setCalendarIntegration(prev => ({ ...prev, apple: checked }))}
                     label="Add to Apple Calendar"
                   />
                 </div>

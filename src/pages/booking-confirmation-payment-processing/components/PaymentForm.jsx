@@ -48,7 +48,7 @@ const PaymentForm = ({
   // Handle card input changes
   const handleCardInputChange = (field, value) => {
     let formattedValue = value;
-    
+
     if (field === 'number') {
       formattedValue = formatCardNumber(value);
     } else if (field === 'expiry') {
@@ -56,7 +56,7 @@ const PaymentForm = ({
     } else if (field === 'cvc') {
       formattedValue = value?.replace(/[^0-9]/gi, '')?.substring(0, 4);
     }
-    
+
     setCardDetails(prev => ({
       ...prev,
       [field]: formattedValue
@@ -68,7 +68,7 @@ const PaymentForm = ({
     const servicesCost = appointment?.estimated_cost || 0;
     const depositRequired = appointment?.deposit_required || 0;
     const convenienceFee = servicesCost * 0.02;
-    
+
     if (depositRequired > 0) {
       return depositRequired + convenienceFee;
     }
@@ -95,10 +95,9 @@ const PaymentForm = ({
           {paymentMethods?.map((method) => (
             <div
               key={method?.value}
-              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                paymentMethod === method?.value
-                  ? 'border-primary bg-primary/5' :'border-border hover:border-muted-foreground'
-              }`}
+              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === method?.value
+                  ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground'
+                }`}
               onClick={() => setPaymentMethod(method?.value)}
             >
               <input
@@ -129,7 +128,7 @@ const PaymentForm = ({
             onValueChange={setSelectedSavedPayment}
             options={[
               { value: '', label: 'Use new payment method' },
-              .savedPayments
+              ...savedPayments
             ]}
             placeholder="Select saved payment method"
             label="Saved payment methods"
@@ -148,7 +147,7 @@ const PaymentForm = ({
             required
             icon="CreditCard"
           />
-          
+
           <Input
             label="Cardholder Name"
             value={cardDetails?.name}
@@ -157,7 +156,7 @@ const PaymentForm = ({
             required
             icon="User"
           />
-          
+
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Expiry Date"

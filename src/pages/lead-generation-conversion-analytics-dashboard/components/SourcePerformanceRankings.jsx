@@ -43,7 +43,7 @@ const SourcePerformanceRankings = ({ sourceData, onSourceClick }) => {
     return { name: 'Minus', color: 'text-muted-foreground' };
   };
 
-  const sortedSources = [.sourceData]?.sort((a, b) => {
+  const sortedSources = [...sourceData]?.sort((a, b) => {
     switch (selectedMetric) {
       case 'conversion':
         return b?.conversionRate - a?.conversionRate;

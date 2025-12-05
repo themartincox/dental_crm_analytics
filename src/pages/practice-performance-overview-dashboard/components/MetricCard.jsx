@@ -9,11 +9,11 @@ const MetricCard = ({ title, value, change, trend, icon, color = 'primary', spar
   // Simple sparkline visualization
   const renderSparkline = () => {
     if (!sparklineData?.length) return null;
-    
-    const max = Math.max(.sparklineData);
-    const min = Math.min(.sparklineData);
+
+    const max = Math.max(...sparklineData);
+    const min = Math.min(...sparklineData);
     const range = max - min || 1;
-    
+
     const points = sparklineData?.map((value, index) => {
       const x = (index / (sparklineData?.length - 1)) * 60;
       const y = 20 - ((value - min) / range) * 15;
@@ -42,7 +42,7 @@ const MetricCard = ({ title, value, change, trend, icon, color = 'primary', spar
           {renderSparkline()}
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         <div className="flex items-end justify-between">

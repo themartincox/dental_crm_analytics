@@ -41,20 +41,20 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
     }
   };
 
-  const maxValue = Math.max(.geoData?.map(region => 
+  const maxValue = Math.max(...geoData?.map(region =>
     selectedView === 'leads' ? region?.totalLeads :
-    selectedView === 'conversion' ? region?.conversionRate :
-    selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead
+      selectedView === 'conversion' ? region?.conversionRate :
+        selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead
   ));
 
-  const sortedRegions = [.geoData]?.sort((a, b) => {
+  const sortedRegions = [...geoData]?.sort((a, b) => {
     const aValue = selectedView === 'leads' ? a?.totalLeads :
-                  selectedView === 'conversion' ? a?.conversionRate :
-                  selectedView === 'revenue' ? a?.totalRevenue : a?.costPerLead;
+      selectedView === 'conversion' ? a?.conversionRate :
+        selectedView === 'revenue' ? a?.totalRevenue : a?.costPerLead;
     const bValue = selectedView === 'leads' ? b?.totalLeads :
-                  selectedView === 'conversion' ? b?.conversionRate :
-                  selectedView === 'revenue' ? b?.totalRevenue : b?.costPerLead;
-    
+      selectedView === 'conversion' ? b?.conversionRate :
+        selectedView === 'revenue' ? b?.totalRevenue : b?.costPerLead;
+
     return selectedView === 'cost' ? aValue - bValue : bValue - aValue;
   });
 
@@ -96,9 +96,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
               <div className="grid grid-cols-2 gap-2 h-full">
                 {geoData?.filter(region => region?.area === 'Scotland')?.map(region => {
                   const value = selectedView === 'leads' ? region?.totalLeads :
-                               selectedView === 'conversion' ? region?.conversionRate :
-                               selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
-                  
+                    selectedView === 'conversion' ? region?.conversionRate :
+                      selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
+
                   return (
                     <div
                       key={region?.name}
@@ -111,9 +111,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                       <div className="text-xs font-medium">{region?.name}</div>
                       <div className="text-xs opacity-80">
                         {selectedView === 'leads' ? region?.totalLeads?.toLocaleString('en-GB') :
-                         selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
-                         selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
-                         formatCurrency(region?.costPerLead)}
+                          selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
+                            selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
+                              formatCurrency(region?.costPerLead)}
                       </div>
                     </div>
                   );
@@ -126,9 +126,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
               <div className="grid grid-cols-3 gap-2 h-full">
                 {geoData?.filter(region => region?.area === 'Northern England')?.map(region => {
                   const value = selectedView === 'leads' ? region?.totalLeads :
-                               selectedView === 'conversion' ? region?.conversionRate :
-                               selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
-                  
+                    selectedView === 'conversion' ? region?.conversionRate :
+                      selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
+
                   return (
                     <div
                       key={region?.name}
@@ -141,9 +141,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                       <div className="text-xs font-medium">{region?.name}</div>
                       <div className="text-xs opacity-80">
                         {selectedView === 'leads' ? region?.totalLeads?.toLocaleString('en-GB') :
-                         selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
-                         selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
-                         formatCurrency(region?.costPerLead)}
+                          selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
+                            selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
+                              formatCurrency(region?.costPerLead)}
                       </div>
                     </div>
                   );
@@ -156,9 +156,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
               <div className="grid grid-cols-4 gap-2 h-full">
                 {geoData?.filter(region => region?.area === 'Midlands' || region?.area === 'Wales')?.map(region => {
                   const value = selectedView === 'leads' ? region?.totalLeads :
-                               selectedView === 'conversion' ? region?.conversionRate :
-                               selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
-                  
+                    selectedView === 'conversion' ? region?.conversionRate :
+                      selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
+
                   return (
                     <div
                       key={region?.name}
@@ -171,9 +171,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                       <div className="text-xs font-medium">{region?.name}</div>
                       <div className="text-xs opacity-80">
                         {selectedView === 'leads' ? region?.totalLeads?.toLocaleString('en-GB') :
-                         selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
-                         selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
-                         formatCurrency(region?.costPerLead)}
+                          selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
+                            selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
+                              formatCurrency(region?.costPerLead)}
                       </div>
                     </div>
                   );
@@ -186,9 +186,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
               <div className="grid grid-cols-3 gap-2 h-full">
                 {geoData?.filter(region => region?.area === 'London' || region?.area === 'South England')?.map(region => {
                   const value = selectedView === 'leads' ? region?.totalLeads :
-                               selectedView === 'conversion' ? region?.conversionRate :
-                               selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
-                  
+                    selectedView === 'conversion' ? region?.conversionRate :
+                      selectedView === 'revenue' ? region?.totalRevenue : region?.costPerLead;
+
                   return (
                     <div
                       key={region?.name}
@@ -201,9 +201,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                       <div className="text-xs font-medium">{region?.name}</div>
                       <div className="text-xs opacity-80">
                         {selectedView === 'leads' ? region?.totalLeads?.toLocaleString('en-GB') :
-                         selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
-                         selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
-                         formatCurrency(region?.costPerLead)}
+                          selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
+                            selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
+                              formatCurrency(region?.costPerLead)}
                       </div>
                     </div>
                   );
@@ -216,8 +216,8 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
           <div className="absolute bottom-4 right-4 bg-background border border-border rounded-lg p-3">
             <div className="text-xs font-medium text-foreground mb-2">
               {selectedView === 'leads' ? 'Lead Volume' :
-               selectedView === 'conversion' ? 'Conversion Rate' :
-               selectedView === 'revenue' ? 'Revenue' : 'Cost per Lead'}
+                selectedView === 'conversion' ? 'Conversion Rate' :
+                  selectedView === 'revenue' ? 'Revenue' : 'Cost per Lead'}
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-xs text-muted-foreground">Low</span>
@@ -260,9 +260,9 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                 <div className="text-right">
                   <p className="text-sm font-semibold text-foreground">
                     {selectedView === 'leads' ? region?.totalLeads?.toLocaleString('en-GB') :
-                     selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
-                     selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
-                     formatCurrency(region?.costPerLead)}
+                      selectedView === 'conversion' ? formatPercentage(region?.conversionRate) :
+                        selectedView === 'revenue' ? formatCurrency(region?.totalRevenue) :
+                          formatCurrency(region?.costPerLead)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {region?.totalLeads?.toLocaleString('en-GB')} leads
@@ -298,7 +298,7 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                     <p className="text-sm font-semibold text-foreground">{formatCurrency(selectedRegion?.costPerLead)}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <h6 className="text-xs font-medium text-foreground">Demographics</h6>
                   {selectedRegion?.demographics?.map((demo, index) => (
@@ -309,7 +309,7 @@ const GeographicHeatmap = ({ geoData, onRegionClick }) => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <div className="w-16 bg-muted rounded-full h-1.5">
-                          <div 
+                          <div
                             className="h-1.5 bg-primary rounded-full"
                             style={{ width: `${demo?.percentage}%` }}
                           />

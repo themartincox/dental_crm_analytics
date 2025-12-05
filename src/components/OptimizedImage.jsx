@@ -25,7 +25,7 @@ const OptimizedImage = ({
   placeholder = true,
   onLoad,
   onError,
-  .props
+  ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -65,7 +65,7 @@ const OptimizedImage = ({
       img.dataset.src = imageProps.src;
       img.dataset.srcset = imageProps.srcSet;
       img.src = ''; // Clear src to prevent immediate loading
-      
+
       // Set up intersection observer
       observerRef.current = lazyLoadImages(`img[data-src="${imageProps.src}"]`);
     }
@@ -90,7 +90,7 @@ const OptimizedImage = ({
     justifyContent: 'center',
     color: '#9ca3af',
     fontSize: '14px',
-    .style
+    ...style
   };
 
   // Error state
@@ -133,14 +133,14 @@ const OptimizedImage = ({
         srcSet={imageProps.srcSet}
         sizes={imageProps.sizes}
       />
-      
+
       {/* AVIF source (best compression) */}
       <source
         type="image/avif"
         srcSet={imageProps.srcSet}
         sizes={imageProps.sizes}
       />
-      
+
       {/* Fallback image */}
       <img
         ref={imgRef}
@@ -160,11 +160,11 @@ const OptimizedImage = ({
           objectFit: 'cover',
           transition: 'opacity 0.3s ease-in-out',
           opacity: isLoaded ? 1 : 0,
-          .style
+          ...style
         }}
         onLoad={handleLoad}
         onError={handleError}
-        {.props}
+        {...props}
       />
     </picture>
   );

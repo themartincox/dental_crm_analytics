@@ -72,7 +72,7 @@ const decryptSensitiveData = (encryptedData) => {
         // Simple client-side decryption for display purposes
         // In production, use proper encryption library
         if (!encryptedData) return null;
-        
+
         // Placeholder for decryption - implement with crypto-js
         return atob(encryptedData);
     } catch (error) {
@@ -99,7 +99,7 @@ class SecureApiService {
             }, {
                 headers: { 'X-Request-ID': `${Date.now()}-${++this.requestId}` }
             });
-            
+
             // Log security event
             await this.logSecurityEvent('access_validation', {
                 valid: validation?.valid,
@@ -139,7 +139,7 @@ class SecureApiService {
                 const method = (options?.method || 'GET').toUpperCase();
                 // Attach CSRF token for mutating calls when enabled
                 const csrfHeader = {};
-                if (['POST','PUT','PATCH','DELETE'].includes(method)) {
+                if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
                     const token = await ensureCsrfToken();
                     if (token) csrfHeader['X-CSRF-Token'] = token;
                 }
@@ -153,8 +153,8 @@ class SecureApiService {
                         'X-Request-ID': `${Date.now()}-${++this.requestId}`,
                         'X-Required-Role': requiredRole || '',
                         'X-Client-Validation': 'true',
-                        .(csrfHeader),
-                        .(options?.headers || {})
+                        ...csrfHeader,
+                        ...(options?.headers || {})
                     },
                     params: options?.params
                 });
@@ -171,7 +171,7 @@ class SecureApiService {
                     throw new Error(errorData?.message || `HTTP ${response?.status}`);
                 }
                 const data = response?.data;
-                
+
                 // Log successful authenticated request
                 await this.logSecurityEvent('authenticated_request', {
                     endpoint: url,
@@ -202,7 +202,7 @@ class SecureApiService {
             await apiClient.post('/security/log', {
                 event: eventType,
                 metadata: {
-                    .metadata,
+                    ...metadata,
                     userAgent: navigator?.userAgent,
                     timestamp: new Date().toISOString(),
                     url: window.location?.href,
@@ -230,12 +230,12 @@ class SecureApiService {
     // Enhanced service methods with role validation
     patients = {
         list: async (filters = {}) => {
-            return this.makeSecureRequest(`/patients?${new URLSearchParams(filters)}`, 
+            return this.makeSecureRequest(`/patients?${new URLSearchParams(filters)}`,
                 { method: 'GET' }, 'dentist'); // Requires dentist role
         },
 
         get: async (patientId) => {
-            return this.makeSecureRequest(`/patients/${patientId}`, 
+            return this.makeSecureRequest(`/patients/${patientId}`,
                 { method: 'GET' }, 'dentist');
         },
 
@@ -250,12 +250,12 @@ class SecureApiService {
     // Admin-only operations with strict role validation
     security = {
         getAuditLogs: async (filters = {}) => {
-            return this.makeSecureRequest(`/security/audit-logs?${new URLSearchParams(filters)}`, 
+            return this.makeSecureRequest(`/security/audit-logs?${new URLSearchParams(filters)}`,
                 { method: 'GET' }, 'super_admin'); // Super admin only
         },
 
         getUserSessions: async (userId) => {
-            return this.makeSecureRequest(`/security/user-sessions/${userId}`, 
+            return this.makeSecureRequest(`/security/user-sessions/${userId}`,
                 { method: 'GET' }, 'practice_admin'); // Admin only
         }
     };
@@ -310,13 +310,13 @@ class SecureApiService {
     // F13 - AI Usage Policy compliance service
     async validateDataForAI(data) {
         const healthDataIndicators = [
-            'patient', 'nhs', 'medical', 'treatment', 'diagnosis', 
+            'patient', 'nhs', 'medical', 'treatment', 'diagnosis',
             'health', 'clinical', 'medication', 'surgery', 'appointment',
             'dentist', 'dental', 'tooth', 'gum', 'pain', 'infection'
         ];
 
         const dataString = JSON.stringify(data)?.toLowerCase();
-        const containsHealthData = healthDataIndicators?.some(indicator => 
+        const containsHealthData = healthDataIndicators?.some(indicator =>
             dataString?.includes(indicator)
         );
 
@@ -324,8 +324,8 @@ class SecureApiService {
             containsHealthData,
             riskLevel: containsHealthData ? 'high' : 'low',
             approved: !containsHealthData,
-            reason: containsHealthData 
-                ? 'Contains potential health data - requires anonymization' 
+            reason: containsHealthData
+                ? 'Contains potential health data - requires anonymization'
                 : 'Safe for AI processing'
         };
     }
@@ -335,10 +335,10 @@ class SecureApiService {
         if (typeof data !== 'object') return data;
 
         const anonymized = { ...data };
-        
+
         // Remove direct identifiers
         const identifierFields = [
-            'id', 'patient_id', 'nhs_number', 'email', 'phone', 
+            'id', 'patient_id', 'nhs_number', 'email', 'phone',
             'name', 'first_name', 'last_name', 'address', 'postcode',
             'date_of_birth', 'created_by_id', 'dentist_id'
         ];
@@ -386,7 +386,7 @@ class SecureApiService {
         try {
             // Step 1: Validate data safety
             const validation = this.validateDataForAI(data);
-            
+
             if (!validation?.approved) {
                 console.warn('AI query blocked:', validation?.reason);
                 await this.logAIUsage(aiProvider, 'blocked', purpose, false);
@@ -394,7 +394,7 @@ class SecureApiService {
             }
 
             // Step 2: Anonymize if necessary
-            const processedData = validation?.riskLevel === 'high' 
+            const processedData = validation?.riskLevel === 'high'
                 ? this.anonymizeForAI(data)
                 : data;
 
@@ -457,7 +457,7 @@ class SecureApiService {
             // Clear relevant cookies based on type
             if (consentType === 'analytics' || consentType === 'all') {
                 // Clear analytics cookies
-                document.cookie?.split(";")?.forEach(function(c) { 
+                document.cookie?.split(";")?.forEach(function (c) {
                     if (c?.indexOf('_ga') === 0 || c?.indexOf('_gid') === 0) {
                         document.cookie = c?.replace(/^ +/, "")?.replace(/=.*/, "=;expires=" + new Date()?.toUTCString() + ";path=/");
                     }
@@ -503,7 +503,7 @@ class SecureApiService {
 
             // Decrypt sensitive data for display
             return data?.map(patient => ({
-                .patient,
+                ...patient,
                 email: patient?.email ? decryptSensitiveData(patient?.email) : null,
                 phone: patient?.phone ? decryptSensitiveData(patient?.phone) : null,
                 dateOfBirth: patient?.date_of_birth ? decryptSensitiveData(patient?.date_of_birth) : null,

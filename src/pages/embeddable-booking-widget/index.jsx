@@ -39,7 +39,7 @@ const EmbeddableBookingWidget = () => {
 
     switch (type) {
       case 'widget:updateConfig':
-        setWidgetConfig(prev => ({ .....prev, .data }));
+        setWidgetConfig(prev => ({ ...prev, ...data }));
         if (data?.theme) applyTheme(data?.theme);
         break;
       case 'widget:minimize':
@@ -392,12 +392,12 @@ const EmbeddableBookingWidget = () => {
   };
 
   const handleStepComplete = (stepData) => {
-    setBookingData(prev => ({ .....prev, .stepData }));
+    setBookingData(prev => ({ ...prev, ...stepData }));
     
     // Auto-select default dentist when service is selected
     if (stepData?.service && !bookingData?.dentist && practiceData?.dentists?.length > 0) {
       const defaultDentist = practiceData?.dentists?.[0];
-      setBookingData(prev => ({ .....prev, .stepData, dentist: defaultDentist }));
+      setBookingData(prev => ({ ...prev, ...stepData, dentist: defaultDentist }));
     }
     
     // Track analytics

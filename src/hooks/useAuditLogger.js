@@ -10,7 +10,7 @@ export const useAuditLogger = () => {
 
   const logPatientView = useCallback(async (patientId, metadata = {}) => {
     return await AuditService?.logPatientAccess(patientId, 'view', {
-      .metadata,
+      ...metadata,
       userId: user?.id,
       userRole: user?.role
     });
@@ -18,7 +18,7 @@ export const useAuditLogger = () => {
 
   const logPatientEdit = useCallback(async (patientId, changes = {}, metadata = {}) => {
     return await AuditService?.logPatientAccess(patientId, 'edit', {
-      .metadata,
+      ...metadata,
       changes,
       userId: user?.id,
       userRole: user?.role
@@ -27,7 +27,7 @@ export const useAuditLogger = () => {
 
   const logAppointmentAccess = useCallback(async (appointmentId, action, metadata = {}) => {
     return await AuditService?.logAppointmentAccess(appointmentId, action, {
-      .metadata,
+      ...metadata,
       userId: user?.id,
       userRole: user?.role
     });
@@ -35,7 +35,7 @@ export const useAuditLogger = () => {
 
   const logLeadInteraction = useCallback(async (leadId, action, metadata = {}) => {
     return await AuditService?.logLeadAccess(leadId, action, {
-      .metadata,
+      ...metadata,
       userId: user?.id,
       userRole: user?.role
     });
@@ -46,7 +46,7 @@ export const useAuditLogger = () => {
       type,
       description,
       metadata: {
-        .metadata,
+        ...metadata,
         userId: user?.id,
         userRole: user?.role
       }
@@ -60,7 +60,7 @@ export const useAuditLogger = () => {
       resourceId,
       riskLevel,
       metadata: {
-        .metadata,
+        ...metadata,
         userId: user?.id,
         userRole: user?.role
       }

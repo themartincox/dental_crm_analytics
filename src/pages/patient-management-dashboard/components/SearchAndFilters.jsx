@@ -15,7 +15,7 @@ import React from 'react';
         }) => {
           const handleFilterChange = (key, value) => {
             onFiltersChange?.({
-              .filters,
+              ...filters,
               [key]: value
             });
           };

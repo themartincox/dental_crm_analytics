@@ -112,7 +112,7 @@ export function lazyLoadImages(selector = 'img[data-src]', options = {}) {
     threshold: imageConfig.lazy.threshold
   };
 
-  const observerOptions = { .defaultOptions, .options };
+  const observerOptions = { ...defaultOptions, ...options };
 
   const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
@@ -186,7 +186,7 @@ export function getOptimizedImageProps(src, alt, options = {}) {
   });
 
   return {
-    .responsiveImage,
+    ...responsiveImage,
     width,
     height,
     style: {

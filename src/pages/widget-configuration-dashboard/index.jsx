@@ -79,7 +79,7 @@ const WidgetConfigurationDashboard = () => {
         }
       }
     ];
-    
+
     setWidgets(mockWidgets);
   };
 
@@ -115,7 +115,7 @@ const WidgetConfigurationDashboard = () => {
         avgSessionTime: '0:00'
       }
     };
-    
+
     setSelectedWidget(newWidget);
     setIsCreating(true);
     setActiveTab('builder');
@@ -124,11 +124,11 @@ const WidgetConfigurationDashboard = () => {
   const saveWidget = async (widgetData) => {
     try {
       if (isCreating) {
-        setWidgets(prev => [...prev, { .widgetData, createdAt: new Date() }]);
+        setWidgets(prev => [...prev, { ...widgetData, createdAt: new Date() }]);
       } else {
-        setWidgets(prev => prev?.map(w => 
-          w?.id === widgetData?.id 
-            ? { .widgetData, lastModified: new Date() }
+        setWidgets(prev => prev?.map(w =>
+          w?.id === widgetData?.id
+            ? { ...widgetData, lastModified: new Date() }
             : w
         ));
       }
@@ -157,7 +157,7 @@ const WidgetConfigurationDashboard = () => {
   const generateEmbedCode = (widget) => {
     const baseUrl = window.location?.origin;
     const widgetUrl = `${baseUrl}/embeddable-booking-widget`;
-    
+
     const config = {
       practiceId: widget?.practiceId,
       theme: widget?.theme,
@@ -169,11 +169,11 @@ const WidgetConfigurationDashboard = () => {
     };
 
     const queryString = Object.entries(config)?.filter(([_, value]) => value !== undefined && value !== null)?.map(([key, value]) => {
-        if (typeof value === 'object') {
-          return `${key}=${encodeURIComponent(JSON.stringify(value))}`;
-        }
-        return `${key}=${encodeURIComponent(value)}`;
-      })?.join('&');
+      if (typeof value === 'object') {
+        return `${key}=${encodeURIComponent(JSON.stringify(value))}`;
+      }
+      return `${key}=${encodeURIComponent(value)}`;
+    })?.join('&');
 
     return `<!-- DentalCRM Booking Widget -->
 <div id="dental-booking-widget-${widget?.id}"></div>
@@ -232,7 +232,7 @@ const WidgetConfigurationDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -246,7 +246,7 @@ const WidgetConfigurationDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -260,7 +260,7 @@ const WidgetConfigurationDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -312,18 +312,17 @@ const WidgetConfigurationDashboard = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      widget?.status === 'active' ?'bg-green-100 text-green-800'
-                        : widget?.status === 'testing' ?'bg-yellow-100 text-yellow-800' :'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${widget?.status === 'active' ? 'bg-green-100 text-green-800'
+                        : widget?.status === 'testing' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {widget?.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {widget?.deploymentUrl ? (
-                      <a 
-                        href={widget?.deploymentUrl} 
-                        target="_blank" 
+                      <a
+                        href={widget?.deploymentUrl}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                       >
@@ -403,14 +402,14 @@ const WidgetConfigurationDashboard = () => {
               }}
             />
           )}
-          
+
           {activeTab === 'theme' && (
             <ThemeCustomizer
               widget={selectedWidget}
               onUpdate={(updatedWidget) => setSelectedWidget(updatedWidget)}
             />
           )}
-          
+
           {activeTab === 'analytics' && (
             <DeploymentAnalytics widget={selectedWidget} />
           )}
@@ -432,7 +431,7 @@ const WidgetConfigurationDashboard = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
-    .(selectedWidget ? [
+    ...(selectedWidget ? [
       { id: 'builder', label: 'Builder', icon: Settings },
       { id: 'theme', label: 'Theme', icon: Edit3 },
       { id: 'analytics', label: 'Analytics', icon: BarChart3 }
@@ -449,10 +448,9 @@ const WidgetConfigurationDashboard = () => {
               <button
                 key={tab?.id}
                 onClick={() => setActiveTab(tab?.id)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === tab?.id
-                    ? 'border-blue-500 text-blue-600' :'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === tab?.id
+                    ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 <tab.icon size={16} />
                 {tab?.label}
@@ -466,7 +464,7 @@ const WidgetConfigurationDashboard = () => {
 
         {/* Integration Guide Modal */}
         {showIntegrationGuide && (
-          <IntegrationGuide 
+          <IntegrationGuide
             onClose={() => setShowIntegrationGuide(false)}
             widgets={widgets}
           />

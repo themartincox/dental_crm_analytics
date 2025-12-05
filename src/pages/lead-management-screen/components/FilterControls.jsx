@@ -5,7 +5,7 @@ import React from 'react';
         const FilterControls = ({ filters, onFiltersChange }) => {
           const handleFilterChange = (key, value) => {
             onFiltersChange?.({
-              .filters,
+              ...filters,
               [key]: value
             });
           };

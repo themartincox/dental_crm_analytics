@@ -30,13 +30,17 @@ const PatientManagementDashboard = () => {
 
   // Fetch patients with filters
   const patientFilters = {
-    .filters,
+    ...filters,
     search: searchQuery,
     sortBy: sortConfig?.key,
     sortDirection: sortConfig?.direction
   };
 
-  const { data: patients, loading: patientsLoading, refetch: refetchPatients, error } = usePatients(patientFilters);
+  const { data: patients, loading: patientsLoading, mutate: refetchPatients, error } = useApi({
+    endpoint: `/patients`,
+    method: 'GET',
+    params: { ...patientFilters }
+  });
   const { data: patientStats, loading: statsLoading } = usePatientStats();
 
   const isLoading = authLoading || patientsLoading || statsLoading;
@@ -48,15 +52,15 @@ const PatientManagementDashboard = () => {
       patient?.email?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
       patient?.phone?.includes(searchQuery)
     ) : true;
-    
+
     return matchesSearch;
   }) || [];
 
   // Sort patients (if additional sorting is needed)
-  const sortedPatients = [.filteredPatients]?.sort((a, b) => {
+  const sortedPatients = [...filteredPatients]?.sort((a, b) => {
     const aVal = a?.[sortConfig?.key];
     const bVal = b?.[sortConfig?.key];
-    
+
     if (sortConfig?.direction === 'asc') {
       return aVal > bVal ? 1 : -1;
     }
@@ -77,8 +81,8 @@ const PatientManagementDashboard = () => {
   };
 
   const handleSelectPatient = (patientId) => {
-    setSelectedPatients(prev => 
-      prev?.includes(patientId) 
+    setSelectedPatients(prev =>
+      prev?.includes(patientId)
         ? prev?.filter(id => id !== patientId)
         : [...prev, patientId]
     );
@@ -201,7 +205,7 @@ const PatientManagementDashboard = () => {
           {/* Main Content Area - 3 columns */}
           <div className="xl:col-span-3 space-y-6">
             {/* Search and Filters */}
-            <SearchAndFilters 
+            <SearchAndFilters
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               filters={filters}
@@ -213,7 +217,7 @@ const PatientManagementDashboard = () => {
 
             {/* Bulk Actions */}
             {selectedPatients?.length > 0 && (
-              <BulkActions 
+              <BulkActions
                 selectedCount={selectedPatients?.length}
                 onClearSelection={() => setSelectedPatients([])}
               />
@@ -251,7 +255,7 @@ const PatientManagementDashboard = () => {
               {/* Table Header */}
               <div className="grid grid-cols-12 gap-4 p-4 bg-muted/50 text-sm font-medium text-muted-foreground border-b border-border">
                 <div className="col-span-1"></div>
-                <div 
+                <div
                   className="col-span-3 cursor-pointer flex items-center space-x-1"
                   onClick={() => handleSort('name')}
                 >
@@ -259,7 +263,7 @@ const PatientManagementDashboard = () => {
                   <Icon name="ArrowUpDown" size={12} />
                 </div>
                 <div className="col-span-2">Contact Info</div>
-                <div 
+                <div
                   className="col-span-2 cursor-pointer flex items-center space-x-1"
                   onClick={() => handleSort('lastVisit')}
                 >
@@ -267,7 +271,7 @@ const PatientManagementDashboard = () => {
                   <Icon name="ArrowUpDown" size={12} />
                 </div>
                 <div className="col-span-2">Treatment Status</div>
-                <div 
+                <div
                   className="col-span-1 cursor-pointer flex items-center space-x-1"
                   onClick={() => handleSort('outstandingBalance')}
                 >
@@ -333,7 +337,7 @@ const PatientManagementDashboard = () => {
           {/* Right Sidebar - 1 column */}
           <div className="xl:col-span-1 space-y-6">
             <PatientStats patients={filteredPatients} stats={patientStats} />
-            
+
             {/* Recent Activity */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="font-semibold text-foreground mb-4">Recent Activity</h3>
