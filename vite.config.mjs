@@ -7,6 +7,12 @@ import tagger from "@dhiwise/component-tagger";
 export default defineConfig({
   // This changes the out put dir from dist to build
   // comment this out if that isn't relevant for your project
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'process.env.VITE_APP_VERSION': JSON.stringify(process.env.VITE_APP_VERSION || '0.1.0'),
+    'process.env.PUBLIC_URL': JSON.stringify(''),
+    'process.env': {} // Fallback
+  },
   build: {
     outDir: "build",
     chunkSizeWarningLimit: 1000, // Reduced from 2000 for better performance

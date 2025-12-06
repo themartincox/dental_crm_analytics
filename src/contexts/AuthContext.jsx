@@ -44,10 +44,9 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  // ✅ REQUIRED: Protected auth handlers
-  const authStateHandlers = {
-    // CRITICAL: This MUST remain synchronous
-    onChange: (event, session) => {
+  useEffect(() => {
+    // Handler for auth state changes
+    const handleAuthChange = (event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
 
@@ -57,21 +56,19 @@ export const AuthProvider = ({ children }) => {
         profileOperations.clear()
       }
     }
-  }
 
-  useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      authStateHandlers.onChange(null, session)
+      handleAuthChange(null, session)
     })
 
     // PROTECTED: Never modify this callback signature
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      authStateHandlers.onChange
+      handleAuthChange
     )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, []) // Empty deps is now safe since handler is defined inside
 
   const signUp = async (email, password, metadata = {}) => {
     try {
